@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMT — BattleMech Tournament Rulebook</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0d0f12;
+    --bg2:      #141720;
+    --bg3:      #1b1f2a;
+    --bg4:      #222738;
+    --border:   #2a3045;
+    --border2:  #3a4460;
+    --text:     #c8d0e0;
+    --text2:    #7a8aaa;
+    --text3:    #4a5570;
+    --accent:   #e8b84b;
+    --accent2:  #c4912a;
+    --red:      #d94f4f;
+    --green:    #4caf7a;
+    --blue:     #4a8fd4;
+    --purple:   #8a6fd4;
+    --teal:     #3ab8a0;
+    --orange:   #d47a3a;
+    --mono:     'Share Tech Mono', monospace;
+    --sans:     'Barlow', sans-serif;
+    --cond:     'Barlow Condensed', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    height: 44px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--cond);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .logo span { color: var(--text2); font-weight: 400; font-size: 12px; letter-spacing: 0.04em; margin-left: 8px; }
+
+  /* NAV TABS - full width row */
+  .nav-row {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3px 24px;
+  }
+  nav {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+  }
+
+  .nav-tab {
+    font-family: var(--cond);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    transition: color 0.15s, background 0.15s;
+  }
+  .nav-tab:hover { color: var(--text2); background: var(--bg3); }
+  .nav-tab.on { color: var(--accent); background: var(--bg3); }
+
+  /* MAIN */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+  }
+
+  .page { display: none; }
+  .page.on { display: block; }
+
+  /* SECTION HEADINGS */
+  .page-title {
+    font-family: var(--cond);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  .sec-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 24px 0 10px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+  }
+  .card.accent-l { border-left: 3px solid var(--accent); }
+  .card.green-l  { border-left: 3px solid var(--green); }
+  .card.red-l    { border-left: 3px solid var(--red); }
+  .card.blue-l   { border-left: 3px solid var(--blue); }
+  .card.purple-l { border-left: 3px solid var(--purple); }
+  .card.teal-l   { border-left: 3px solid var(--teal); }
+  .card.orange-l { border-left: 3px solid var(--orange); }
+
+  .card-title {
+    font-family: var(--cond);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+  }
+  .card-sub { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+  .card-body { font-size: 13px; color: var(--text2); line-height: 1.65; }
+  .card-body strong { color: var(--text); font-weight: 500; }
+
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+  @media (max-width: 700px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+
+  /* TABLES */
+  .tbl-wrap { overflow-x: auto; margin-bottom: 16px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+  }
+  td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text2);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg3); }
+  td strong { color: var(--text); font-weight: 500; }
+
+  /* PILLS */
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-right: 4px;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+  }
+  .pill-g  { background: #1a2e20; color: var(--green); border: 1px solid #2a4a30; }
+  .pill-r  { background: #2e1a1a; color: var(--red); border: 1px solid #4a2a2a; }
+  .pill-b  { background: #1a2238; color: var(--blue); border: 1px solid #2a3858; }
+  .pill-p  { background: #221a38; color: var(--purple); border: 1px solid #382a58; }
+  .pill-a  { background: #2e2010; color: var(--orange); border: 1px solid #4a3420; }
+  .pill-t  { background: #1a2e28; color: var(--teal); border: 1px solid #2a4a3a; }
+  .pill-y  { background: #2e2810; color: var(--accent); border: 1px solid #4a4020; }
+
+  /* IP ROW */
+  .ip-row {
+    display: grid;
+    grid-template-columns: 2fr 0.5fr 1.8fr;
+    gap: 10px;
+    align-items: start;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    margin-bottom: 5px;
+    font-size: 12px;
+  }
+  .ip-row.pos { border-left: 3px solid var(--green); }
+  .ip-row.neg { border-left: 3px solid var(--red); }
+  .ip-row.spe { border-left: 3px solid var(--purple); }
+  .ip-row.warn { border-left: 3px solid var(--orange); }
+  .ip-name { font-weight: 500; color: var(--text); }
+  .ip-note { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .ip-val { font-family: var(--mono); font-size: 14px; font-weight: 600; text-align: center; padding-top: 2px; }
+  .ip-pos-c { color: var(--green); }
+  .ip-neg-c { color: var(--red); }
+  .ip-spe-c { color: var(--purple); }
+  .ip-cond  { font-size: 11px; color: var(--text3); }
+
+  /* TURN TRACK */
+  .turn-track {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+  .turn-step {
+    flex: 1;
+    padding: 10px 6px;
+    text-align: center;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-right: none;
+    font-family: var(--cond);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .turn-step:first-child { border-radius: 4px 0 0 4px; }
+  .turn-step:last-child  { border-radius: 0 4px 4px 0; border-right: 1px solid var(--border); }
+  .turn-step .snum { display: block; font-size: 10px; color: var(--text3); font-weight: 400; margin-bottom: 3px; font-family: var(--mono); }
+  .turn-step.hi { color: var(--accent); border-color: var(--accent2); background: #1e1a08; }
+
+  /* FACTION CARDS */
+  .faction-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .faction-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .faction-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .faction-name { font-family: var(--cond); font-size: 16px; font-weight: 600; color: var(--text); }
+  .faction-motto { font-size: 11px; color: var(--text3); font-style: italic; margin-left: auto; text-align: right; max-width: 180px; }
+  .faction-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .fi {
+    font-size: 11px;
+    padding: 6px 9px;
+    border-radius: 4px;
+    line-height: 1.5;
+  }
+  .fi strong { font-weight: 600; display: block; margin-bottom: 2px; font-size: 11px; }
+  .fi-g { background: #1a2e20; color: #8acca8; }
+  .fi-r { background: #2e1a1a; color: #cc8888; }
+  .fi-b { background: #1a2238; color: #88aacc; }
+  .fi-p { background: #221a38; color: #aa88cc; }
+  .fi-n { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+
+  /* AMMO TRACK */
+  .ammo-track { display: flex; align-items: center; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
+  .ammo-box {
+    width: 30px; height: 30px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text3);
+    background: var(--bg3);
+  }
+  .ammo-box.full { background: #1a2e20; border-color: var(--green); color: var(--green); }
+  .ammo-label { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+  /* CHAIN / COORD */
+  .chain-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+  .chain-node { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: var(--mono); letter-spacing: 0.03em; }
+  .cn-g  { background: #1a2e20; color: var(--green); }
+  .cn-r  { background: #2e1a1a; color: var(--red); }
+  .cn-b  { background: #1a2238; color: var(--blue); }
+  .cn-p  { background: #221a38; color: var(--purple); }
+  .cn-a  { background: #2e2010; color: var(--orange); }
+  .chain-arr { color: var(--text3); font-size: 14px; }
+
+  /* NOTE / CALLOUT */
+  .callout {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 14px;
+    line-height: 1.65;
+  }
+  .callout strong { color: var(--accent); font-weight: 600; }
+
+  .callout.info  { border-left-color: var(--blue);   }
+  .callout.warn  { border-left-color: var(--orange);  }
+  .callout.good  { border-left-color: var(--green);   }
+  .callout.danger{ border-left-color: var(--red);     }
+
+  /* TIER CARDS */
+  .tier-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .tier-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .tier-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .tier-name { font-family: var(--cond); font-size: 15px; font-weight: 600; color: var(--text); }
+  .tier-ip   { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-left: auto; }
+  .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ti {
+    font-size: 11px; padding: 6px 9px;
+    border-radius: 4px; background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2); line-height: 1.5;
+  }
+  .ti strong { font-weight: 600; display: block; color: var(--text); margin-bottom: 2px; font-size: 11px; }
+
+  /* SCENARIO BOXES */
+  .scenario { padding: 10px 12px; border-radius: 4px; background: var(--bg2); border: 1px solid var(--border); font-size: 12px; margin-bottom: 8px; }
+  .scenario.yes { border-left: 3px solid var(--green); }
+  .scenario.no  { border-left: 3px solid var(--border2); }
+  .scenario strong { font-weight: 600; display: block; margin-bottom: 5px; color: var(--text); font-size: 12px; }
+  .result-yes { font-family: var(--mono); font-size: 11px; color: var(--green); margin-top: 5px; }
+  .result-no  { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 5px; }
+
+  /* STATUS TABLE */
+  .status-ok   { color: var(--green); font-weight: 600; font-family: var(--mono); font-size: 11px; }
+  .status-warn { color: var(--orange); font-weight: 600; font-family: var(--mono); font-size: 11px; }
+  .status-bad  { color: var(--red); font-weight: 600; font-family: var(--mono); font-size: 11px; }
+  .status-spe  { color: var(--purple); font-weight: 600; font-family: var(--mono); font-size: 11px; }
+
+  /* EARN PILLS ROW */
+  .earn-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .earn-pill {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+  }
+
+  /* PV RANGE */
+  .pv-range { font-family: var(--mono); font-size: 12px; }
+  .pv-lo { color: var(--text3); }
+  .pv-hi { color: var(--accent); font-weight: 600; }
+
+  /* WEAPON CLASS BADGES */
+  .wc-e { font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 3px; background: #1a2e20; color: var(--green); border: 1px solid #2a4a30; font-weight: 600; letter-spacing: 0.06em; }
+  .wc-m { font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 3px; background: #2e2010; color: var(--orange); border: 1px solid #4a3420; font-weight: 600; letter-spacing: 0.06em; }
+  .wc-a { font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 3px; background: #2e1a1a; color: var(--red); border: 1px solid #4a2a2a; font-weight: 600; letter-spacing: 0.06em; }
+
+  /* PV items */
+  .pv-primary { background: #221a38; border: 1px solid #382a58; color: #aa88cc; }
+  .pv-alt     { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); }
+  .pv-deny    { background: #2e1a1a; border: 1px solid #4a2a2a; color: #cc8888; }
+  .pv-bonus   { background: #1a2e20; border: 1px solid #2a4a30; color: #8acca8; }
+  .pv-item    { font-size: 11px; padding: 8px 10px; border-radius: 4px; line-height: 1.55; }
+  .pv-item strong { font-weight: 600; display: block; margin-bottom: 3px; font-size: 11px; }
+
+  /* divider */
+  hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  /* hex badge */
+  .hx { display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 3px; font-family: var(--mono); white-space: nowrap; }
+  .hx-arty   { background: #2e1a1a; color: var(--red); }
+  .hx-spot   { background: #1a2e20; color: var(--green); }
+  .hx-supply { background: #1a2238; color: var(--blue); }
+  .hx-neutral{ background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">BMT<span>BattleMech Tournament — Complete Rulebook v1.0</span></div>
+  </div>
+  <div class="nav-row">
+    <nav id="nav"></nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 1: OVERVIEW -->
+<div class="page on" id="page-overview">
+  <div class="page-title">Game Overview</div>
+  <div class="page-sub">Large-scale BattleTech planetary combat — fast, combined arms, faction-driven.</div>
+
+  <div class="callout">
+    <strong>Design Goals:</strong> BMT simulates large-scale BattleTech battles at planetary scale. Battles are fast-paced, feel authentically BattleTech, take place across hexagon world maps, and include full combined arms: infantry, battle armor, tanks, artillery, 'Mechs, and air support.
+  </div>
+
+  <div class="sec-label">Core Concepts</div>
+  <div class="grid-2">
+    <div class="card accent-l">
+      <div class="card-title">The Lance is the Atom</div>
+      <div class="card-body">Individual units matter less than lances. A lance moves, fights, and takes damage as a single unit. A lance is either <strong>Functional</strong>, <strong>Crippled</strong> (below 50% strength), or <strong>Destroyed</strong>. All IP events are measured at lance level.</div>
+    </div>
+    <div class="card accent-l">
+      <div class="card-title">Dual Resource System</div>
+      <div class="card-body"><strong>PV (Budget)</strong> — what you can afford to field, measured in Alpha Strike Point Value.<br><strong>IP (Influence Points)</strong> — Political Clout, gates what formations you can requisition and unlocks special actions.</div>
+    </div>
+    <div class="card accent-l">
+      <div class="card-title">Minimum Battle Scale</div>
+      <div class="card-body">The minimum engagement is <strong>Company vs Company</strong> (12 'Mechs per side). Each hexagon on the world map represents a single BattleTech map sheet. Lances are placed on hexes and move as single units.</div>
+    </div>
+    <div class="card accent-l">
+      <div class="card-title">Alpha Strike Cards</div>
+      <div class="card-body">Every lance or star is built using Alpha Strike Cards. Each card flags the lance's <strong>weapon classification</strong> (E / M / A), PV total, movement, and damage ratings used to calculate Damage Dice.</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Damage Dice System</div>
+  <div class="card blue-l">
+    <div class="card-title">Every 2 Damage = 1 Damage Die</div>
+    <div class="card-body">
+      Each Damage Die = one pair of D6 for attack purposes.<br><br>
+      <strong>Example:</strong> Lance A has an overall attack rating of 6, giving it 2 Damage Dice.<br>
+      Lance A rolls 2 pairs of D6. Both attacks succeed — result: 4 damage from one pair, 2 from the other.<br>
+      If one attack fails, the maximum damage is allotted to the successful attack (in this case, 4 damage).
+    </div>
+  </div>
+
+  <div class="sec-label">Turn Structure</div>
+  <div class="turn-track">
+    <div class="turn-step hi"><span class="snum">01</span>Declare Orders</div>
+    <div class="turn-step hi"><span class="snum">02</span>Assign Actions</div>
+    <div class="turn-step hi"><span class="snum">03</span>Simultaneous Resolve</div>
+    <div class="turn-step hi"><span class="snum">04</span>Hex Control Check</div>
+    <div class="turn-step hi"><span class="snum">05</span>IP Tally</div>
+    <div class="turn-step hi"><span class="snum">06</span>Requisition Window</div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Phase 1 Declaration is critical for IP.</strong> Each player declares 1 Primary Objective and up to 2 Secondary Objectives before orders are written. Declarations are locked. Undeclared victories earn half IP. Declared objectives that fail cost IP.
+  </div>
+
+  <div class="sec-label">Lance Actions (Choose One Per Lance Per Turn)</div>
+  <div class="grid-2">
+    <div class="card green-l"><div class="card-title">Attack</div><div class="card-body">Full offensive. Damage dice applied vs target lance in same or adjacent hex.</div></div>
+    <div class="card blue-l"><div class="card-title">Move</div><div class="card-body">Reposition on world map. No attacks this turn. Can capture uncontested hex objectives.</div></div>
+    <div class="card orange-l"><div class="card-title">Retreat</div><div class="card-body">Move at half speed. Half the lance can shoot and take damage. Must be declared in Phase 1 or costs −2 IP.</div></div>
+    <div class="card blue-l"><div class="card-title">Scan Objective</div><div class="card-body">Gather intel on a hex. Reveals hidden GM bonus objectives worth +3 IP on capture.</div></div>
+    <div class="card purple-l" style="grid-column:span 2"><div class="card-title">Target Tag <span style="font-weight:400;font-size:12px;color:var(--text3)">— Recon Lances only</span></div><div class="card-body">Designates enemy lance for bonus damage next turn. Artillery and air support can strike tagged targets without line of sight. Tagging lance earns +1 bonus IP if the tagged lance is destroyed.</div></div>
+  </div>
+
+  <div class="sec-label">Campaign Objectives — Attacker vs Defender</div>
+  <div class="grid-2">
+    <div class="card red-l">
+      <div class="card-title">Attacker Objectives</div>
+      <div class="card-body">
+        1. Capture major location(s) on the world map<br>
+        2. Capture majority of minor location(s)<br>
+        3. Capture key site or technology<br>
+        4. Achieve a political victory (faction-specific)<br>
+        5. Destroy a key percentage of opponent units
+      </div>
+    </div>
+    <div class="card green-l">
+      <div class="card-title">Defender Objectives</div>
+      <div class="card-body">
+        1. Hold major location(s) on the world map<br>
+        2. Hold majority of minor location(s)<br>
+        3. Prevent loss of key site or technology<br>
+        4. Achieve a political victory (faction-specific)<br>
+        5. Destroy a key percentage of opponent units
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 2: FORMATIONS -->
+<div class="page" id="page-formations">
+  <div class="page-title">Formations & PV Ranges</div>
+  <div class="page-sub">All formations with estimated PV ranges based on mixed lance configurations. PV Low = all Light. PV Typical = mixed. PV High = all Assault.</div>
+
+  <div class="callout info">
+    <strong>PV Assumptions:</strong> Light avg 12 · Medium avg 25 · Heavy avg 38 · Assault avg 70 · Combat Vehicle avg 18 · Aerospace avg 35 · Battle Armor squad avg 12
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Formation</th><th>Combat Units</th><th>IP Tier</th><th>IP Cost</th><th>PV Low</th><th>PV Typical</th><th>PV High</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Lance</strong></td><td>4 'Mechs</td><td><span class="pill pill-b">T1</span></td><td>0 IP</td><td class="pv-lo">48</td><td>120</td><td class="pv-hi">280</td><td>Standard formation</td></tr>
+        <tr><td><strong>Augmented Lance (std)</strong></td><td>4M + 2 vehicles</td><td><span class="pill pill-b">T1</span></td><td>1 IP</td><td class="pv-lo">84</td><td>156</td><td class="pv-hi">376</td><td>CCAF doctrine</td></tr>
+        <tr><td><strong>Augmented Lance (sec)</strong></td><td>4M + 2 BA squads</td><td><span class="pill pill-b">T1</span></td><td>1 IP</td><td class="pv-lo">72</td><td>144</td><td class="pv-hi">304</td><td>CCAF secondary</td></tr>
+        <tr><td><strong>Demi-Company</strong></td><td>6 units</td><td><span class="pill pill-g">T2</span></td><td>2 IP</td><td class="pv-lo">72</td><td>180</td><td class="pv-hi">420</td><td>Mercenary staple</td></tr>
+        <tr><td><strong>Air Lance</strong></td><td>4M + ASF flight</td><td><span class="pill pill-g">T2</span></td><td>3 IP</td><td class="pv-lo">118</td><td>190</td><td class="pv-hi">420</td><td>Aerospace included</td></tr>
+        <tr><td><strong>Company</strong></td><td>12 'Mechs</td><td><span class="pill pill-g">T2</span></td><td>4 IP</td><td class="pv-lo">144</td><td>360</td><td class="pv-hi">840</td><td>With DropShip</td></tr>
+        <tr><td><strong>Augmented Company</strong></td><td>12 units (2 aug lances)</td><td><span class="pill pill-g">T2</span></td><td>4 IP</td><td class="pv-lo">144</td><td>340</td><td class="pv-hi">800</td><td>CCAF exclusive</td></tr>
+        <tr><td><strong>Company Task Force</strong></td><td>18–24 units</td><td><span class="pill pill-g">T2</span></td><td>5 IP</td><td class="pv-lo">216</td><td>540–720</td><td class="pv-hi">1,680</td><td>Combined arms</td></tr>
+        <tr><td><strong>Errant Force</strong></td><td>4 'Mechs (elite)</td><td><span class="pill pill-a">T3</span></td><td>6 IP</td><td class="pv-lo">48</td><td>120</td><td class="pv-hi">280</td><td>Must be earned</td></tr>
+        <tr><td><strong>Battalion</strong></td><td>~40 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>8 IP</td><td class="pv-lo">480</td><td>1,200</td><td class="pv-hi">2,800</td><td>Full support staff</td></tr>
+        <tr><td><strong>Augmented Battalion</strong></td><td>40M + 16 vehicles</td><td><span class="pill pill-a">T3</span></td><td>9 IP</td><td class="pv-lo">768</td><td>1,488</td><td class="pv-hi">3,088</td><td>CCAF standard</td></tr>
+        <tr><td><strong>Reinforced Battalion</strong></td><td>48 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>10 IP</td><td class="pv-lo">576</td><td>1,440</td><td class="pv-hi">3,360</td><td>4 companies</td></tr>
+        <tr><td><strong>SL Reinforced Battalion</strong></td><td>64 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>12 IP</td><td class="pv-lo">768</td><td>1,920</td><td class="pv-hi">4,480</td><td>ComStar/WoB only</td></tr>
+        <tr><td><strong>Regiment</strong></td><td>108–180 'Mechs</td><td><span class="pill pill-r">T4</span></td><td>15 IP</td><td class="pv-lo">1,296</td><td>3,240–5,400</td><td class="pv-hi">12,600</td><td>Regimental Battlegroup</td></tr>
+        <tr><td><strong>Reinforced Regiment</strong></td><td>~192 'Mechs</td><td><span class="pill pill-r">T4</span></td><td>18 IP</td><td class="pv-lo">2,304</td><td>5,760</td><td class="pv-hi">13,440</td><td>Est. — 4 battalions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>Errant Force Note:</strong> Cannot be requisitioned cold. Must be earned through documented unsupported engagements in the campaign log. Minimum 5 years Jihad veteran experience, 1 year as organized unit, 2 documented unsupported combat instances.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 3: IP SYSTEM -->
+<div class="page" id="page-ip">
+  <div class="page-title">IP — Influence Points (Political Clout)</div>
+  <div class="page-sub">IP gates what you can requisition. It is both a tier threshold and a spendable currency.</div>
+
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card accent-l">
+      <div class="card-title">PV — Budget</div>
+      <div class="card-body">What you can afford to field. Measured in Alpha Strike Point Value. Spent when equipping formations with specific units.</div>
+    </div>
+    <div class="card purple-l">
+      <div class="card-title">IP — Influence</div>
+      <div class="card-body">Political Clout. Gates what you can request. Earned through battlefield performance, objectives, and political actions. Spent on requisitions and special actions.</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Command Tiers</div>
+
+  <div class="tier-card">
+    <div class="tier-header">
+      <span class="tier-badge" style="background:#1a2238;color:var(--blue);border:1px solid #2a3858;">TIER 1</span>
+      <span class="tier-name">Lieutenant / Sergeant</span>
+      <span class="tier-ip">0–9 IP</span>
+    </div>
+    <div class="tier-grid">
+      <div class="ti"><strong>Max Formation</strong>Lance (4 'Mechs)</div>
+      <div class="ti"><strong>Max PV Request</strong>Up to 280 PV</div>
+      <div class="ti"><strong>Unit Quality</strong>Green / Regular</div>
+      <div class="ti"><strong>Requisition</strong>Standard lance config</div>
+    </div>
+  </div>
+
+  <div class="tier-card">
+    <div class="tier-header">
+      <span class="tier-badge" style="background:#1a2e20;color:var(--green);border:1px solid #2a4a30;">TIER 2</span>
+      <span class="tier-name">Captain</span>
+      <span class="tier-ip">10–24 IP</span>
+    </div>
+    <div class="tier-grid">
+      <div class="ti"><strong>Max Formation</strong>Company (12 'Mechs)</div>
+      <div class="ti"><strong>Max PV Request</strong>Up to 840 PV</div>
+      <div class="ti"><strong>Unit Quality</strong>Regular / Veteran</div>
+      <div class="ti"><strong>Requisition</strong>Augmented lance, air lance</div>
+      <div class="ti"><strong>Special</strong>1× artillery request/game</div>
+      <div class="ti"><strong>Special</strong>Demi-company formations</div>
+    </div>
+  </div>
+
+  <div class="tier-card">
+    <div class="tier-header">
+      <span class="tier-badge" style="background:#2e2010;color:var(--orange);border:1px solid #4a3420;">TIER 3</span>
+      <span class="tier-name">Major / Lt. Colonel</span>
+      <span class="tier-ip">25–49 IP</span>
+    </div>
+    <div class="tier-grid">
+      <div class="ti"><strong>Max Formation</strong>Battalion (40 'Mechs)</div>
+      <div class="ti"><strong>Max PV Request</strong>Up to 2,800 PV</div>
+      <div class="ti"><strong>Unit Quality</strong>Veteran / Elite</div>
+      <div class="ti"><strong>Requisition</strong>Augmented battalion, mixed arms</div>
+      <div class="ti"><strong>Special</strong>Orbital bombardment (1×/campaign)</div>
+      <div class="ti"><strong>Special</strong>Assign Errant Force status</div>
+    </div>
+  </div>
+
+  <div class="tier-card">
+    <div class="tier-header">
+      <span class="tier-badge" style="background:#2e1a1a;color:var(--red);border:1px solid #4a2a2a;">TIER 4</span>
+      <span class="tier-name">Colonel / General</span>
+      <span class="tier-ip">50–99 IP</span>
+    </div>
+    <div class="tier-grid">
+      <div class="ti"><strong>Max Formation</strong>Regiment (180 'Mechs)</div>
+      <div class="ti"><strong>Max PV Request</strong>Up to 12,600 PV</div>
+      <div class="ti"><strong>Unit Quality</strong>Elite / Legendary</div>
+      <div class="ti"><strong>Requisition</strong>Reinforced regiment, WarShip escort</div>
+      <div class="ti"><strong>Special</strong>Reassign other players' units</div>
+      <div class="ti"><strong>Special</strong>Invoke faction alliance (NPC forces)</div>
+    </div>
+  </div>
+
+  <div class="tier-card" style="border-color:var(--purple)">
+    <div class="tier-header">
+      <span class="tier-badge" style="background:#221a38;color:var(--purple);border:1px solid #382a58;">TIER 5</span>
+      <span class="tier-name">Field Marshal / Precentor Martial</span>
+      <span class="tier-ip">100+ IP</span>
+    </div>
+    <div class="tier-grid">
+      <div class="ti"><strong>Max Formation</strong>Multi-regiment task force</div>
+      <div class="ti"><strong>Max PV Request</strong>Unlimited (GM approval)</div>
+      <div class="ti"><strong>Unit Quality</strong>Legendary + hero 'Mechs</div>
+      <div class="ti"><strong>Requisition</strong>DropShip assault, Clan-tech salvage</div>
+      <div class="ti"><strong>Special</strong>Declare planetary martial law</div>
+      <div class="ti"><strong>Special</strong>Named hero unit assignment</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Special Spend Actions (Any Tier)</div>
+  <div class="earn-row">
+    <span class="earn-pill">3 IP — Upgrade unit quality +1 step</span>
+    <span class="earn-pill">5 IP — Request hero / unique 'Mech</span>
+    <span class="earn-pill">2 IP — Intelligence package (recon report)</span>
+    <span class="earn-pill">4 IP — Emergency resupply (restore PV mid-campaign)</span>
+    <span class="earn-pill">6 IP — Call in allied faction reinforcements</span>
+    <span class="earn-pill">3 IP — Veto another player's requisition</span>
+    <span class="earn-pill">1 IP — Reassign salvage rights post-battle</span>
+  </div>
+
+  <div class="sec-label">Phase 6 — Requisition Window</div>
+  <div class="callout good">
+    After IP is tallied, the Requisition Window opens. <strong>Spend IP</strong> to pay the formation cost — unit arrives next turn. <strong>Spend PV</strong> to equip with specific units. <strong>Bank IP</strong> for a higher tier or larger requisition. <strong>Veto</strong> (3 IP) to block one opponent requisition this window.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 4: CLOUT GAIN -->
+<div class="page" id="page-clout">
+  <div class="page-title">Clout Gain Rules</div>
+  <div class="page-sub">How IP is earned and lost each turn. All events resolve at end of Phase 5 against declared intentions.</div>
+
+  <div class="sec-label">IP Earning Sources</div>
+  <div class="earn-row">
+    <span class="earn-pill">+4 IP — Primary objective achieved (declared)</span>
+    <span class="earn-pill">+2 IP — Primary achieved (undeclared)</span>
+    <span class="earn-pill">+2 IP — Secondary objective achieved</span>
+    <span class="earn-pill">+3 IP — Bonus (GM hidden) objective</span>
+    <span class="earn-pill">−2 IP — Primary objective failed</span>
+    <span class="earn-pill">−1 IP — Secondary objective failed</span>
+  </div>
+
+  <div class="sec-label">Hex Objectives</div>
+  <div class="ip-row pos"><div><div class="ip-name">Capture / hold major location hex</div><div class="ip-note">Attacker takes it. Defender holds it end of turn.</div></div><div class="ip-val ip-pos-c">+4 IP</div><div class="ip-cond">Per major location. Ongoing: +2 IP/turn while held.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Capture / hold minor location hex</div><div class="ip-note">Majority = &gt;50% of minor hexes</div></div><div class="ip-val ip-pos-c">+2 IP</div><div class="ip-cond">Per hex. Majority bonus: +2 IP if you hold &gt;50%.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Capture / protect key site or technology</div><div class="ip-note">Named hex — factory, HPG, LosTech cache</div></div><div class="ip-val ip-pos-c">+5 IP</div><div class="ip-cond">One-time capture bonus. +1 IP/turn while held.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Cut enemy supply line</div><div class="ip-note">Move lance into hex on enemy supply path</div></div><div class="ip-val ip-spe-c">+2 IP</div><div class="ip-cond">Must be maintained next turn to trigger supply effects.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Restore own cut supply line</div><div class="ip-note">Retake hex that was breaking supply path</div></div><div class="ip-val ip-spe-c">+1 IP</div><div class="ip-cond">Logistics restoration recognized as political win.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Major location hex lost</div><div class="ip-note">Defender loses control this turn</div></div><div class="ip-val ip-neg-c">−3 IP</div><div class="ip-cond">Defender only. Cannot be recovered same turn.</div></div>
+
+  <div class="sec-label">Enemy Lance Destruction</div>
+  <div class="ip-row pos"><div><div class="ip-name">Enemy lance destroyed</div><div class="ip-note">All units in lance eliminated this turn</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Full lance only. Crippled lance = +1 IP.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Enemy command lance destroyed</div><div class="ip-note">Opposing commander's own lance</div></div><div class="ip-val ip-pos-c">+5 IP</div><div class="ip-cond">Replaces standard +3 IP. High-value decapitation.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Enemy company broken</div><div class="ip-note">≥50% of a company's lances destroyed in one turn</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Bonus stacks with individual lance destruction IP.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Enemy lance crippled via tagged strike</div><div class="ip-note">Recon tagged it — artillery/air finishes it</div></div><div class="ip-val ip-spe-c">+2 IP</div><div class="ip-cond">+1 to recon lance, +1 to striking lance. Shared.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Enemy lance captured (salvage)</div><div class="ip-note">Crippled and unable to retreat</div></div><div class="ip-val ip-spe-c">+3 IP</div><div class="ip-cond">Also returns 50% of that lance's PV as salvage budget.</div></div>
+
+  <div class="sec-label">Enemy Resource Destruction</div>
+  <div class="ip-row pos"><div><div class="ip-name">Destroy enemy supply depot hex</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Enemy loses ability to repair lances for 1 turn.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Destroy enemy artillery battery</div><div class="ip-note">Artillery lance eliminated</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Artillery is high-value — more than standard lance.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Destroy enemy air support asset</div><div class="ip-note">Fighter or bomber lance eliminated</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Removes air umbrella. Opponent loses air action next turn.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Destroy enemy DropShip</div></div><div class="ip-val ip-pos-c">+4 IP</div><div class="ip-cond">Enemy cannot requisition reinforcements next turn.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Destroy civilian infrastructure</div><div class="ip-note">Factory, city, water, power</div></div><div class="ip-val ip-neg-c">−3 IP</div><div class="ip-cond">Political blowback. Faction modifiers apply.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Destroy allied resource (friendly fire)</div></div><div class="ip-val ip-neg-c">−3 IP</div><div class="ip-cond">Immediate. Cannot be appealed.</div></div>
+
+  <div class="sec-label">Special Conditions</div>
+  <div class="ip-row spe"><div><div class="ip-name">Win engagement while outnumbered in PV</div><div class="ip-note">Your force PV &lt; enemy force PV at battle start</div></div><div class="ip-val ip-spe-c">+3 IP</div><div class="ip-cond">Periphery factions: +5 IP.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">No lances lost this turn</div></div><div class="ip-val ip-spe-c">+2 IP</div><div class="ip-cond">Full operational efficiency.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Special mission completed</div><div class="ip-note">GM-assigned covert / timed mission</div></div><div class="ip-val ip-spe-c">+4 IP</div><div class="ip-cond">Only available when assigned. Cannot farm.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Hold region 3+ consecutive turns</div></div><div class="ip-val ip-spe-c">+2 IP</div><div class="ip-cond">Awarded at the 3rd turn milestone only.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Own lance destroyed</div><div class="ip-note">Per lance completely eliminated</div></div><div class="ip-val ip-neg-c">−2 IP</div><div class="ip-cond">Crippled = −1 IP.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Commander 'Mech destroyed</div></div><div class="ip-val ip-neg-c">−3 IP</div><div class="ip-cond">Kurita: −5 IP. Leadership failure.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Unauthorized retreat</div><div class="ip-note">Not declared in Phase 1 or approved</div></div><div class="ip-val ip-neg-c">−2 IP</div><div class="ip-cond">Davion: −3 IP.</div></div>
+
+  <div class="callout warn" style="margin-top:14px">
+    <strong>Per-Turn Caps:</strong> Maximum IP gain: +12 IP/turn · Maximum IP loss: −6 IP/turn · Max from lance kills alone: +4 IP · Max from hex control alone: +3 IP · Political victory IP is uncapped.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 5: FACTIONS -->
+<div class="page" id="page-factions">
+  <div class="page-title">Faction Modifiers</div>
+  <div class="page-sub">Each faction modifies how IP is earned, spent, and what can be requisitioned. All modifiers stack with base tier rules.</div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#2e1a1a;color:var(--red);border:1px solid #4a2a2a;">House Davion</span>
+      <span class="faction-name">Federated Suns</span>
+      <span class="faction-motto">"Across the stars and beyond"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>+1 IP per objective held at end of round</div>
+      <div class="fi fi-g"><strong>Requisition</strong>Heavy/Assault 'Mechs cost −10% PV</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>−2 IP if retreat ordered without approval. −3 IP unauthorized retreat.</div>
+      <div class="fi fi-p"><strong>Unique</strong>RCT doctrine: mix armor + 'Mechs at no IP surcharge</div>
+      <div class="fi fi-n"><strong>Passive</strong>Allied with Lyran: share IP tier access once per campaign</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Cannot requisition Capellan or Combine units</div>
+    </div>
+  </div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#1a2238;color:var(--blue);border:1px solid #2a3858;">House Steiner</span>
+      <span class="faction-name">Lyran Commonwealth</span>
+      <span class="faction-motto">"By strength and industry"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>+2 IP when fielding all-Assault lance</div>
+      <div class="fi fi-g"><strong>Requisition</strong>Assault 'Mechs available 1 tier earlier. DropShip supply range +1 hex.</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>−1 IP per Light 'Mech in your force (social stigma)</div>
+      <div class="fi fi-p"><strong>Unique</strong>Wealth Requisition: spend 20 extra PV to skip 1 IP requirement once per game</div>
+      <div class="fi fi-n"><strong>Passive</strong>Resupply costs −15% PV</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Light lances incur −1 IP if used as primary strike force</div>
+    </div>
+  </div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#1a2e20;color:var(--green);border:1px solid #2a4a30;">House Kurita</span>
+      <span class="faction-name">Draconis Combine</span>
+      <span class="faction-motto">"The sword is mightier"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>+2 IP for destroying enemy command unit</div>
+      <div class="fi fi-g"><strong>Requisition</strong>Veteran/Elite pilots available 1 tier earlier</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>−3 IP if commander's unit is destroyed (−5 IP total)</div>
+      <div class="fi fi-p"><strong>Unique</strong>Bushido: declare a duel — 1v1 lance fight. Winner gains +4 IP regardless of outcome</div>
+      <div class="fi fi-n"><strong>Passive</strong>ISF Intel: 1× free recon report per campaign turn</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Must spend 2 IP to field non-Combine 'Mechs (honor cost). Can trace supply through 1 enemy hex once per campaign.</div>
+    </div>
+  </div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#2e2010;color:var(--orange);border:1px solid #4a3420;">House Liao</span>
+      <span class="faction-name">Capellan Confederation</span>
+      <span class="faction-motto">"For the glory of Liao"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>+2 IP for any augmented lance victory</div>
+      <div class="fi fi-g"><strong>Requisition</strong>Augmented lances available at Tier 1 — FREE, no IP cost. Light logistics: −20% supply consumption.</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>−1 IP per round if below 50% starting PV</div>
+      <div class="fi fi-p"><strong>Unique</strong>Death Commandos: spend 5 IP to deploy 1 elite stealth unit (no PV cost)</div>
+      <div class="fi fi-n"><strong>Passive</strong>Mixed-arms formations never pay IP surcharge</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Must field at least 1 augmented lance per company-level force</div>
+    </div>
+  </div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#1a2e28;color:var(--teal);border:1px solid #2a4a3a;">House Marik</span>
+      <span class="faction-name">Free Worlds League</span>
+      <span class="faction-motto">"For the captain-general"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>+1 IP per allied faction unit in your force. Allied units share supply nodes freely.</div>
+      <div class="fi fi-g"><strong>Requisition</strong>May hire mercenary lances at −1 IP tier cost</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>Internal politics: roll d6 each turn, on 1–2 lose 1 IP to faction infighting</div>
+      <div class="fi fi-p"><strong>Unique</strong>Parliamentary Override: once per campaign, requisition any formation at current tier without PV cost</div>
+      <div class="fi fi-n"><strong>Passive</strong>Heavy armor support available Tier 2+</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Cannot hold IP Tier 4 without allied support</div>
+    </div>
+  </div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#221a38;color:var(--purple);border:1px solid #382a58;">ComStar / WoB</span>
+      <span class="faction-name">The Blessed Order</span>
+      <span class="faction-motto">"Knowledge is power"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>+3 IP for capturing HPG relay. HPG relay counts as supply node (range 2 hexes).</div>
+      <div class="fi fi-g"><strong>Requisition</strong>Star League-era tech available at Tier 2. SL Reinforced Battalion at standard cost.</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>−2 IP if HPG relay is destroyed (not captured)</div>
+      <div class="fi fi-p"><strong>Unique</strong>ROM Dossier: spend 2 IP to learn opponent's full force composition before deployment</div>
+      <div class="fi fi-n"><strong>Passive</strong>Interdiction: opponents spend +1 IP per requisition while ComStar is active</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Cannot ally with Word of Blake (and vice versa)</div>
+    </div>
+  </div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#2e1a1a;color:#cc6688;border:1px solid #4a2a3a;">Clan Forces</span>
+      <span class="faction-name">Invasion Era</span>
+      <span class="faction-motto">"Seyla"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>+1 IP per enemy unit destroyed in a Trial. All units Veteran quality minimum at no extra cost.</div>
+      <div class="fi fi-g"><strong>Requisition</strong>OmniMechs at all tiers. Star = 5 units. Immune to supply degradation for 2 turns.</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>−4 IP for dezgra tactics (artillery on civilians, ambush without Batchall)</div>
+      <div class="fi fi-p"><strong>Unique</strong>Batchall: declare force size before battle — win with fewer units = +3 IP</div>
+      <div class="fi fi-n"><strong>Passive</strong>Galaxy = 3–5 Clusters, same IP cost as Regiment</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Cannot build supply depots. Must accept Trials of Possession.</div>
+    </div>
+  </div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#1e1e1e;color:var(--text2);border:1px solid var(--border2);">Mercenaries</span>
+      <span class="faction-name">Independent Command</span>
+      <span class="faction-motto">"War is a business"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>Convert excess PV budget to IP at 20:1 ratio (once per round). Salvage at 50% PV value.</div>
+      <div class="fi fi-g"><strong>Requisition</strong>No faction restrictions — field any unit from any House. Demi-company available Tier 1.</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>No passive IP from regional control — must earn actively</div>
+      <div class="fi fi-p"><strong>Unique</strong>Contract Clause: negotiate +2 IP bonus with employer in exchange for binding objective condition</div>
+      <div class="fi fi-n"><strong>Passive</strong>Salvage rights: +15% PV from destroyed enemy units</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Tier 4–5 requires a House patron</div>
+    </div>
+  </div>
+
+  <div class="faction-card">
+    <div class="faction-header">
+      <span class="faction-badge" style="background:#1a2e28;color:#6abba0;border:1px solid #2a4a3a;">Periphery States</span>
+      <span class="faction-name">Taurian / Magistracy / Outworlds</span>
+      <span class="faction-motto">"We endure"</span>
+    </div>
+    <div class="faction-grid">
+      <div class="fi fi-g"><strong>IP Bonus</strong>+2 IP when defeating a Great House force (lower PV). Home Turf: +1 move hex for all units when defending held region.</div>
+      <div class="fi fi-g"><strong>Requisition</strong>Guerrilla formations: small lances −20% PV. Mobile Field Base has 2 uses/turn.</div>
+      <div class="fi fi-r"><strong>IP Penalty</strong>−1 IP per Assault 'Mech lost. All supply ranges −1 hex.</div>
+      <div class="fi fi-p"><strong>Unique</strong>Home Turf: opponents pay +1 IP to requisition reinforcements when attacking your held region</div>
+      <div class="fi fi-n"><strong>Passive</strong>Smuggler network: 1× per campaign, acquire black-market unit (random quality, GM roll)</div>
+      <div class="fi fi-r"><strong>Restriction</strong>Max formation size capped at Battalion without external alliance</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 6: SUPPLY -->
+<div class="page" id="page-supply">
+  <div class="page-title">Supply &amp; Logistics</div>
+  <div class="page-sub">Supply is tracked per company. A supply line runs from a DropShip or Supply Depot through connected friendly or neutral hexes to the company's hex. Checked at start of Phase 5.</div>
+
+  <div class="sec-label">Weapon Classification — Flagged at List-Building</div>
+  <div class="grid-3">
+    <div class="card green-l">
+      <div class="card-title"><span class="wc-e">E — All-Energy</span></div>
+      <div class="card-body">All units carry only energy weapons (lasers, PPCs, flamers). No ammo dependency. Immune to damage die reduction at all supply statuses. Flagged at list-building. Opponent may verify.</div>
+    </div>
+    <div class="card orange-l">
+      <div class="card-title"><span class="wc-m">M — Mixed</span></div>
+      <div class="card-body">At least one unit has ballistic or missile weapons alongside energy. Partial damage die reduction applies. Avoids ×2 repair cost at strained status.</div>
+    </div>
+    <div class="card red-l">
+      <div class="card-title"><span class="wc-a">A — Ammo-Dependent</span></div>
+      <div class="card-body">Primarily or entirely ballistic/missile armed. Full damage die reduction applies when out of supply. Artillery is always A — energy exemption does not apply.</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Supply Status Effects</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Status</th><th>Condition</th><th>All-Energy (E)</th><th>Mixed (M)</th><th>Ammo-Dep (A)</th><th>IP Impact</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="status-ok">IN SUPPLY</span></td>
+          <td>Line traced to DropShip</td>
+          <td>Full damage. All actions.</td>
+          <td>Full damage. All actions.</td>
+          <td>Full damage. All actions.</td>
+          <td>None</td>
+        </tr>
+        <tr>
+          <td><span class="status-warn">STRAINED</span></td>
+          <td>Line exceeds depot range by 1 hex</td>
+          <td><strong>No reduction.</strong> Full damage dice.</td>
+          <td>−½ Die (round up). Repair ×1.5.</td>
+          <td>−1 Damage Die. Repair ×2.</td>
+          <td>−1 IP/turn</td>
+        </tr>
+        <tr>
+          <td><span class="status-bad">OUT T1</span></td>
+          <td>No line this turn</td>
+          <td><strong>No reduction.</strong> Cannot repair.</td>
+          <td>−1 Damage Die. Cannot repair.</td>
+          <td>−1 Damage Die. Cannot repair.</td>
+          <td>−1 IP/turn</td>
+        </tr>
+        <tr>
+          <td><span class="status-bad">OUT T2</span></td>
+          <td>No line 2 consecutive turns</td>
+          <td><strong>No damage reduction.</strong> Heat stress: −1 to-hit penalty (coolant depletion).</td>
+          <td>Counts as Crippled. Retreat action only.</td>
+          <td>Counts as Crippled. Retreat action only.</td>
+          <td>−2 IP/turn</td>
+        </tr>
+        <tr>
+          <td><span class="status-bad">OUT T3+</span></td>
+          <td>No line 3+ turns</td>
+          <td><strong>Still combat-effective</strong> but counts as Crippled for objective holding. Heat penalty persists.</td>
+          <td>Combat-ineffective. Must withdraw or surrender.</td>
+          <td>Combat-ineffective. Must withdraw or surrender.</td>
+          <td>−3 IP/turn</td>
+        </tr>
+        <tr>
+          <td><span class="status-spe">ERRANT</span></td>
+          <td>Designated Errant Force status</td>
+          <td colspan="3" style="text-align:center;color:var(--purple)">Immune to all supply effects for up to 3 turns.</td>
+          <td>No penalty while immune</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <strong>Heat Stress Rule (All-Energy, T2+):</strong> Without coolant resupply, sustained all-energy combat generates runaway heat. The −1 to-hit penalty represents pilots managing heat conservatively. Removed immediately when supply is restored.
+  </div>
+
+  <div class="sec-label">Supply Node Types</div>
+  <div class="grid-2">
+    <div class="card green-l">
+      <div class="card-title">DropShip (Primary)</div>
+      <div class="card-body">Anchors the supply network. Supplies all friendly companies within <strong>3 hexes</strong> automatically. High-value target: +4 IP if destroyed. 2 consecutive barrages to destroy entirely.</div>
+    </div>
+    <div class="card blue-l">
+      <div class="card-title">Supply Depot (Fixed)</div>
+      <div class="card-body">Captured hex node. Extends supply network by <strong>+2 hexes</strong> from its position. Must trace back to a DropShip. Destroyable: +3 IP. Barrage suppresses it for 1 turn.</div>
+    </div>
+    <div class="card orange-l">
+      <div class="card-title">Mobile Field Base</div>
+      <div class="card-body">Attached to a company. Moves with it. Provides <strong>1-turn emergency supply</strong> to its own company only. Single use per campaign turn (Periphery: 2 uses). Costs 10 PV. Destroyed outright by barrage.</div>
+    </div>
+    <div class="card red-l">
+      <div class="card-title">Artillery Forward Base</div>
+      <div class="card-body">Dedicated supply for artillery lances only. Provides ammo resupply. Artillery without this node loses 1 Damage Die per turn. Priority target: +3 IP. Barrage prevents resupply for 1 turn.</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Supply Line Routing</div>
+  <div class="callout info">Path must pass through <strong>friendly-controlled or uncontested hexes</strong> only. Enemy-occupied hexes break the line.
+  </div>
+  <div style="margin-bottom:8px">
+    <div class="chain-row">
+      <span class="chain-node cn-g">DropShip</span><span class="chain-arr">→</span>
+      <span class="chain-node" style="background:var(--bg3);color:var(--blue)">Friendly</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-g">Supply Depot</span><span class="chain-arr">→</span>
+      <span class="chain-node" style="background:var(--bg3);color:var(--blue)">Friendly</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-a">Company</span>
+      <span style="font-size:11px;color:var(--green);margin-left:8px;font-family:var(--mono)">✓ IN SUPPLY</span>
+    </div>
+    <div class="chain-row" style="margin-top:6px">
+      <span class="chain-node cn-g">DropShip</span><span class="chain-arr">→</span>
+      <span class="chain-node" style="background:var(--bg3);color:var(--blue)">Friendly</span><span class="chain-arr">→</span>
+      <span class="chain-node" style="background:#2e1a1a;color:var(--red)">Enemy Hex ✗</span>
+      <span style="font-size:11px;color:var(--red);margin-left:8px;font-family:var(--mono)">LINE BROKEN — OUT OF SUPPLY</span>
+    </div>
+  </div>
+
+  <div class="sec-label">Repair Rules</div>
+  <div class="ip-row pos"><div><div class="ip-name">Repair crippled lance (in supply)</div><div class="ip-note">Lance returns to full strength next turn</div></div><div class="ip-val" style="color:var(--text3)">0 IP</div><div class="ip-cond">Costs 25% of lance PV from budget. Must be in supply.</div></div>
+  <div class="ip-row warn"><div><div class="ip-name">Emergency repair (out of supply)</div><div class="ip-note">Mobile Field Base used this turn</div></div><div class="ip-val" style="color:var(--orange)">−1 IP</div><div class="ip-cond">Lance restored to 50% strength only. One use per turn.</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 7: ARTILLERY & AIR -->
+<div class="page" id="page-combat">
+  <div class="page-title">Artillery &amp; Air Support</div>
+  <div class="page-sub">All assets are separate on-map lances. Each has 3 use tokens per supply cycle. Tokens refresh when in supply at start of Phase 2.</div>
+
+  <div class="sec-label">Artillery — Barrage Token Rules</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Tokens</th><th>Status</th><th>Effect</th><th>Resupply Required</th></tr></thead>
+      <tbody>
+        <tr><td><span class="status-ok">3 — Full</span></td><td>All options</td><td>Full damage dice. Splash available.</td><td>—</td></tr>
+        <tr><td><span class="status-warn">2 — Strained</span></td><td>Limited</td><td>Full damage. Splash reduced to 0 dice (Heavy only).</td><td>Reach Artillery Forward Base within 2 turns.</td></tr>
+        <tr><td><span class="status-warn">1 — Critical</span></td><td>Restricted</td><td>−1 Damage Die. No splash. No danger close.</td><td>Must reach Artillery Forward Base next turn.</td></tr>
+        <tr><td><span class="status-bad">0 — Silent</span></td><td>Cannot fire</td><td>May only Move or Retreat.</td><td>Must be adjacent to Artillery Forward Base hex.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-2">
+    <div class="card red-l">
+      <div class="card-title">Heavy Artillery — Long Tom / Arrow IV</div>
+      <div class="ammo-track"><span class="ammo-label">Tokens:</span><div class="ammo-box full">1</div><div class="ammo-box full">2</div><div class="ammo-box full">3</div><div class="ammo-box">—</div></div>
+      <div class="card-body">
+        <strong>Range:</strong> Up to 3 hexes (indirect). Requires spotter or tagged target for hexes 2–3.<br>
+        <strong>Damage:</strong> 3 Damage Dice vs primary hex. 1 Die vs adjacent hexes (splash).<br>
+        <strong>Action:</strong> Full lance action. Cannot move and fire same turn.<br>
+        <strong>Classification:</strong> <span class="wc-a">A</span> Always. Energy exemption does not apply.<br>
+        <strong>Out of supply:</strong> Loses 1 barrage token permanently until resupplied.
+      </div>
+    </div>
+    <div class="card orange-l">
+      <div class="card-title">Field Artillery — Thumper / Sniper</div>
+      <div class="ammo-track"><span class="ammo-label">Tokens:</span><div class="ammo-box full">1</div><div class="ammo-box full">2</div><div class="ammo-box full">3</div><div class="ammo-box">—</div></div>
+      <div class="card-body">
+        <strong>Range:</strong> Up to 2 hexes. Can fire on own hex (danger close — friendly takes 1 Die).<br>
+        <strong>Damage:</strong> 2 Damage Dice vs primary hex. No splash.<br>
+        <strong>Action:</strong> Can move 1 hex then fire (mobile battery).<br>
+        <strong>Arrow IV variant:</strong> Tagged targets only — skip LOS requirement.<br>
+        <strong>Out of supply:</strong> −1 Damage Die per OOS turn. At 0 dice, battery is silent.
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Artillery Supply Interdiction Rules</div>
+  <div class="callout">
+    <strong>Artillery range has no bearing on supply interdiction.</strong> An artillery unit can only threaten a supply hex if it has direct observation — the battery is 1 hex adjacent to the node, OR a friendly spotter is 1 hex adjacent to the node. Without one of these conditions, the supply hex is safe regardless of range.
+  </div>
+
+  <div class="grid-2">
+    <div class="scenario yes">
+      <strong>CAN interdict — Direct Observation</strong>
+      <div class="chain-row"><span class="hx hx-arty">Artillery</span><span class="chain-arr">→</span><span class="hx hx-supply">Supply Depot</span></div>
+      Artillery is 1 hex away. Direct LOS. No spotter needed.
+      <div class="result-yes">✓ Supply hex threatened this turn.</div>
+    </div>
+    <div class="scenario yes">
+      <strong>CAN interdict — Spotter Adjacent</strong>
+      <div class="chain-row"><span class="hx hx-arty">Artillery</span><span class="chain-arr">···</span><span class="hx hx-spot">Spotter</span><span class="chain-arr">→</span><span class="hx hx-supply">Supply Depot</span></div>
+      Artillery is far away but spotter is adjacent. Coordinates relayed. Spotter must survive to Phase 3.
+      <div class="result-yes">✓ Supply hex threatened.</div>
+    </div>
+    <div class="scenario no">
+      <strong>CANNOT interdict — No observer</strong>
+      <div class="chain-row"><span class="hx hx-arty">Artillery</span><span class="chain-arr">···</span><span class="hx hx-neutral">open hexes</span><span class="chain-arr">···</span><span class="hx hx-supply">Supply Depot</span></div>
+      Artillery has range but no unit within 1 hex of node.
+      <div class="result-no">✗ No interdiction. Supply unaffected.</div>
+    </div>
+    <div class="scenario no">
+      <strong>CANNOT interdict — Spotter too far</strong>
+      <div class="chain-row"><span class="hx hx-spot">Spotter</span><span class="chain-arr">→</span><span class="hx hx-neutral">2+ hexes</span><span class="chain-arr">→</span><span class="hx hx-supply">Supply Depot</span></div>
+      Spotter is not adjacent to supply node.
+      <div class="result-no">✗ Must close distance first.</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Counter-Interdiction:</strong> Destroy or drive off the spotter before Phase 3 — the barrage is cancelled and the token is wasted. Achieving air superiority grounds recon aircraft spotters, cancelling all dependent barrages.
+  </div>
+
+  <div class="sec-label">Air Support Assets</div>
+  <div class="grid-2">
+    <div class="card blue-l">
+      <div class="card-title">Fighters — Air Superiority / Escort</div>
+      <div class="ammo-track"><span class="ammo-label">Sortie tokens:</span><div class="ammo-box full">1</div><div class="ammo-box full">2</div><div class="ammo-box full">3</div><div class="ammo-box">—</div></div>
+      <div class="card-body">
+        <strong>Role:</strong> Intercept enemy air assets. Escort bombers and recon craft.<br>
+        <strong>Ground attack:</strong> 1 Damage Die (strafing). Cannot barrage.<br>
+        <strong>Interception:</strong> Automatic engagement vs enemy air in same hex before ground actions resolve.<br>
+        <strong>Escort rule:</strong> Attach to bomber lance — bomber cannot be intercepted while escorted unless fighter is destroyed first.<br>
+        <strong>Classification:</strong> <span class="wc-a">A</span> standard. Energy variant <span class="wc-e">E</span> possible (heat stress rules apply).<br>
+        <strong>Threat value:</strong> +3 IP if destroyed. Opponent gains air superiority bonus.
+      </div>
+    </div>
+    <div class="card red-l">
+      <div class="card-title">Bombers — Ground Strike</div>
+      <div class="ammo-track"><span class="ammo-label">Sortie tokens:</span><div class="ammo-box full">1</div><div class="ammo-box full">2</div><div class="ammo-box full">3</div><div class="ammo-box">—</div></div>
+      <div class="card-body">
+        <strong>Role:</strong> Heavy ground strike. 3 Damage Dice vs target hex.<br>
+        <strong>Splash:</strong> 1 Damage Die vs adjacent hexes.<br>
+        <strong>Vulnerability:</strong> Cannot defend against interception. Must have fighter escort or take automatic 2 Damage Dice from interceptors.<br>
+        <strong>Tagged bonus:</strong> If target was tagged by recon this turn — +1 Damage Die. Splash also increases to 2 dice.<br>
+        <strong>Classification:</strong> <span class="wc-a">A</span> Always. Bomb payload cannot be energy-substituted.<br>
+        <strong>Threat value:</strong> +3 IP if destroyed.
+      </div>
+    </div>
+    <div class="card green-l">
+      <div class="card-title">Recon Aircraft — Scan + Target Tag</div>
+      <div class="ammo-track"><span class="ammo-label">Sortie tokens:</span><div class="ammo-box full">1</div><div class="ammo-box full">2</div><div class="ammo-box full">3</div><div class="ammo-box">—</div></div>
+      <div class="card-body">
+        <strong>Role:</strong> Scan Objective or Target Tag from air. Covers 2 hexes per action (vs ground recon's 1).<br>
+        <strong>Tag bonus:</strong> Air-tagged targets grant +1 Damage Die to ALL strikes that turn (artillery and bombers).<br>
+        <strong>Deep recon:</strong> Can scan adjacent hexes behind enemy lines without entering them.<br>
+        <strong>Combat:</strong> No damage capability. If intercepted without escort: automatic destruction.<br>
+        <strong>Supply:</strong> Fuel only — treated as <span class="wc-e">E</span>. No token reduction from supply strain.<br>
+        <strong>Threat value:</strong> +2 IP if destroyed. Opponent loses air tag bonus.
+      </div>
+    </div>
+    <div class="card purple-l">
+      <div class="card-title">DropShip Gunship — Heavy Support</div>
+      <div class="ammo-track"><span class="ammo-label">Sortie tokens:</span><div class="ammo-box full">1</div><div class="ammo-box full">2</div><div class="ammo-box full">3</div><div class="ammo-box">—</div></div>
+      <div class="card-body">
+        <strong>Role:</strong> Orbital fire support. 4 Damage Dice vs target hex. Most powerful single strike.<br>
+        <strong>Restrictions:</strong> Tier 3+ only. 12 IP to requisition. Cannot be intercepted by fighters.<br>
+        <strong>Splash:</strong> 2 Damage Dice to all adjacent hexes. Cannot be used near friendlies without danger close penalty.<br>
+        <strong>Resupply:</strong> Tokens only refresh at the DropShip hex itself. If DropShip is destroyed: gunship loses all remaining tokens permanently.<br>
+        <strong>Classification:</strong> <span class="wc-a">A</span> Always.<br>
+        <strong>Threat value:</strong> Destroying the parent DropShip silences the gunship: +4 IP.
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Air Superiority States</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>State</th><th>Bombers</th><th>Recon Aircraft</th><th>Artillery</th></tr></thead>
+      <tbody>
+        <tr><td><span class="status-ok">AIR SUPERIORITY HELD</span></td><td>Operate freely. Full damage.</td><td>Operate freely. Deep recon available.</td><td>No effect — ground asset.</td></tr>
+        <tr><td><span class="status-warn">CONTESTED AIR</span></td><td>Must have escort or take interception hit.</td><td>Must have escort or cannot operate.</td><td>No effect.</td></tr>
+        <tr><td><span class="status-bad">AIR SUPERIORITY LOST</span></td><td>Cannot operate. Grounded until fighters return.</td><td>Cannot operate. Grounded.</td><td>No effect, but loses air-tag bonus.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label">Coordination Chains</div>
+  <div class="card teal-l">
+    <div class="card-title">Recon → Artillery Strike</div>
+    <div class="chain-row">
+      <span class="chain-node cn-g">Recon tags hex</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-r">Artillery fires on tag</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-p">+1 Die, no LOS needed</span>
+    </div>
+    <div class="card-body" style="margin-top:6px">If recon is intercepted before tagging: artillery fires at base damage, LOS required, no bonus.</div>
+  </div>
+  <div class="card teal-l">
+    <div class="card-title">Fighter Escort → Bomber Strike</div>
+    <div class="chain-row">
+      <span class="chain-node cn-b">Fighter escorts bomber</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-r">Bomber strikes</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-p">Strike resolves unimpeded</span>
+    </div>
+    <div class="card-body" style="margin-top:6px">Without escort: enemy fighters deal 2 Damage Dice to bomber before strike resolves.</div>
+  </div>
+  <div class="card teal-l">
+    <div class="card-title">Full Chain — Recon → Bomber → Artillery</div>
+    <div class="chain-row">
+      <span class="chain-node cn-g">Recon tags</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-r">Bombers strike (+1 die)</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-a">Artillery follows</span><span class="chain-arr">→</span>
+      <span class="chain-node cn-p">+1 die each + splash on both</span>
+    </div>
+    <div class="card-body" style="margin-top:6px">Costs 1 sortie token from recon, 1 from bombers, 1 barrage token from artillery. Most expensive — most devastating. Earns +2 IP coordination bonus if all resolve same turn.</div>
+  </div>
+
+  <div class="sec-label">Artillery &amp; Air IP Events</div>
+  <div class="ip-row pos"><div><div class="ip-name">Artillery destroys enemy lance</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Standard lance destruction bonus.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Counter-battery: arty destroys enemy arty</div></div><div class="ip-val ip-pos-c">+4 IP</div><div class="ip-cond">Silences enemy batteries.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Enemy artillery silenced via supply denial</div><div class="ip-note">Enemy reaches 0 tokens due to your interdiction</div></div><div class="ip-val ip-spe-c">+2 IP</div><div class="ip-cond">Awarded when token depletion caused by your actions.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Full coordination chain executes</div><div class="ip-note">Recon → Bomber → Artillery all resolve same turn</div></div><div class="ip-val ip-spe-c">+2 IP</div><div class="ip-cond">Stacks with destruction bonuses.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Fighter achieves air superiority</div><div class="ip-note">All enemy air assets destroyed or grounded</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Opponent cannot use bombers or recon next turn.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">DropShip gunship strike destroys lance</div></div><div class="ip-val ip-pos-c">+4 IP</div><div class="ip-cond">High-value asset warrants higher IP reward.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Bomber destroyed by interception</div><div class="ip-note">Lost without escort</div></div><div class="ip-val ip-neg-c">−2 IP</div><div class="ip-cond">Preventable loss. Escort your bombers.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Artillery friendly fire</div><div class="ip-note">Splash or misdirected barrage hits own lance</div></div><div class="ip-val ip-neg-c">−2 IP</div><div class="ip-cond">Danger close barrages always risk this.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Air asset or artillery goes silent (0 tokens)</div></div><div class="ip-val ip-neg-c">−1 IP</div><div class="ip-cond">Opponent gains free air window / fire-free turn.</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 8: POLITICAL -->
+<div class="page" id="page-political">
+  <div class="page-title">Political Victory Conditions</div>
+  <div class="page-sub">Declared publicly at campaign start. Primary = +6 IP (one-time). Alternate = +3 IP. Denial = +3 IP for actively preventing opponent's condition.</div>
+
+  <div class="callout">
+    <strong>Structure:</strong> Conditions are public knowledge from turn one — creating strategic pressure throughout the campaign. Denial conditions award IP for actively preventing the opponent's political victory, not just coincidentally.
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" style="color:var(--red)">House Davion — Federated Suns</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Hold &gt;60% of all hexes for 3 consecutive turns.</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Field an RCT (mixed company) at a major location for 2 turns.</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Prevent Davion majority hex control for any 2 consecutive turns.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+2 IP)</strong>Political victory won without losing a major location hex all campaign.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--blue)">House Steiner — Lyran Commonwealth</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Field highest total PV force on the map for any 3 turns.</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Destroy 3+ enemy Assault-class lances over the campaign.</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Outfield Steiner in PV for 2 consecutive turns at a disadvantage.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+2 IP)</strong>Primary won using only Heavy and Assault lances.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--green)">House Kurita — Draconis Combine</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Destroy the enemy command lance in direct combat (not artillery/air).</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Win a declared Trial (Bushido duel — 1 lance vs 1 lance, no support).</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Keep your command lance alive and undefeated all campaign.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+2 IP)</strong>Command lance destruction on a declared primary objective hex.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--orange)">House Liao — Capellan Confederation</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Capture a key site using only augmented lances.</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Deploy Death Commandos and eliminate a named target within 2 turns.</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Destroy the key site before Liao can capture it.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+2 IP)</strong>Key site captured without any friendly lance loss that turn.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--teal)">House Marik — Free Worlds League</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Maintain at least one allied unit on map for 4 consecutive turns.</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Hold minor hex majority AND HPG relay simultaneously for 2 turns.</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Destroy or drive off every allied unit on Marik's side before turn 5.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+2 IP)</strong>2+ different allied unit types on map when primary is achieved.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--purple)">ComStar / WoB — The Blessed Order</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Control HPG relay for 4 consecutive turns + complete 3 Scan Objective actions.</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Use ROM Dossier to correctly predict enemy force composition 2 turns in a row.</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Destroy the HPG relay hex entirely, denying ComStar permanently.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+2 IP)</strong>HPG held without ComStar ever losing supply.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#cc6688">Clan Forces — Invasion Era</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Win a formally declared Trial of Possession with equal or fewer units than declared.</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Destroy 5+ IS lances using only Clan OmniMechs — no vehicle or BA support.</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Force Clan player to use dezgra tactics — they lose −4 IP, you gain denial bonus.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+3 IP)</strong>Trial won with fewer units than the opponent fielded (exceptional honor).</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--text2)">Mercenaries — Independent Command</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Complete all contracted objectives (primary + both secondaries) in any 3 turns.</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Convert PV-to-IP twice in the same campaign using the 20:1 exchange.</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Force mercenary player to fail a declared primary objective.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+2 IP)</strong>All objectives completed with no unauthorized retreats all campaign.</div>
+      </div>
+    </div>
+    <div class="card" style="grid-column:span 2">
+      <div class="card-title" style="color:var(--teal)">Periphery States — Taurian / Magistracy / Outworlds</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">
+        <div class="pv-item pv-primary"><strong>Primary (+6 IP)</strong>Defeat a Great House force while holding home region hex all campaign.</div>
+        <div class="pv-item pv-alt"><strong>Alternate (+3 IP)</strong>Acquire 2+ units via smuggler network and field them in combat at least once each.</div>
+        <div class="pv-item pv-deny"><strong>Denial (+3 IP)</strong>Capture the Periphery player's home region hex and hold it for 2 turns.</div>
+        <div class="pv-item pv-bonus"><strong>Bonus (+2 IP)</strong>Primary achieved while never fielding more than Battalion-size force.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 9: MOVEMENT -->
+<div class="page" id="page-movement">
+  <div class="page-title">Movement Rules</div>
+  <div class="page-sub">Hex map movement for lances. One hex = one BattleTech map sheet. All movement is declared in Phase 1 before simultaneous resolution.</div>
+
+  <div class="callout">
+    <strong>Atomic unit reminder:</strong> A lance moves as a single unit. All 4 units occupy the same hex. Movement decisions are made for the lance, not individual 'Mechs.
+  </div>
+
+  <div class="sec-label">Base Movement</div>
+  <div class="card blue-l">
+    <div class="card-title">1 hex per TMM point</div>
+    <div class="card-body">
+      A lance's base hex movement on the world map equals its average TMM value.<br><br>
+      <strong>TMM 1</strong> → 1 hex/turn &nbsp;·&nbsp;
+      <strong>TMM 2</strong> → 2 hexes/turn &nbsp;·&nbsp;
+      <strong>TMM 3</strong> → 3 hexes/turn &nbsp;·&nbsp;
+      <strong>TMM 4</strong> → 4 hexes/turn &nbsp;·&nbsp;
+      <strong>TMM 5</strong> → 5 hexes/turn<br><br>
+      Movement and attack can both occur in the same turn unless the lance is Sprinting.
+    </div>
+  </div>
+
+  <div class="sec-label">Sprint</div>
+  <div class="card orange-l">
+    <div class="card-title">Cannot attack · +50% movement (round up) · +50% TMM (round up) for that turn</div>
+    <div class="card-body">
+      A lance that declares Sprint in Phase 1 gains significant mobility at the cost of all offensive action that turn.<br><br>
+      <strong>Sprint movement</strong> = base TMM × 1.5, rounded up.<br>
+      <strong>Sprint TMM</strong> = base TMM × 1.5, rounded up — applies to defensive targeting modifier for that turn only.<br><br>
+      Sprint is declared in Phase 1. A Sprinting lance cannot make any attacks during Phase 3. It may still take damage if engaged.
+    </div>
+  </div>
+
+  <div class="sec-label">Sprint Reference Table</div>
+  <div class="callout warn" style="margin-bottom:10px"><strong>TMM cap:</strong> Sprint TMM (defensive) is capped at 5 regardless of base TMM. Movement hexes are not capped — only the defensive modifier.</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Base TMM</th><th>Base hexes/turn</th><th>Sprint hexes/turn</th><th>Sprint TMM (defensive, max 5)</th><th>Can attack while sprinting?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>TMM 1</strong></td><td>1 hex</td><td>2 hexes <span style="font-size:11px;color:var(--text2)">(1 × 1.5 = 1.5 → 2)</span></td><td>TMM 2</td><td><span style="color:var(--red)">No</span></td></tr>
+        <tr><td><strong>TMM 2</strong></td><td>2 hexes</td><td>3 hexes <span style="font-size:11px;color:var(--text2)">(2 × 1.5 = 3.0 → 3)</span></td><td>TMM 3</td><td><span style="color:var(--red)">No</span></td></tr>
+        <tr><td><strong>TMM 3</strong></td><td>3 hexes</td><td>5 hexes <span style="font-size:11px;color:var(--text2)">(3 × 1.5 = 4.5 → 5)</span></td><td>TMM 5 <span style="font-size:11px;color:var(--text2)">(cap reached)</span></td><td><span style="color:var(--red)">No</span></td></tr>
+        <tr><td><strong>TMM 4</strong></td><td>4 hexes</td><td>6 hexes <span style="font-size:11px;color:var(--text2)">(4 × 1.5 = 6.0 → 6)</span></td><td>TMM 5 <span style="font-size:11px;color:var(--text2)">(capped from 6)</span></td><td><span style="color:var(--red)">No</span></td></tr>
+        <tr><td><strong>TMM 5</strong></td><td>5 hexes</td><td>8 hexes <span style="font-size:11px;color:var(--text2)">(5 × 1.5 = 7.5 → 8)</span></td><td>TMM 5 <span style="font-size:11px;color:var(--text2)">(capped from 8)</span></td><td><span style="color:var(--red)">No</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label">Movement and Range Interaction</div>
+  <div class="grid-2">
+    <div class="card green-l">
+      <div class="card-title">TMM 1–2 — 1 range band/turn</div>
+      <div class="card-body">
+        Within a hex battle, these lances move 1 range band per turn (Long → Medium → Short). They can move toward or away from the enemy but only 1 band at a time.<br><br>
+        <strong>Retreat:</strong> Must already be at Long range to exit. Cannot retreat from Medium in one turn.
+      </div>
+    </div>
+    <div class="card green-l">
+      <div class="card-title">TMM 3–4 — 2 range bands/turn</div>
+      <div class="card-body">
+        Within a hex battle, these lances move up to 2 range bands per turn. Can jump Long → Short in one turn, or retreat from Medium → Long in one turn.<br><br>
+        <strong>Retreat:</strong> Can escape from Medium range in one turn by jumping back to Long, then exiting the following turn.
+      </div>
+    </div>
+    <div class="card green-l" style="grid-column:span 2">
+      <div class="card-title">TMM 5+ — 3 range bands/turn</div>
+      <div class="card-body">
+        Within a hex battle, these lances effectively choose any range band each turn. Can retreat from Short range all the way off the map in a single turn. Extremely difficult to pin down — opponents must use terrain or flanking to force engagement.
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Sprint Tactical Uses</div>
+  <div class="grid-2">
+    <div class="card purple-l">
+      <div class="card-title">Flanking approach</div>
+      <div class="card-body">A lance sprinting to get behind an enemy gives up its attack that turn but arrives in flanking position — then triggers the free shot and +1 die bonus from the following turn onward. The lost attack turn is usually worth it.</div>
+    </div>
+    <div class="card purple-l">
+      <div class="card-title">Supply line interdiction</div>
+      <div class="card-body">A fast lance (TMM 3, sprinting to 5 hexes) can race deep behind enemy lines to cut a supply line in a single turn — potentially placing a spotter adjacent to an enemy supply depot without the enemy being able to intercept in time.</div>
+    </div>
+    <div class="card purple-l">
+      <div class="card-title">Escape from artillery threat</div>
+      <div class="card-body">A lance that has been spotted for artillery can sprint out of the artillery's observation range (move the spotter's adjacent hex) before the barrage fires in Phase 3. Sprint declares in Phase 1 — the race is simultaneous.</div>
+    </div>
+    <div class="card purple-l">
+      <div class="card-title">Recon sweep</div>
+      <div class="card-body">Recon lances with high TMM can sprint to scan 2 hexes worth of objectives in a single turn — covering more ground than normal movement allows. Scanning still uses the Scan Objective action; the sprint provides the range.</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Sprint TMM is defensive only and capped at 5.</strong> The increased TMM from Sprinting applies to how hard the lance is to hit that turn — it does not grant additional range band movement within an ongoing hex engagement. Sprint movement applies on the world map between hexes. Range band movement within a battle hex uses the base TMM brackets (1–2, 3–4, 5+). The TMM 5 cap means TMM 4 and TMM 5 lances gain the same defensive benefit from Sprinting — but TMM 5 lances still gain the additional hex movement.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 10: COMBAT -->
+<div class="page" id="page-lancecombat">
+  <div class="page-title">Lance Combat Rules</div>
+  <div class="page-sub">Range-band engagement, TMM movement within a hex, flanking, and damage resolution.</div>
+
+  <div class="sec-label">Range Band System</div>
+  <div class="callout info">
+    Every hex engagement plays out across up to 3 range bands: <strong>Long → Medium → Short</strong>. Lances start at Long range. Each turn the range closes unless a lance uses its movement to hold or retreat. Attacks are resolved at the current range band using that column from the Alpha Strike card totals.
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Range Band</th><th>Typical Turn</th><th>Attack column used</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong style="color:var(--green)">Long</strong></td><td>Turn 1</td><td>L (Long) total</td><td>Starting range for all engagements. Some lances peak here (missile boats, snipers).</td></tr>
+        <tr><td><strong style="color:var(--orange)">Medium</strong></td><td>Turn 2</td><td>M (Medium) total</td><td>Most balanced range. Majority of lances perform well here.</td></tr>
+        <tr><td><strong style="color:var(--red)">Short</strong></td><td>Turn 3</td><td>S (Short) total</td><td>Brawl range. High-damage lances (brawlers, energy boats) dominate.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label">TMM and Range Band Movement</div>
+  <div class="card blue-l">
+    <div class="card-title">Within a hex engagement, TMM determines range band mobility</div>
+    <div class="card-body">
+      <strong>TMM 1–2</strong> — move 1 range band per turn. Can advance or retreat 1 band. To exit (retreat), must be at Long range.<br><br>
+      <strong>TMM 3–4</strong> — move 2 range bands per turn. Can jump Long → Short in one turn. Can retreat from Medium to Long in one turn, then exit next turn.<br><br>
+      <strong>TMM 5+</strong> — move 3 range bands per turn. Effectively chooses any range band freely each turn. Can retreat from Short to off-map in a single turn.
+    </div>
+  </div>
+
+  <div class="sec-label">Damage Dice Resolution</div>
+  <div class="card accent-l">
+    <div class="card-title">Every 2 damage = 1 Damage Die (1 pair of D6)</div>
+    <div class="card-body">
+      Read the attack total from the appropriate range column (S / M / L). Divide by 2 to get Damage Dice. Round up for odd totals.<br><br>
+      <strong>Example:</strong> Lance total S: 9 → 4.5 → 5 Damage Dice at Short range.<br>
+      <strong>Example:</strong> Lance total L: 4 → 2 Damage Dice at Long range.<br><br>
+      Each Damage Die is a pair of D6. Both dice in a pair must meet the target number (based on Skill) to deal damage. If one die in a pair fails, the maximum damage from that pair is allocated to the successful die.
+    </div>
+  </div>
+
+  <div class="sec-label">Flanking</div>
+  <div class="card red-l">
+    <div class="card-title">Whole lance attacks from behind — two permanent benefits</div>
+    <div class="card-body">
+      A flanking engagement requires all 4 units of the lance to be positioned behind the target lance. A single unit behind does not qualify. The GM adjudicates based on hex positioning at the start of the turn.<br><br>
+      <strong>Benefit 1 — Free shot at any chosen range:</strong> Before normal range sequencing begins, the flanking lance picks Short, Medium, or Long and fires once at that range. The enemy cannot react to this shot — it resolves before Phase 3 combat. The flanking lance picks whatever range maximizes its damage output.<br><br>
+      <strong>Benefit 2 — +1 extra Damage Die ongoing:</strong> For every subsequent turn of the engagement, the flanking lance rolls one additional Damage Die on every attack. This bonus persists until the flanking lance retreats or the enemy disengages from the hex.<br><br>
+      <strong>Countering a flank:</strong> A high-TMM lance (3–4) at Medium range can jump back to Long in one turn, then exit the following turn — breaking the engagement before the +1 die bonus compounds. A TMM 5+ lance can break from Short range in a single turn.
+    </div>
+  </div>
+
+  <div class="sec-label">Flanking — Worked Example</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Setup</div>
+      <div class="card-body">
+        Kurita Recon Lance (TMM 3, S:9 M:8 L:1) successfully flanks Davion Fire Support (TMM 2, S:11 M:13 L:18).<br><br>
+        Kurita picks <strong>Short range</strong> for the free shot — their peak damage (9 dmg → 5 dice). Davion's Fire Support has low Short damage (11 dmg → 6 dice) but excels at Long (18 dmg → 9 dice).
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Resolution</div>
+      <div class="card-body">
+        <strong>Free shot (Short):</strong> Kurita fires 5 dice. Davion cannot respond.<br><br>
+        <strong>Turn 1 onward:</strong> Engagement starts at Long. Kurita rolls Math.ceil(1/2)+1 = 2 dice (L:1 + flank die). Davion rolls 9 dice (L:18).<br><br>
+        Kurita's TMM 3 means it can sprint back to Long next turn if needed — but the +1 die bonus only applies while engaged.
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Combat IP Events (Summary)</div>
+  <div class="ip-row pos"><div><div class="ip-name">Enemy lance destroyed</div><div class="ip-note">Full lance eliminated this turn</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Full only. Crippled = +1 IP.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Enemy command lance destroyed</div></div><div class="ip-val ip-pos-c">+5 IP</div><div class="ip-cond">Replaces standard +3 IP.</div></div>
+  <div class="ip-row pos"><div><div class="ip-name">Enemy company broken</div><div class="ip-note">≥50% of company lances destroyed in one turn</div></div><div class="ip-val ip-pos-c">+3 IP</div><div class="ip-cond">Stacks with per-lance destruction IP.</div></div>
+  <div class="ip-row spe"><div><div class="ip-name">Flanking lance destroys target lance</div><div class="ip-note">Flank engagement results in full destruction</div></div><div class="ip-val ip-spe-c">+4 IP</div><div class="ip-cond">+1 IP over standard — flank acknowledged.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Own lance destroyed</div></div><div class="ip-val ip-neg-c">−2 IP</div><div class="ip-cond">Per lance lost. Crippled = −1 IP.</div></div>
+  <div class="ip-row neg"><div><div class="ip-name">Unauthorized retreat</div><div class="ip-note">Not declared in Phase 1</div></div><div class="ip-val ip-neg-c">−2 IP</div><div class="ip-cond">Davion: −3 IP.</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PAGE 11: HEX MAP -->
+<div class="page" id="page-hexmap">
+  <div class="page-title">Hex Map — Worked Example</div>
+  <div class="page-sub">Kurita vs Davion planetary assault. Each hex = one BattleTech map sheet. Use the tabs to explore movement, supply, and combat interactively.</div>
+
+  <div class="callout info">
+    <strong>Scenario:</strong> Kurita is assaulting from the west. Davion holds the Industrial City (major objective) and the HPG relay. Both sides have a DropShip and one forward Supply Depot. Units show their TMM value below the circle. Click into each tab to see mechanics in action.
+  </div>
+
+  <div style="margin-bottom:10px">
+  <div style="display:flex;gap:0;margin-bottom:0" id="hm-tabs">
+    <div class="hmt" data-hm="overview" onclick="hmTab('overview')" style="flex:1;padding:7px 4px;text-align:center;font-size:11px;font-weight:500;border:0.5px solid var(--color-border-primary);background:var(--color-background-tertiary);color:var(--color-text-primary);cursor:pointer;border-radius:var(--border-radius-md) 0 0 var(--border-radius-md)">Overview</div>
+    <div class="hmt" data-hm="movement" onclick="hmTab('movement')" style="flex:1;padding:7px 4px;text-align:center;font-size:11px;font-weight:500;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;border-left:none">Movement</div>
+    <div class="hmt" data-hm="supply" onclick="hmTab('supply')" style="flex:1;padding:7px 4px;text-align:center;font-size:11px;font-weight:500;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;border-left:none">Supply Lines</div>
+    <div class="hmt" data-hm="combat" onclick="hmTab('combat')" style="flex:1;padding:7px 4px;text-align:center;font-size:11px;font-weight:500;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;border-left:none;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0">Combat</div>
+  </div>
+  </div>
+
+  <svg id="hmap2" width="100%" viewBox="0 0 590 360" style="display:block;border-radius:var(--border-radius-lg)">
+    <rect id="hmbg2" width="590" height="360" fill="#eae4d0"/>
+    <g id="ht2"></g><g id="hhl2"></g><g id="hb2"></g><g id="hln2"></g><g id="hu2"></g><g id="hlb2"></g><g id="hs2"></g>
+  </svg>
+
+  <div id="hinfo2" style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;font-size:12px;color:var(--color-text-secondary);margin-top:10px;line-height:1.65">Loading...</div>
+
+  <div class="sec-label" style="margin-top:20px">Reading the Map</div>
+  <div class="grid-2">
+    <div class="card blue-l">
+      <div class="card-title">Movement tab</div>
+      <div class="card-body">Click any lance to highlight its movement range. Blue = base movement (1 hex per TMM). Amber = sprint range (TMM×1.5, rounded up). Notice K Recon (TMM 3) reaches 5 hexes on sprint — enough to reach the D supply line bottleneck in one turn.</div>
+    </div>
+    <div class="card green-l">
+      <div class="card-title">Supply tab</div>
+      <div class="card-body">Green lines trace Kurita supply, blue traces Davion. Press the demo button to simulate K Recon sprinting to hex (7,2) — the single hex that both the D DropShip-to-Depot path must cross. Cutting it puts D Command Out of Supply immediately.</div>
+    </div>
+    <div class="card red-l">
+      <div class="card-title">Combat tab</div>
+      <div class="card-body">K Command vs D Command contest the City hex. Switch range bands to see damage shift — D wants Long (18 dmg, 9 dice), K wants Short (12 dmg, 6 dice). Enable flanking to see the free shot and +1 die bonus applied live.</div>
+    </div>
+    <div class="card accent-l">
+      <div class="card-title">Key terrain notes</div>
+      <div class="card-body">Forest hexes provide cover — attacking through or from forest adds +1 to target difficulty (GM discretion). Hills provide elevation advantage: a lance on a hill hex attacking an adjacent lower hex gains +1 Damage Die. HPG relay is a ComStar-faction supply node worth +3 IP on capture.</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>BMT — BATTLEMECH TOURNAMENT &nbsp;·&nbsp; RULEBOOK v1.0 &nbsp;·&nbsp; ALL RULES SUBJECT TO GM DISCRETION</footer>
+
+<script>
+const pages = [
+  { id: 'overview',     label: 'Overview' },
+  { id: 'formations',   label: 'Formations' },
+  { id: 'ip',           label: 'IP System' },
+  { id: 'clout',        label: 'Clout Gain' },
+  { id: 'factions',     label: 'Factions' },
+  { id: 'supply',       label: 'Supply' },
+  { id: 'combat',       label: 'Artillery & Air' },
+  { id: 'political',    label: 'Political Victory' },
+  { id: 'movement',     label: 'Movement' },
+  { id: 'lancecombat',  label: 'Lance Combat' },
+  { id: 'hexmap',       label: 'Hex Map Example' },
+];
+
+const HNS='http://www.w3.org/2000/svg',HS=33,HHW=HS*Math.sqrt(3),HPAD=18,HCOLS=9,HROWS=6;
+function hhc(c,r){return{x:c*HHW+(r%2?HHW/2:0)+HHW/2+HPAD,y:r*HS*1.5+HS+HPAD};}
+function hhpts(c,r){const{x,y}=hhc(c,r);return Array.from({length:6},(_,i)=>{const a=Math.PI/180*(60*i-30);return`${(x+HS*Math.cos(a)).toFixed(1)},${(y+HS*Math.sin(a)).toFixed(1)}`;}).join(' ');}
+function hcube(c,r){const x=c-(r-(r&1))/2;return{x,y:-x-r,z:r};}
+function hhdist(c1,r1,c2,r2){const a=hcube(c1,r1),b=hcube(c2,r2);return Math.max(Math.abs(a.x-b.x),Math.abs(a.y-b.y),Math.abs(a.z-b.z));}
+function hrange(c,r,d){const o=[];for(let cc=0;cc<HCOLS;cc++)for(let rr=0;rr<HROWS;rr++)if(hhdist(c,r,cc,rr)<=d&&!(cc===c&&rr===r))o.push([cc,rr]);return o;}
+function hel(t,a){const e=document.createElementNS(HNS,t);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));return e;}
+function hclr(id){const g=document.getElementById(id);while(g.firstChild)g.removeChild(g.firstChild);}
+const HTERRAIN={'4,0':'hpg','4,2':'city','2,1':'minor','6,1':'minor','2,4':'minor','6,4':'minor','0,2':'forest','8,2':'forest','3,3':'forest','5,3':'forest','1,1':'hills','7,1':'hills','1,4':'hills','7,4':'hills'};
+const HTC={hills:'#c4ae60',forest:'#6a9e50',city:'#a09888',hpg:'#8080bb',minor:'#ddcc66'};
+const HSN=[{c:0,r:1,f:'k',t:'ds',lbl:'K Drop'},{c:2,r:2,f:'k',t:'dep',lbl:'K Depot'},{c:8,r:1,f:'d',t:'ds',lbl:'D Drop'},{c:6,r:2,f:'d',t:'dep',lbl:'D Depot'}];
+const HUNITS=[
+  {id:'k-cmd',f:'k',lbl:'KCmd',name:'K Command',tmm:3,s:9,m:10,l:4,c:3,r:2},
+  {id:'k-fire',f:'k',lbl:'KFire',name:'K Fire',tmm:2,s:12,m:12,l:6,c:2,r:3},
+  {id:'k-rcn',f:'k',lbl:'KRcn',name:'K Recon',tmm:3,s:9,m:8,l:1,c:3,r:1},
+  {id:'k-arm',f:'k',lbl:'KArm',name:'K Armor',tmm:1,s:12,m:10,l:6,c:1,r:3},
+  {id:'d-cmd',f:'d',lbl:'DCmd',name:'D Command',tmm:2,s:12,m:12,l:13,c:5,r:2},
+  {id:'d-fire',f:'d',lbl:'DFire',name:'D Fire',tmm:2,s:11,m:13,l:18,c:6,r:3},
+  {id:'d-rcn',f:'d',lbl:'DRcn',name:'D Recon',tmm:3,s:8,m:9,l:7,c:5,r:1},
+  {id:'d-arm',f:'d',lbl:'DArm',name:'D Armor',tmm:1,s:10,m:8,l:6,c:7,r:3},
+];
+let hmode='overview',hsel=null,hcut=false,hcr='long',hflank=false;
+function htmmR(t){return t>=5?3:t>=3?2:1;}
+function hsph(t){return Math.ceil(t*1.5);}
+function hGetDmg(u,r){return r==='short'?u.s:r==='medium'?u.m:u.l;}
+function hGetUC(u){return(hcut&&u.id==='k-rcn')?{c:7,r:2}:{c:u.c,r:u.r};}
+function hInSupply(u){
+  const{c,r}=hGetUC(u);
+  const ds=u.f==='k'?HSN[0]:HSN[2];
+  const dep=u.f==='k'?HSN[1]:HSN[3];
+  if(hhdist(c,r,ds.c,ds.r)<=3)return true;
+  const depOk=u.f==='k'?true:!hcut;
+  return depOk&&hhdist(c,r,dep.c,dep.r)<=2;
+}
+function hDrawBase(){
+  const tg=document.getElementById('ht2');
+  for(let c=0;c<HCOLS;c++)for(let r=0;r<HROWS;r++){const t=HTERRAIN[`${c},${r}`];if(t&&HTC[t])tg.appendChild(hel('polygon',{points:hhpts(c,r),fill:HTC[t],opacity:'0.7'}));}
+  const bg=document.getElementById('hb2');
+  for(let c=0;c<HCOLS;c++)for(let r=0;r<HROWS;r++)bg.appendChild(hel('polygon',{points:hhpts(c,r),fill:'none',stroke:'#aa9060','stroke-width':'0.5',opacity:'0.55'}));
+  const sg=document.getElementById('hs2');
+  Object.entries(HTERRAIN).forEach(([k,t])=>{
+    if(!['hpg','city','minor'].includes(t))return;
+    const[c,r]=k.split(',').map(Number);const{x,y}=hhc(c,r);
+    if(t==='city'||t==='hpg'){const s=hel('text',{x,y:y+2,'text-anchor':'middle','dominant-baseline':'central','font-size':'18',fill:'#aa8800',opacity:'0.45'});s.textContent='★';sg.appendChild(s);}
+    else{sg.appendChild(hel('polygon',{points:`${x},${y-9} ${x+6},${y} ${x},${y+9} ${x-6},${y}`,fill:'#cc9900',opacity:'0.45'}));}
+    const lbl=t==='hpg'?'HPG':t==='city'?'City':'Obj';
+    const lt=hel('text',{x,y:y-16,'text-anchor':'middle','font-size':'8','font-weight':'700',fill:'#332200',opacity:'0.65'});lt.textContent=lbl;sg.appendChild(lt);
+  });
+  const kl=hel('text',{x:48,y:18,'font-size':'9','font-weight':'600',fill:'#882222',opacity:'0.65','font-style':'italic'});kl.textContent='KURITA';sg.appendChild(kl);
+  const dl=hel('text',{x:542,y:18,'text-anchor':'end','font-size':'9','font-weight':'600',fill:'#222288',opacity:'0.65','font-style':'italic'});dl.textContent='DAVION';sg.appendChild(dl);
+  const cl=hel('text',{x:295,y:18,'text-anchor':'middle','font-size':'8',fill:'#664400',opacity:'0.5'});cl.textContent='CONTESTED ZONE';sg.appendChild(cl);
+}
+function hDrawHL(hexes,fill,op){
+  const g=document.getElementById('hhl2');
+  hexes.forEach(([c,r])=>g.appendChild(hel('polygon',{points:hhpts(c,r),fill,opacity:op||'0.35',stroke:fill,'stroke-width':'1.5'})));
+}
+function hDrawLines(){
+  hclr('hln2');const g=document.getElementById('hln2');
+  if(hmode==='supply'){
+    const kds=hhc(0,1),kdep=hhc(2,2);
+    g.appendChild(hel('line',{x1:kds.x,y1:kds.y,x2:kdep.x,y2:kdep.y,stroke:'#339944','stroke-width':'2','stroke-dasharray':'6 3',opacity:'0.8'}));
+    const dds=hhc(8,1),ddep=hhc(6,2);const dc=hcut?'#cc4444':'#4466cc';
+    g.appendChild(hel('line',{x1:dds.x,y1:dds.y,x2:ddep.x,y2:ddep.y,stroke:dc,'stroke-width':'2','stroke-dasharray':'6 3',opacity:'0.8'}));
+    if(hcut){const{x,y}=hhc(7,2);g.appendChild(hel('line',{x1:x-11,y1:y-11,x2:x+11,y2:y+11,stroke:'#ff3333','stroke-width':'3'}));g.appendChild(hel('line',{x1:x+11,y1:y-11,x2:x-11,y2:y+11,stroke:'#ff3333','stroke-width':'3'}));}
+    HUNITS.forEach(u=>{const{c,r}=hGetUC(u);const{x:ux,y:uy}=hhc(c,r);const ds=u.f==='k'?HSN[0]:HSN[2];const dep=u.f==='k'?HSN[1]:HSN[3];
+      if(hInSupply(u)){const src=hhdist(c,r,ds.c,ds.r)<=3?hhc(ds.c,ds.r):hhc(dep.c,dep.r);const col=u.f==='k'?'#339944':'#4466cc';g.appendChild(hel('line',{x1:src.x,y1:src.y,x2:ux,y2:uy,stroke:col,'stroke-width':'1','stroke-dasharray':'3 2',opacity:'0.5'}));}
+    });
+  }
+  if(hmode==='combat'){const kp=hhc(3,2),dp=hhc(5,2);g.appendChild(hel('line',{x1:kp.x,y1:kp.y,x2:dp.x,y2:dp.y,stroke:'#888','stroke-width':'1.5','stroke-dasharray':'4 3',opacity:'0.7'}));}
+}
+function hDrawUnits(){
+  hclr('hu2');hclr('hlb2');const ug=document.getElementById('hu2'),lg=document.getElementById('hlb2');
+  HSN.forEach(n=>{const{x,y}=hhc(n.c,n.r);const col=n.f==='k'?'#cc3333':'#3355cc';
+    if(n.t==='ds')ug.appendChild(hel('polygon',{points:`${x},${y-17} ${x+12},${y} ${x},${y+17} ${x-12},${y}`,fill:col,stroke:'white','stroke-width':'1.5',opacity:'0.88'}));
+    else ug.appendChild(hel('rect',{x:x-9,y:y-9,width:18,height:18,rx:'2',fill:col,stroke:'white','stroke-width':'1',opacity:'0.88'}));
+    const lt=hel('text',{x,y:y+27,'text-anchor':'middle','font-size':'8',fill:col,'font-weight':'700'});lt.textContent=n.lbl;lg.appendChild(lt);
+  });
+  HUNITS.forEach(u=>{const{c,r}=hGetUC(u);const{x,y}=hhc(c,r);const baseCol=u.f==='k'?'#cc3333':'#3355cc';const isSel=hsel&&hsel.id===u.id;
+    let fc=baseCol;if(hmode==='supply')fc=hInSupply(u)?'#228833':'#cc3333';
+    const circ=hel('circle',{cx:x,cy:y,r:'14',fill:fc,stroke:isSel?'#ffee00':'rgba(255,255,255,0.85)','stroke-width':isSel?'3':'1.5',cursor:hmode==='movement'?'pointer':'default',opacity:'0.93'});
+    circ.addEventListener('click',()=>{if(hmode==='movement'){hsel=u;hRefresh();hUpdateInfo();}});
+    ug.appendChild(circ);
+    const lt=hel('text',{x,y:y+1,'text-anchor':'middle','dominant-baseline':'central','font-size':'8','font-weight':'700',fill:'white','pointer-events':'none'});lt.textContent=u.lbl;lg.appendChild(lt);
+    const tl=hel('text',{x,y:y+22,'text-anchor':'middle','font-size':'8',fill:baseCol,'font-weight':'600',opacity:'0.95'});tl.textContent=`T${u.tmm}`;lg.appendChild(tl);
+  });
+}
+function hRefresh(){
+  hclr('hhl2');
+  if(hmode==='movement'&&hsel){const{c,r}=hGetUC(hsel);const mv=hsel.tmm,sp=hsph(hsel.tmm);hDrawHL(hrange(c,r,sp).filter(([cc,rr])=>hhdist(c,r,cc,rr)>mv),'#EF9F27','0.28');hDrawHL(hrange(c,r,mv),'#378ADD','0.38');}
+  if(hmode==='combat'){hDrawHL([[3,2]],'#cc3333','0.22');hDrawHL([[5,2]],'#3355cc','0.22');hDrawHL([[4,2]],'#ddaa00','0.22');}
+  if(hmode==='supply'&&hcut)hDrawHL([[7,2]],'#cc3333','0.32');
+  hDrawLines();hDrawUnits();
+}
+function hUpdateInfo(){
+  const p=document.getElementById('hinfo2');
+  const btnStyle=(active,danger)=>`style="font-size:11px;padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:${active?(danger?'var(--color-background-danger)':'var(--color-background-info)'):'var(--color-background-primary)'};color:${active?(danger?'var(--color-text-danger)':'var(--color-text-info)'):'var(--color-text-primary)'};border-color:${active?(danger?'var(--color-border-danger)':'var(--color-border-info)'):'var(--color-border-secondary)'};cursor:pointer;margin-right:5px;margin-bottom:4px"`;
+  if(hmode==='overview'){
+    p.innerHTML=`<strong>Kurita vs Davion — planetary assault.</strong> Kurita presses from the west; Davion holds the Industrial City and HPG relay. Switch tabs above to explore movement, supply interdiction, and combat mechanics interactively.<br><br>
+    <span style="color:#cc3333">■</span> Kurita lances &nbsp;·&nbsp; <span style="color:#3355cc">■</span> Davion lances &nbsp;·&nbsp; Diamond = DropShip &nbsp;·&nbsp; Square = Supply Depot &nbsp;·&nbsp; T# below unit = TMM &nbsp;·&nbsp; <span style="color:#6a9e50">■</span> Forest &nbsp;·&nbsp; <span style="color:#c4ae60">■</span> Hills &nbsp;·&nbsp; ★ City/HPG (major objectives) &nbsp;·&nbsp; ◆ Minor objective`;
+  } else if(hmode==='movement'){
+    if(!hsel){p.innerHTML=`<strong>Movement — click any lance to see its range.</strong><br><br><span style="display:inline-block;width:12px;height:10px;background:#378ADD;opacity:0.7;border-radius:2px;margin-right:4px"></span><strong style="color:var(--color-text-info)">Blue hexes</strong> = base movement (1 hex per TMM).<br><span style="display:inline-block;width:12px;height:10px;background:#EF9F27;opacity:0.6;border-radius:2px;margin-right:4px"></span><strong style="color:var(--color-text-warning)">Amber hexes</strong> = sprint range (TMM×1.5, rounded up) — no attack that turn. Sprint defensive TMM capped at 5.`;}
+    else{const u=hsel,mv=u.tmm,sp=hsph(u.tmm),st=Math.min(5,Math.ceil(u.tmm*1.5)),rb=htmmR(u.tmm);
+      p.innerHTML=`<strong>${u.name}</strong> — TMM ${u.tmm}<br><br>Base movement: <strong>${mv} hex/turn</strong> &nbsp;·&nbsp; Sprint: <strong>${sp} hexes</strong> (no attack) &nbsp;·&nbsp; Sprint TMM: <strong>${st}${u.tmm>=4?' — capped':''}</strong><br>Within a hex battle: moves <strong>${rb} range band${rb>1?'s':''}/turn</strong>. ${rb>=3?'Can escape from Short range in a single turn.':rb>=2?'Can escape from Medium range in one turn.':'Must be at Long range to retreat.'}`;}
+  } else if(hmode==='supply'){
+    const sts=HUNITS.map(u=>`<span style="margin-right:10px"><span style="color:${hInSupply(u)?'#228833':'#cc3333'};font-weight:700">${hInSupply(u)?'✓':'✗'}</span> ${u.name}</span>`).join('');
+    p.innerHTML=`<strong>Supply lines.</strong> DropShips supply within 3 hexes. Depots extend +2 hexes from their position. Line must trace through friendly/neutral hexes only.<br><br>
+    <button onclick="hToggleCut()" ${btnStyle(hcut,true)}>${hcut?'✓ Restore supply':'Demo: K Recon sprints to cut D supply'}</button><br>
+    <div style="margin:8px 0;font-size:11px">${sts}</div>
+    ${hcut?'<span style="color:#cc3333;font-weight:500">K Recon (TMM 3) sprinted 4 hexes to (7,2), blocking the D DropShip → D Depot path. The ✗ marks the cut. D Command is now Out of Supply — loses 1 Damage Die next turn, cannot repair. D Recon, D Fire, and D Armor remain in direct DropShip range and stay in supply.</span>':'All units currently in supply. The Davion supply line bottleneck is hex (7,2) — the only path from D DropShip (8,1) to D Depot (6,2). K Recon at TMM 3 can reach it in one sprint turn.'}`;
+  } else {
+    const ku=HUNITS[0],du=HUNITS[4];const kd=hGetDmg(ku,hcr),dd=hGetDmg(du,hcr);const fb=hflank?1:0,kdice=Math.ceil(kd/2)+fb,ddice=Math.ceil(dd/2);
+    const rb=(r,l)=>`<button onclick="hSetCR('${r}')" ${btnStyle(hcr===r,false)}>${l}</button>`;
+    p.innerHTML=`<strong>K Command vs D Command</strong> — contesting the City hex (highlighted gold).<br><br>
+    ${rb('long','Long range')}${rb('medium','Medium range')}${rb('short','Short range')}
+    <button onclick="hToggleFlank()" ${btnStyle(hflank,true)}>${hflank?'✓ Flanking ON (K)':'Enable K flanking'}</button><br><br>
+    K Command: <strong style="color:#cc3333">${kd} dmg → ${kdice} dice${fb?' (+1 flank)':''}</strong> at ${hcr} range &nbsp;·&nbsp;
+    D Command: <strong style="color:#3355cc">${dd} dmg → ${ddice} dice</strong> at ${hcr} range<br>
+    ${hflank?`<br><span style="color:#cc3333"><strong>Flanking:</strong> K free shot at Short (${ku.s} dmg → ${Math.ceil(ku.s/2)} dice, D cannot react). +1 die every subsequent turn.</span><br>`:''}
+    <br><span style="font-size:11px">D peaks at <strong>Long</strong> (${du.l} dmg, ${Math.ceil(du.l/2)} dice) — wants to stay back. K peaks at <strong>Short/Medium</strong> (${ku.s}/${ku.m} dmg) — wants to close. K TMM ${ku.tmm} moves ${htmmR(ku.tmm)} range bands/turn; D TMM ${du.tmm} moves ${htmmR(du.tmm)} band/turn.</span>`;
+  }
+}
+function hToggleCut(){hcut=!hcut;hRefresh();hUpdateInfo();}
+function hSetCR(r){hcr=r;hUpdateInfo();}
+function hToggleFlank(){hflank=!hflank;hUpdateInfo();}
+
+const nav = document.getElementById('nav');
+pages.forEach(p => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-tab' + (p.id === 'overview' ? ' on' : '');
+  btn.textContent = p.label;
+  btn.onclick = () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('.page').forEach(pg => pg.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('page-' + p.id).classList.add('on');
+    window.scrollTo(0, 0);
+    if(p.id === 'hexmap') hMapInit();
+  };
+  nav.appendChild(btn);
+});
+
+let hMapReady = false;
+function hMapInit() {
+  if (hMapReady) return;
+  hMapReady = true;
+  hDrawBase();
+  hRefresh();
+  hUpdateInfo();
+}
+
+function hmTab(m) {
+  hmode = m; hsel = null; hcut = false; hcr = 'long'; hflank = false;
+  document.querySelectorAll('.hmt').forEach(t => {
+    const active = t.getAttribute('data-hm') === m;
+    t.style.background = active ? 'var(--color-background-tertiary)' : 'var(--color-background-secondary)';
+    t.style.color = active ? 'var(--color-text-primary)' : 'var(--color-text-secondary)';
+    t.style.borderColor = active ? 'var(--color-border-primary)' : 'var(--color-border-tertiary)';
+  });
+  hRefresh(); hUpdateInfo();
+}
+</script>
+</body>
+</html>
