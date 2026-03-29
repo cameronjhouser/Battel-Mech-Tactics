@@ -382,6 +382,42 @@
   }
   .ti strong { font-weight: 600; display: block; color: var(--text); margin-bottom: 2px; font-size: 11px; }
 
+  /* LANCE TYPE CARDS */
+  .lance-type-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .lance-type-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .lance-badge {
+    font-family: var(--cond); font-size: 10px; font-weight: 600;
+    padding: 3px 8px; border-radius: 3px; letter-spacing: 0.06em;
+    text-transform: uppercase; white-space: nowrap;
+  }
+  .lance-type-sub { font-size: 11px; color: var(--text3); }
+  .lance-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 8px; }
+  .slot {
+    font-size: 10px; font-family: var(--mono); padding: 4px 8px;
+    border-radius: 3px; background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+  }
+  .slot.filled { border-color: currentColor; font-weight: 700; }
+  .slot.empty  { color: var(--text3); text-decoration: line-through; opacity: 0.6; }
+  .lance-req-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+  .req-tag { font-size: 10px; padding: 3px 7px; border-radius: 3px; font-family: var(--cond); font-weight: 600; letter-spacing: 0.04em; }
+  .req-tag.comp     { background:#1a2238; color:var(--blue); }
+  .req-tag.speed    { background:#1a2e20; color:var(--green); }
+  .req-tag.role     { background:#2e2010; color:var(--orange); }
+  .req-tag.restrict { background:#2e1a1a; color:var(--red); }
+  .lance-abilities { margin-top: 6px; display: flex; flex-direction: column; gap: 3px; }
+  .lance-abilities.choice {
+    background: rgba(255,255,255,0.02); border: 1px dashed var(--border2);
+    border-radius: 4px; padding: 4px 6px;
+  }
+  .lance-choice-label {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text3); margin-top: 6px; margin-bottom: 2px; font-family: var(--cond);
+  }
+  .lance-ability { font-size: 10px; color: var(--text2); line-height: 1.5; padding: 2px 0; }
+  .lance-ability.leader { color: var(--accent); }
+  .ab-name { font-family: var(--cond); font-weight: 700; color: var(--text); font-size: 10px; margin-right: 4px; }
+  .lance-note { font-size: 10px; color: var(--text3); margin-top: 4px; font-style: italic; }
+
   /* SCENARIO BOXES */
   .scenario { padding: 10px 12px; border-radius: 4px; background: var(--bg2); border: 1px solid var(--border); font-size: 12px; margin-bottom: 8px; }
   .scenario.yes { border-left: 3px solid var(--green); }
@@ -611,14 +647,14 @@
   <div class="tier-card">
     <div class="tier-header">
       <span class="tier-badge" style="background:#1a2238;color:var(--blue);border:1px solid #2a3858;">TIER 1</span>
-      <span class="tier-name">Lieutenant / Sergeant</span>
+      <span class="tier-name">Lieutenant</span>
       <span class="tier-ip">0–9 IP</span>
     </div>
     <div class="tier-grid">
-      <div class="ti"><strong>Max Formation</strong>Lance (4 'Mechs)</div>
+      <div class="ti"><strong>Max Formation</strong>Lance — 4 'Mechs</div>
       <div class="ti"><strong>Max PV Request</strong>Up to 280 PV</div>
-      <div class="ti"><strong>Unit Quality</strong>Green / Regular</div>
-      <div class="ti"><strong>Requisition</strong>Standard lance config</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Unit Quality</strong>Skill 4 units only</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Lance Types</strong>Light Lance, Medium Lance</div>
     </div>
   </div>
 
@@ -629,61 +665,247 @@
       <span class="tier-ip">10–24 IP</span>
     </div>
     <div class="tier-grid">
-      <div class="ti"><strong>Max Formation</strong>Company (12 'Mechs)</div>
-      <div class="ti"><strong>Max PV Request</strong>Up to 840 PV</div>
-      <div class="ti"><strong>Unit Quality</strong>Regular / Veteran</div>
-      <div class="ti"><strong>Requisition</strong>Augmented lance, air lance</div>
-      <div class="ti"><strong>Special</strong>1× artillery request/game</div>
-      <div class="ti"><strong>Special</strong>Demi-company formations</div>
+      <div class="ti"><strong>Max Formation</strong>Company — 3–4 Lances (12–16 'Mechs)</div>
+      <div class="ti"><strong>Max PV Request</strong>Up to 1,120 PV</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Unit Quality</strong>Unlimited Skill 4 &nbsp;·&nbsp; 1× Skill 3</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Lance Types</strong>Light Lance, Medium Lance &nbsp;·&nbsp; max 1 Heavy Lance</div>
     </div>
   </div>
 
   <div class="tier-card">
     <div class="tier-header">
       <span class="tier-badge" style="background:#2e2010;color:var(--orange);border:1px solid #4a3420;">TIER 3</span>
-      <span class="tier-name">Major / Lt. Colonel</span>
+      <span class="tier-name">Major</span>
       <span class="tier-ip">25–49 IP</span>
     </div>
     <div class="tier-grid">
-      <div class="ti"><strong>Max Formation</strong>Battalion (40 'Mechs)</div>
-      <div class="ti"><strong>Max PV Request</strong>Up to 2,800 PV</div>
-      <div class="ti"><strong>Unit Quality</strong>Veteran / Elite</div>
-      <div class="ti"><strong>Requisition</strong>Augmented battalion, mixed arms</div>
-      <div class="ti"><strong>Special</strong>Orbital bombardment (1×/campaign)</div>
-      <div class="ti"><strong>Special</strong>Assign Errant Force status</div>
+      <div class="ti"><strong>Max Formation</strong>Battalion — 3–4 Companies (36–64 'Mechs)</div>
+      <div class="ti"><strong>Max PV Request</strong>Up to 4,480 PV</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Unit Quality</strong>Unlimited Skill 4 &nbsp;·&nbsp; 3× Skill 3 &nbsp;·&nbsp; 1× Skill 2</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Lance Types</strong>Light &amp; Medium unrestricted &nbsp;·&nbsp; 3–4 Heavy Lances &nbsp;·&nbsp; 1–2 Assault Lances</div>
+      <div class="ti" style="grid-column:1/-1;border-color:var(--teal);color:var(--teal)"><strong style="color:var(--teal)">Special Forces</strong>1 lance (4 'Mechs, any type &amp; weight) — units must be Skill 1</div>
     </div>
   </div>
 
   <div class="tier-card">
     <div class="tier-header">
       <span class="tier-badge" style="background:#2e1a1a;color:var(--red);border:1px solid #4a2a2a;">TIER 4</span>
-      <span class="tier-name">Colonel / General</span>
+      <span class="tier-name">Colonel</span>
       <span class="tier-ip">50–99 IP</span>
     </div>
     <div class="tier-grid">
-      <div class="ti"><strong>Max Formation</strong>Regiment (180 'Mechs)</div>
-      <div class="ti"><strong>Max PV Request</strong>Up to 12,600 PV</div>
-      <div class="ti"><strong>Unit Quality</strong>Elite / Legendary</div>
-      <div class="ti"><strong>Requisition</strong>Reinforced regiment, WarShip escort</div>
-      <div class="ti"><strong>Special</strong>Reassign other players' units</div>
-      <div class="ti"><strong>Special</strong>Invoke faction alliance (NPC forces)</div>
+      <div class="ti"><strong>Max Formation</strong>Regiment — 3–4 Battalions (108–256 'Mechs)</div>
+      <div class="ti"><strong>Max PV Request</strong>Up to 17,920 PV</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Unit Quality</strong>Unlimited Skill 4 &nbsp;·&nbsp; 9× Skill 3 &nbsp;·&nbsp; 3× Skill 2 &nbsp;·&nbsp; 1× Skill 1</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Lance Types</strong>Light &amp; Medium unrestricted &nbsp;·&nbsp; 9–12 Heavy Lances &nbsp;·&nbsp; 3–4 Assault Lances</div>
+      <div class="ti" style="grid-column:1/-1;border-color:var(--teal);color:var(--teal)"><strong style="color:var(--teal)">Special Forces</strong>2 lances (4 'Mechs each, any type &amp; weight) — units must be Skill 0</div>
     </div>
   </div>
 
   <div class="tier-card" style="border-color:var(--purple)">
     <div class="tier-header">
       <span class="tier-badge" style="background:#221a38;color:var(--purple);border:1px solid #382a58;">TIER 5</span>
-      <span class="tier-name">Field Marshal / Precentor Martial</span>
+      <span class="tier-name">General</span>
       <span class="tier-ip">100+ IP</span>
     </div>
     <div class="tier-grid">
-      <div class="ti"><strong>Max Formation</strong>Multi-regiment task force</div>
+      <div class="ti"><strong>Max Formation</strong>Brigade — 3–4 Regiments</div>
       <div class="ti"><strong>Max PV Request</strong>Unlimited (GM approval)</div>
-      <div class="ti"><strong>Unit Quality</strong>Legendary + hero 'Mechs</div>
-      <div class="ti"><strong>Requisition</strong>DropShip assault, Clan-tech salvage</div>
-      <div class="ti"><strong>Special</strong>Declare planetary martial law</div>
-      <div class="ti"><strong>Special</strong>Named hero unit assignment</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Unit Quality</strong>Unlimited Skill 4 &nbsp;·&nbsp; 27× Skill 3 &nbsp;·&nbsp; 9× Skill 2 &nbsp;·&nbsp; 2× Skill 1</div>
+      <div class="ti" style="grid-column:1/-1"><strong>Lance Types</strong>Light &amp; Medium unrestricted &nbsp;·&nbsp; 27–36 Heavy Lances &nbsp;·&nbsp; 9–12 Assault Lances</div>
+      <div class="ti" style="grid-column:1/-1;border-color:var(--teal);color:var(--teal)"><strong style="color:var(--teal)">Special Forces</strong>3 lances (4 'Mechs each, any type &amp; weight) — units must be Skill 0</div>
     </div>
+  </div>
+
+  <!-- GENERAL LANCE TYPES -->
+  <div class="sec-label">General Lance Types</div>
+  <div class="grid-2">
+
+    <!-- LIGHT LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#1a2238;color:var(--blue);border:1px solid #2a3858;">LIGHT LANCE</span>
+        <span class="lance-type-sub">For Light units</span>
+      </div>
+      <div class="lance-slots">
+        <div class="slot filled" style="color:var(--blue);">Light: 2+</div>
+        <div class="slot">Medium: 0–2</div>
+        <div class="slot empty">Heavy: 0</div>
+        <div class="slot empty">Assault: 0</div>
+      </div>
+    </div>
+
+    <!-- MEDIUM LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#1a2e20;color:var(--green);border:1px solid #2a4a30;">MEDIUM LANCE</span>
+        <span class="lance-type-sub">For Medium units</span>
+      </div>
+      <div class="lance-slots">
+        <div class="slot">Light: 0+</div>
+        <div class="slot filled" style="color:var(--green);">Medium: 2+</div>
+        <div class="slot">Heavy: 0–1</div>
+        <div class="slot empty">Assault: 0</div>
+      </div>
+    </div>
+
+    <!-- HEAVY LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#2e2010;color:var(--orange);border:1px solid #4a3420;">HEAVY LANCE</span>
+        <span class="lance-type-sub">For Heavy units</span>
+      </div>
+      <div class="lance-slots">
+        <div class="slot">Light: 0+</div>
+        <div class="slot">Medium: 0+</div>
+        <div class="slot filled" style="color:var(--orange);">Heavy: 2+</div>
+        <div class="slot">Assault: 0–1</div>
+      </div>
+    </div>
+
+    <!-- ASSAULT LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#2e1a1a;color:var(--red);border:1px solid #4a2a2a;">ASSAULT LANCE</span>
+        <span class="lance-type-sub">For Assault units</span>
+      </div>
+      <div class="lance-slots">
+        <div class="slot empty">Light: 0 (none)</div>
+        <div class="slot">Medium: 0+</div>
+        <div class="slot">Heavy: 0+</div>
+        <div class="slot filled" style="color:var(--red);">Assault: 2+</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SPECIAL LANCE TYPES -->
+  <div class="sec-label">Special Lance Types</div>
+  <div class="grid-2">
+
+    <!-- RECON / SCOUT LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#122828;color:var(--teal);border:1px solid #1e4040;">RECON / SCOUT LANCE</span>
+      </div>
+      <div class="lance-req-row">
+        <span class="req-tag comp">Any weight</span>
+        <span class="req-tag speed">MV 10+ all 4</span>
+        <span class="req-tag role">≥2 Scout/Striker</span>
+      </div>
+      <div class="lance-abilities">
+        <div class="lance-ability"><span class="ab-name">Eagle's Eyes</span>Gains RCN keyword. +2" sensor range, auto-reveal hidden units ≤2", +2 to avoid minefields.</div>
+        <div class="lance-ability"><span class="ab-name">Forward Observer</span>Spot for indirect fire for multiple friendly units at once — can still attack while spotting (no penalty).</div>
+        <div class="lance-ability"><span class="ab-name">Maneuvering Ace</span>Reduced movement penalty through woods and rough terrain.</div>
+      </div>
+      <div class="lance-note">Best for: Light or Medium (fast ones)</div>
+    </div>
+
+    <!-- STRIKE / STRIKER LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#1a2238;color:var(--blue);border:1px solid #2a3858;">STRIKE / STRIKER LANCE</span>
+      </div>
+      <div class="lance-req-row">
+        <span class="req-tag restrict">No Assault</span>
+        <span class="req-tag speed">MV 10+ or Jump 8+</span>
+        <span class="req-tag role">≥50% Striker/Skirmisher</span>
+      </div>
+      <div class="lance-abilities">
+        <div class="lance-ability"><span class="ab-name">Speed Demon</span>+2" extra movement per turn without increasing your Target Movement Modifier (TMM).</div>
+      </div>
+      <div class="lance-note">Best for: Light or Medium</div>
+    </div>
+
+    <!-- FIRE LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#2e2010;color:var(--orange);border:1px solid #4a3420;">FIRE LANCE</span>
+      </div>
+      <div class="lance-req-row">
+        <span class="req-tag comp">Any weight</span>
+        <span class="req-tag role">≥3 Missile Boat/Sniper</span>
+      </div>
+      <div class="lance-abilities">
+        <div class="lance-ability"><span class="ab-name">Sniper</span>Halves all range penalties: +1 at medium range (instead of +2); +2 at long range (instead of +4).</div>
+      </div>
+      <div class="lance-note">Works with: Any class with long-range weapons</div>
+    </div>
+
+    <!-- BATTLE / LINE LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#2e1a1a;color:var(--red);border:1px solid #4a2a2a;">BATTLE / LINE LANCE</span>
+      </div>
+      <div class="lance-req-row">
+        <span class="req-tag comp">≥50% Heavy/Assault</span>
+        <span class="req-tag role">3/4 Brawler/Sniper/Skirmisher</span>
+      </div>
+      <div class="lance-abilities">
+        <div class="lance-ability"><span class="ab-name">Lucky</span>Reroll one failed to-hit roll per game. Lance version grants extra uses based on number of units in formation.</div>
+      </div>
+      <div class="lance-note">Best for: Mix with Heavy/Assault as the core</div>
+    </div>
+
+    <!-- ASSAULT LANCE (Special) -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#2a1010;color:#ff6060;border:1px solid #5a2a2a;">ASSAULT LANCE</span>
+      </div>
+      <div class="lance-req-row">
+        <span class="req-tag restrict">No Light units</span>
+        <span class="req-tag comp">≥3 Heavy/Assault</span>
+        <span class="req-tag comp">Min 5 armor each</span>
+        <span class="req-tag role">75% medium-range strong</span>
+      </div>
+      <div class="lance-abilities">
+        <div class="lance-ability"><span class="ab-name">Demoralizer</span>Once per turn: enemies within 6" roll 2d6 — on 8 or less, they're slowed (half MV, half TMM) and have a penalty to hit this lance.</div>
+        <div class="lance-ability"><span class="ab-name">Multi-Tasker</span>Split your damage between two different targets in one attack instead of concentrating on one.</div>
+      </div>
+      <div class="lance-note">Best for: Heavy and Assault only</div>
+    </div>
+
+    <!-- COMMAND LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#2a2010;color:var(--accent);border:1px solid #4a3a20;">COMMAND LANCE</span>
+      </div>
+      <div class="lance-req-row">
+        <span class="req-tag comp">Any weight</span>
+        <span class="req-tag role">≥1 Force Commander</span>
+        <span class="req-tag role">50% Missile Boat/Juggernaut/Skirmisher/Sniper</span>
+      </div>
+      <div class="lance-choice-label">Each 'Mech picks one:</div>
+      <div class="lance-abilities choice">
+        <div class="lance-ability"><span class="ab-name">Antagonizer</span>Enemies within 6" roll 2d6; fail = must move toward you and can only shoot you.</div>
+        <div class="lance-ability"><span class="ab-name">Blood Stalker</span>Pick 1 enemy at game start: −1 to hit that target, +2 to hit all others.</div>
+        <div class="lance-ability"><span class="ab-name">Combat Intuition</span>Win initiative → move and shoot immediately (3-turn cooldown).</div>
+        <div class="lance-ability"><span class="ab-name">Eagle's Eyes</span>RCN keyword, +2" sensor range, auto-reveal hidden ≤2", +2 minefield avoid.</div>
+        <div class="lance-ability"><span class="ab-name">Marksman</span>Trade half damage &amp; movement for a Through-Armor Critical chance on hit by 3+.</div>
+        <div class="lance-ability"><span class="ab-name">Multi-Tasker</span>Split damage between two different targets in one attack.</div>
+      </div>
+      <div class="lance-abilities">
+        <div class="lance-ability leader"><span class="ab-name">★ Tactical Genius</span>Leader only — reroll the initiative roll once every 2 turns.</div>
+      </div>
+      <div class="lance-note">Works with: Any mix</div>
+    </div>
+
+    <!-- PURSUIT LANCE -->
+    <div class="lance-type-card">
+      <div class="lance-type-header">
+        <span class="lance-badge" style="background:#221a38;color:var(--purple);border:1px solid #382a58;">PURSUIT LANCE</span>
+      </div>
+      <div class="lance-req-row">
+        <span class="req-tag comp">Any weight</span>
+        <span class="req-tag speed">MV 10+ all 4</span>
+        <span class="req-tag role">≥2 Striker/Skirmisher</span>
+      </div>
+      <div class="lance-abilities">
+        <div class="lance-ability"><span class="ab-name">Blood Stalker</span>Choose 1 enemy at game start: −1 to hit that target, +2 to hit all others. Perfect for relentless pursuit.</div>
+      </div>
+      <div class="lance-note">Best for: Fast units built for hunting down targets</div>
+    </div>
+
   </div>
 
   <div class="sec-label">Special Spend Actions (Any Tier)</div>
