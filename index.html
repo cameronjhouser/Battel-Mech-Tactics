@@ -488,6 +488,58 @@
   .hx-neutral{ background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
 
   /* ── LANCE BUILDER ─────────────────────────────────── */
+  .lb-mode-btn {
+    background:none; border:none; border-bottom:2px solid transparent;
+    color:var(--text2); font-family:var(--cond); font-weight:600; font-size:13px;
+    letter-spacing:.05em; padding:8px 14px 10px; cursor:pointer;
+  }
+  .lb-mode-btn.on { color:var(--accent); border-bottom-color:var(--accent); }
+  .lb-mode-btn:hover:not(.on) { color:var(--text); }
+
+  .lb-csv-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:center; }
+  .lb-csv-controls select {
+    background:var(--bg3); border:1px solid var(--border2); color:var(--text);
+    font-family:var(--sans); font-size:13px; padding:7px 10px; border-radius:4px; flex:1 1 200px;
+  }
+  .lb-file-label {
+    display:inline-flex; align-items:center; gap:8px; background:var(--bg3);
+    border:1px solid var(--border2); border-radius:4px; padding:7px 12px;
+    cursor:pointer; font-size:13px; color:var(--text2); white-space:nowrap;
+  }
+  .lb-file-label:hover { border-color:var(--accent); color:var(--accent); }
+  .lb-file-label input[type=file] { display:none; }
+
+  .lb-formation-block { margin-top:18px; }
+  .lb-formation-header {
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--bg2); border:1px solid var(--border2); border-radius:5px 5px 0 0;
+    padding:10px 14px; margin-bottom:0;
+  }
+  .lb-formation-title { font-family:var(--cond); font-weight:700; font-size:16px; color:var(--text); }
+  .lb-formation-meta { font-family:var(--mono); font-size:12px; color:var(--text3); }
+
+  .lb-lances-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; margin-top:14px; }
+
+  .lb-lance-block {
+    background:var(--bg2); border:1px solid var(--border); border-radius:5px; overflow:hidden;
+  }
+  .lb-lance-title {
+    background:var(--bg3); border-bottom:1px solid var(--border);
+    padding:6px 12px; font-family:var(--cond); font-weight:700; font-size:12px;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--text2);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .lb-lance-pv { font-family:var(--mono); font-size:11px; color:var(--accent); }
+  .lb-unit-row {
+    display:flex; align-items:center; gap:8px; padding:7px 12px;
+    border-bottom:1px solid var(--border); font-size:12px;
+  }
+  .lb-unit-row:last-of-type { border-bottom:none; }
+  .lb-unit-name { flex:1; font-weight:500; color:var(--text); }
+  .lb-unit-name small { display:block; font-size:10px; color:var(--text3); }
+  .lb-unit-dmg { font-family:var(--mono); font-size:10px; color:var(--text3); }
+  .lb-unresolved { color:var(--red); font-size:11px; font-style:italic; padding:6px 12px; }
+  .lb-lance-analysis { padding:5px 12px 8px; font-size:10px; color:var(--text3); border-top:1px solid var(--border); }
   .lb-layout { display:grid; grid-template-columns:1fr 340px; gap:16px; align-items:start; }
   @media(max-width:800px){ .lb-layout { grid-template-columns:1fr; } }
 
@@ -1862,48 +1914,80 @@
 <!-- ═══════════════════════════════════════════════════════ LANCE BUILDER -->
 <div class="page" id="page-lance">
   <div class="page-title">Lance Builder</div>
-  <div class="page-sub">Search the Master Unit List to find Alpha Strike units and auto-build your lance.</div>
+  <div class="page-sub">Search the Master Unit List to find Alpha Strike units and auto-build your lance — or upload a CSV roster to auto-generate a full formation.</div>
 
-  <div class="lb-layout">
-    <!-- LEFT: search + results -->
-    <div>
-      <div class="lb-search-form">
-        <input id="lb-name" type="text" placeholder="Unit name (e.g. Warhammer, Atlas, Locust…)" />
-        <select id="lb-weight">
-          <option value="">All weights</option>
-          <option value="20,35">Light (20–35t)</option>
-          <option value="40,55">Medium (40–55t)</option>
-          <option value="60,75">Heavy (60–75t)</option>
-          <option value="80,100">Assault (80–100t)</option>
-        </select>
-        <select id="lb-type">
-          <option value="18">BattleMech</option>
-          <option value="">All types</option>
-          <option value="23">Combat Vehicle</option>
-          <option value="21">Battle Armor</option>
-          <option value="22">Aerospace</option>
-        </select>
-        <button class="lb-btn" onclick="lbSearch()">Search MUL</button>
-      </div>
-      <div id="lb-status" class="lb-status">Enter a unit name and hit Search.</div>
-      <div id="lb-results" class="lb-results" style="display:none"></div>
-    </div>
+  <!-- ── TAB SWITCHER ───────────────────────── -->
+  <div style="display:flex;gap:8px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:0">
+    <button class="lb-mode-btn on" id="lb-tab-search" onclick="lbSwitchMode('search')">Manual Search</button>
+    <button class="lb-mode-btn"   id="lb-tab-csv"    onclick="lbSwitchMode('csv')">CSV Formation Builder</button>
+  </div>
 
-    <!-- RIGHT: lance roster -->
-    <div>
-      <div class="sec-label" style="margin-bottom:10px">Lance Roster</div>
-      <div class="lb-roster" id="lb-roster">
-        <div class="lb-slot" id="lb-slot-0">Slot 1 — empty</div>
-        <div class="lb-slot" id="lb-slot-1">Slot 2 — empty</div>
-        <div class="lb-slot" id="lb-slot-2">Slot 3 — empty</div>
-        <div class="lb-slot" id="lb-slot-3">Slot 4 — empty</div>
+  <!-- ── MANUAL SEARCH MODE ────────────────── -->
+  <div id="lb-mode-search">
+    <div class="lb-layout">
+      <div>
+        <div class="lb-search-form">
+          <input id="lb-name" type="text" placeholder="Unit name (e.g. Warhammer, Atlas, Locust…)" />
+          <select id="lb-weight">
+            <option value="">All weights</option>
+            <option value="20,35">Light (20–35t)</option>
+            <option value="40,55">Medium (40–55t)</option>
+            <option value="60,75">Heavy (60–75t)</option>
+            <option value="80,100">Assault (80–100t)</option>
+          </select>
+          <select id="lb-type">
+            <option value="18">BattleMech</option>
+            <option value="">All types</option>
+            <option value="23">Combat Vehicle</option>
+            <option value="21">Battle Armor</option>
+            <option value="22">Aerospace</option>
+          </select>
+          <button class="lb-btn" onclick="lbSearch()">Search MUL</button>
+        </div>
+        <div id="lb-status" class="lb-status">Enter a unit name and hit Search.</div>
+        <div id="lb-results" class="lb-results" style="display:none"></div>
       </div>
-      <div class="lb-totals">
-        <span>Total PV: <span class="lb-totals-pv" id="lb-totalpv">0</span></span>
-        <span>Supply: <span class="lb-totals-sp" id="lb-supply">0</span></span>
+      <div>
+        <div class="sec-label" style="margin-bottom:10px">Lance Roster</div>
+        <div class="lb-roster" id="lb-roster">
+          <div class="lb-slot" id="lb-slot-0">Slot 1 — empty</div>
+          <div class="lb-slot" id="lb-slot-1">Slot 2 — empty</div>
+          <div class="lb-slot" id="lb-slot-2">Slot 3 — empty</div>
+          <div class="lb-slot" id="lb-slot-3">Slot 4 — empty</div>
+        </div>
+        <div class="lb-totals">
+          <span>Total PV: <span class="lb-totals-pv" id="lb-totalpv">0</span></span>
+          <span>Supply: <span class="lb-totals-sp" id="lb-supply">0</span></span>
+        </div>
+        <div class="lb-analysis" id="lb-analysis"></div>
       </div>
-      <div class="lb-analysis" id="lb-analysis"></div>
     </div>
+  </div>
+
+  <!-- ── CSV FORMATION BUILDER MODE ────────── -->
+  <div id="lb-mode-csv" style="display:none">
+    <div class="lb-csv-controls">
+      <label class="lb-file-label">
+        <span>📂 Choose CSV file</span>
+        <input type="file" id="lb-csv-input" accept=".csv,.txt" onchange="lbLoadCSV(this)">
+      </label>
+      <select id="lb-formation-type" style="flex:1 1 200px">
+        <option value="lance">Lance (4 units · 1 lance)</option>
+        <option value="aug-lance">Augmented Lance (6 units · 1 lance + support)</option>
+        <option value="demi">Demi-Company (6 units · 1–2 lances)</option>
+        <option value="company" selected>Company (12 units · 3 lances)</option>
+        <option value="aug-company">Augmented Company (12 units · 3 lances)</option>
+        <option value="ctf">Company Task Force (18–24 units · 4–6 lances)</option>
+        <option value="battalion">Battalion (40 units · 10 lances)</option>
+      </select>
+      <button class="lb-btn" id="lb-build-btn" onclick="lbBuildFormation()" disabled>Build Formation</button>
+    </div>
+    <div id="lb-csv-status" class="lb-status">Upload a CSV with one unit name per row to get started.</div>
+    <div id="lb-csv-pool" style="display:none">
+      <div class="sec-label" style="margin:12px 0 8px">Resolved Unit Pool</div>
+      <div id="lb-pool-list" class="lb-results"></div>
+    </div>
+    <div id="lb-formation-out"></div>
   </div>
 </div>
 
@@ -2313,6 +2397,205 @@ document.addEventListener('DOMContentLoaded', () => {
   const inp = document.getElementById('lb-name');
   if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') lbSearch(); });
 });
+
+/* ── CSV FORMATION BUILDER ───────────────────────────── */
+let lbPoolUnits = []; // resolved units from CSV
+
+const LB_FORMATIONS = {
+  'lance':       { name:'Lance',               lances:1,  unitsPerLance:4,  total:4  },
+  'aug-lance':   { name:'Augmented Lance',      lances:1,  unitsPerLance:6,  total:6  },
+  'demi':        { name:'Demi-Company',         lances:2,  unitsPerLance:3,  total:6  },
+  'company':     { name:'Company',              lances:3,  unitsPerLance:4,  total:12 },
+  'aug-company': { name:'Augmented Company',    lances:3,  unitsPerLance:4,  total:12 },
+  'ctf':         { name:'Company Task Force',   lances:5,  unitsPerLance:4,  total:20 },
+  'battalion':   { name:'Battalion',            lances:10, unitsPerLance:4,  total:40 },
+};
+
+function lbSwitchMode(mode) {
+  document.getElementById('lb-mode-search').style.display = mode === 'search' ? '' : 'none';
+  document.getElementById('lb-mode-csv').style.display    = mode === 'csv'    ? '' : 'none';
+  document.getElementById('lb-tab-search').classList.toggle('on', mode === 'search');
+  document.getElementById('lb-tab-csv').classList.toggle('on', mode === 'csv');
+}
+
+function lbLoadCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => lbParseCSV(e.target.result);
+  reader.readAsText(file);
+}
+
+function lbParseCSV(text) {
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  // Skip header rows (non-unit lines like "Mech Units")
+  const unitNames = lines.filter(l => {
+    const lower = l.toLowerCase();
+    return !lower.startsWith('mech unit') && !lower.startsWith('unit') && !lower.startsWith('#') && l.length > 1;
+  });
+  if (unitNames.length === 0) {
+    document.getElementById('lb-csv-status').textContent = 'No unit names found in file.';
+    return;
+  }
+  document.getElementById('lb-csv-status').textContent = `Found ${unitNames.length} unit names. Looking up on Master Unit List…`;
+  document.getElementById('lb-csv-pool').style.display = 'none';
+  document.getElementById('lb-formation-out').innerHTML = '';
+  document.getElementById('lb-build-btn').disabled = true;
+  lbBatchLookup(unitNames);
+}
+
+async function lbBatchLookup(names) {
+  const status = document.getElementById('lb-csv-status');
+  const resolved = [];
+  const failed = [];
+
+  for (let i = 0; i < names.length; i++) {
+    status.textContent = `Looking up ${i + 1} / ${names.length}: ${names[i]}…`;
+    try {
+      const params = new URLSearchParams({ Name: names[i] });
+      const res = await fetch(`${MUL_API}?${params}`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const units = data.Units || data;
+      if (units && units.length > 0) {
+        // Pick best match: exact name first, otherwise first result
+        const exact = units.find(u => u.Name.toLowerCase() === names[i].toLowerCase());
+        resolved.push({ query: names[i], unit: exact || units[0] });
+      } else {
+        failed.push(names[i]);
+        resolved.push({ query: names[i], unit: null });
+      }
+    } catch(e) {
+      failed.push(names[i]);
+      resolved.push({ query: names[i], unit: null });
+    }
+    // Small delay to be polite to the API
+    if (i < names.length - 1) await new Promise(r => setTimeout(r, 120));
+  }
+
+  lbPoolUnits = resolved;
+  const okCount = resolved.filter(r => r.unit).length;
+  status.textContent = `Resolved ${okCount} of ${names.length} units. ${failed.length > 0 ? failed.length + ' not found.' : 'All found!'} Select a formation type and click Build.`;
+  status.className = failed.length > 0 ? 'lb-status err' : 'lb-status';
+  document.getElementById('lb-build-btn').disabled = false;
+  lbRenderPool(resolved);
+}
+
+function lbRenderPool(resolved) {
+  const el = document.getElementById('lb-pool-list');
+  el.innerHTML = resolved.map(r => {
+    if (!r.unit) {
+      return `<div class="lb-result-row">
+        <div class="lb-rname">${r.query} <small style="color:var(--red)">Not found in MUL</small></div>
+      </div>`;
+    }
+    const u = r.unit;
+    const sz = u.BFSize || 0;
+    const role = u.Role ? u.Role.Name : '—';
+    return `<div class="lb-result-row">
+      <div class="lb-rname">${u.Name}<small>${u.Tonnage||'?'}t · ${role} · MV ${u.BFMove||'?'}</small></div>
+      <span class="lb-rpill ${LB_SZ_CLS[sz]}">${LB_SZ[sz]||'?'}</span>
+      <span class="lb-rpv">${u.BFPointValue||'?'} PV</span>
+    </div>`;
+  }).join('');
+  document.getElementById('lb-csv-pool').style.display = 'block';
+}
+
+function lbBuildFormation() {
+  const fKey = document.getElementById('lb-formation-type').value;
+  const fDef = LB_FORMATIONS[fKey];
+  if (!fDef) return;
+
+  const available = lbPoolUnits.filter(r => r.unit).map(r => r.unit);
+  const unresolved = lbPoolUnits.filter(r => !r.unit).map(r => r.query);
+
+  // Sort by BFSize desc (Assault first), then by PV desc within size
+  const sorted = [...available].sort((a, b) =>
+    (b.BFSize||0) - (a.BFSize||0) || (b.BFPointValue||0) - (a.BFPointValue||0)
+  );
+
+  // Group into lances
+  const lances = [];
+  const pool = [...sorted];
+  for (let l = 0; l < fDef.lances; l++) {
+    const lance = pool.splice(0, fDef.unitsPerLance);
+    lances.push(lance);
+    if (pool.length === 0) break;
+  }
+
+  // Render
+  const totalPV = available.reduce((s, u) => s + (u.BFPointValue||0), 0);
+  const supply = Math.ceil(totalPV * 0.1);
+
+  let html = `<div class="lb-formation-block">
+    <div class="lb-formation-header">
+      <span class="lb-formation-title">${fDef.name}</span>
+      <span class="lb-formation-meta">
+        ${lances.length} lance${lances.length!==1?'s':''} &nbsp;·&nbsp;
+        Total PV: <span style="color:var(--accent)">${totalPV}</span> &nbsp;·&nbsp;
+        Supply: <span style="color:var(--green)">${supply}</span>
+      </span>
+    </div>
+    <div class="lb-lances-grid">`;
+
+  lances.forEach((units, li) => {
+    const lancePV = units.reduce((s, u) => s + (u.BFPointValue||0), 0);
+    const counts = [0,0,0,0,0];
+    units.forEach(u => { const s=u.BFSize||0; if(s>=1&&s<=4) counts[s]++; });
+    const compStr = [1,2,3,4].filter(s=>counts[s]>0)
+      .map(s=>`${counts[s]}× ${LB_SZ[s]}`).join(' · ');
+    const eligible = lbCheckLanceTypes(counts, units.length);
+
+    html += `<div class="lb-lance-block">
+      <div class="lb-lance-title">
+        Lance ${li+1}
+        <span class="lb-lance-pv">${lancePV} PV</span>
+      </div>`;
+
+    units.forEach(u => {
+      const sz = u.BFSize||0;
+      const dmg = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
+      html += `<div class="lb-unit-row">
+        <span class="lb-rpill ${LB_SZ_CLS[sz]}" style="flex-shrink:0">${LB_SZ[sz]||'?'}</span>
+        <div class="lb-unit-name">
+          ${u.Name}
+          <small>${u.Tonnage||'?'}t · ${u.Role?u.Role.Name:'—'} · MV ${u.BFMove||'?'}</small>
+        </div>
+        <span class="lb-unit-dmg">${u.BFPointValue||'?'}pv<br>S${dmg}</span>
+      </div>`;
+    });
+
+    html += `<div class="lb-lance-analysis">${compStr} &nbsp;·&nbsp; ${eligible}</div>
+    </div>`;
+  });
+
+  html += `</div>`;
+
+  if (unresolved.length > 0) {
+    html += `<div class="lb-unresolved" style="margin-top:10px">
+      ⚠ Units not found in MUL (excluded from formation): ${unresolved.join(', ')}
+    </div>`;
+  }
+
+  if (pool && pool.length > 0) {
+    html += `<div class="lb-unresolved" style="margin-top:6px;color:var(--text3)">
+      ${pool.length} unit${pool.length!==1?'s':''} in pool not used by this formation size.
+    </div>`;
+  }
+
+  html += `</div>`;
+  document.getElementById('lb-formation-out').innerHTML = html;
+}
+
+function lbCheckLanceTypes(counts, total) {
+  const results = [];
+  if (counts[1] >= 2 && counts[3] === 0 && counts[4] === 0) results.push('Light Lance ✓');
+  if (counts[2] >= 2 && counts[4] === 0)                     results.push('Medium Lance ✓');
+  if (counts[3] >= 2)                                         results.push('Heavy Lance ✓');
+  if (counts[4] >= 2 && counts[1] === 0)                     results.push('Assault Lance ✓');
+  if ((counts[3]+counts[4]) >= Math.ceil(total/2))           results.push('Battle Lance ✓');
+  return results.length > 0 ? results.join(' &nbsp; ') : '<span style="color:var(--text3)">Mixed</span>';
+}
 
 function hmTab(m) {
   hmode = m; hsel = null; hcut = false; hcr = 'long'; hflank = false;
