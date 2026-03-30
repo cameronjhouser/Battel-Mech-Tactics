@@ -447,6 +447,7 @@
 
   /* PV RANGE */
   .pv-range { font-family: var(--mono); font-size: 12px; }
+  .supply-pts { font-family: var(--mono); font-size: 11px; color: var(--green); }
   .pv-lo { color: var(--text3); }
   .pv-hi { color: var(--accent); font-weight: 600; }
 
@@ -590,42 +591,37 @@
 <!-- ═══════════════════════════════════════════════════════ PAGE 2: FORMATIONS -->
 <div class="page" id="page-formations">
   <div class="page-title">Formations & PV Ranges</div>
-  <div class="page-sub">All formations with estimated PV ranges based on mixed lance configurations. PV Low = all Light. PV Typical = mixed. PV High = all Assault.</div>
 
   <div class="callout info">
-    <strong>PV Assumptions:</strong> Light avg 12 · Medium avg 25 · Heavy avg 38 · Assault avg 70 · Combat Vehicle avg 18 · Aerospace avg 35 · Battle Armor squad avg 12
+    <strong>Supply Points</strong> = 10% of your total PV budget (round up).
+    Your PV spend + Supply Points <em>cannot exceed</em> the PV High value for your formation.
   </div>
 
   <div class="tbl-wrap">
     <table>
       <thead>
-        <tr><th>Formation</th><th>Combat Units</th><th>IP Tier</th><th>IP Cost</th><th>PV Low</th><th>PV Typical</th><th>PV High</th><th>Notes</th></tr>
+        <tr><th>Formation</th><th>Combat Units</th><th>IP Tier</th><th>IP Cost</th><th>PV Range</th><th>Supply Pts</th></tr>
       </thead>
       <tbody>
-        <tr><td><strong>Lance</strong></td><td>4 'Mechs</td><td><span class="pill pill-b">T1</span></td><td>0 IP</td><td class="pv-lo">48</td><td>120</td><td class="pv-hi">280</td><td>Standard formation</td></tr>
-        <tr><td><strong>Augmented Lance (std)</strong></td><td>4M + 2 vehicles</td><td><span class="pill pill-b">T1</span></td><td>1 IP</td><td class="pv-lo">84</td><td>156</td><td class="pv-hi">376</td><td>CCAF doctrine</td></tr>
-        <tr><td><strong>Augmented Lance (sec)</strong></td><td>4M + 2 BA squads</td><td><span class="pill pill-b">T1</span></td><td>1 IP</td><td class="pv-lo">72</td><td>144</td><td class="pv-hi">304</td><td>CCAF secondary</td></tr>
-        <tr><td><strong>Demi-Company</strong></td><td>6 units</td><td><span class="pill pill-g">T2</span></td><td>2 IP</td><td class="pv-lo">72</td><td>180</td><td class="pv-hi">420</td><td>Mercenary staple</td></tr>
-        <tr><td><strong>Air Lance</strong></td><td>4M + ASF flight</td><td><span class="pill pill-g">T2</span></td><td>3 IP</td><td class="pv-lo">118</td><td>190</td><td class="pv-hi">420</td><td>Aerospace included</td></tr>
-        <tr><td><strong>Company</strong></td><td>12 'Mechs</td><td><span class="pill pill-g">T2</span></td><td>4 IP</td><td class="pv-lo">144</td><td>360</td><td class="pv-hi">840</td><td>With DropShip</td></tr>
-        <tr><td><strong>Augmented Company</strong></td><td>12 units (2 aug lances)</td><td><span class="pill pill-g">T2</span></td><td>4 IP</td><td class="pv-lo">144</td><td>340</td><td class="pv-hi">800</td><td>CCAF exclusive</td></tr>
-        <tr><td><strong>Company Task Force</strong></td><td>18–24 units</td><td><span class="pill pill-g">T2</span></td><td>5 IP</td><td class="pv-lo">216</td><td>540–720</td><td class="pv-hi">1,680</td><td>Combined arms</td></tr>
-        <tr><td><strong>Errant Force</strong></td><td>4 'Mechs (elite)</td><td><span class="pill pill-a">T3</span></td><td>6 IP</td><td class="pv-lo">48</td><td>120</td><td class="pv-hi">280</td><td>Must be earned</td></tr>
-        <tr><td><strong>Battalion</strong></td><td>~40 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>8 IP</td><td class="pv-lo">480</td><td>1,200</td><td class="pv-hi">2,800</td><td>Full support staff</td></tr>
-        <tr><td><strong>Augmented Battalion</strong></td><td>40M + 16 vehicles</td><td><span class="pill pill-a">T3</span></td><td>9 IP</td><td class="pv-lo">768</td><td>1,488</td><td class="pv-hi">3,088</td><td>CCAF standard</td></tr>
-        <tr><td><strong>Reinforced Battalion</strong></td><td>48 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>10 IP</td><td class="pv-lo">576</td><td>1,440</td><td class="pv-hi">3,360</td><td>4 companies</td></tr>
-        <tr><td><strong>SL Reinforced Battalion</strong></td><td>64 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>12 IP</td><td class="pv-lo">768</td><td>1,920</td><td class="pv-hi">4,480</td><td>ComStar/WoB only</td></tr>
-        <tr><td><strong>Regiment</strong></td><td>108–180 'Mechs</td><td><span class="pill pill-r">T4</span></td><td>15 IP</td><td class="pv-lo">1,296</td><td>3,240–5,400</td><td class="pv-hi">12,600</td><td>Regimental Battlegroup</td></tr>
-        <tr><td><strong>Reinforced Regiment</strong></td><td>~192 'Mechs</td><td><span class="pill pill-r">T4</span></td><td>18 IP</td><td class="pv-lo">2,304</td><td>5,760</td><td class="pv-hi">13,440</td><td>Est. — 4 battalions</td></tr>
-        <tr><td><strong>Brigade</strong></td><td>3 Regiments (~324–540 'Mechs)</td><td><span class="pill pill-p">T5</span></td><td>20 IP</td><td class="pv-lo">3,888</td><td>9,720–16,200</td><td class="pv-hi">37,800</td><td>Standard brigade</td></tr>
-        <tr><td><strong>Reinforced Brigade</strong></td><td>4 Regiments (~768 'Mechs)</td><td><span class="pill pill-p">T5</span></td><td>24 IP</td><td class="pv-lo">9,216</td><td>23,040</td><td class="pv-hi">53,760</td><td>Full-strength brigade</td></tr>
-        <tr><td><strong>Provisional Brigade</strong></td><td>2–3 Regiments + support</td><td><span class="pill pill-p">T5</span></td><td>20 IP</td><td class="pv-lo">2,592</td><td>6,480–9,720</td><td class="pv-hi">25,200</td><td>Wartime composite force</td></tr>
+        <tr><td><strong>Lance</strong></td><td>4 'Mechs</td><td><span class="pill pill-b">T1</span></td><td>0 IP</td><td class="pv-range"><span class="pv-lo">48</span> – <span class="pv-hi">280</span></td><td class="supply-pts">12</td></tr>
+        <tr><td><strong>Augmented Lance (std)</strong></td><td>4M + 2 vehicles</td><td><span class="pill pill-b">T1</span></td><td>1 IP</td><td class="pv-range"><span class="pv-lo">84</span> – <span class="pv-hi">376</span></td><td class="supply-pts">16</td></tr>
+        <tr><td><strong>Augmented Lance (sec)</strong></td><td>4M + 2 BA squads</td><td><span class="pill pill-b">T1</span></td><td>1 IP</td><td class="pv-range"><span class="pv-lo">72</span> – <span class="pv-hi">304</span></td><td class="supply-pts">14</td></tr>
+        <tr><td><strong>Demi-Company</strong></td><td>6 units</td><td><span class="pill pill-g">T2</span></td><td>2 IP</td><td class="pv-range"><span class="pv-lo">72</span> – <span class="pv-hi">420</span></td><td class="supply-pts">18</td></tr>
+        <tr><td><strong>Air Lance</strong></td><td>4M + ASF flight</td><td><span class="pill pill-g">T2</span></td><td>3 IP</td><td class="pv-range"><span class="pv-lo">118</span> – <span class="pv-hi">420</span></td><td class="supply-pts">19</td></tr>
+        <tr><td><strong>Company</strong></td><td>12 'Mechs</td><td><span class="pill pill-g">T2</span></td><td>4 IP</td><td class="pv-range"><span class="pv-lo">144</span> – <span class="pv-hi">840</span></td><td class="supply-pts">36</td></tr>
+        <tr><td><strong>Augmented Company</strong></td><td>12 units (2 aug lances)</td><td><span class="pill pill-g">T2</span></td><td>4 IP</td><td class="pv-range"><span class="pv-lo">144</span> – <span class="pv-hi">800</span></td><td class="supply-pts">34</td></tr>
+        <tr><td><strong>Company Task Force</strong></td><td>18–24 units</td><td><span class="pill pill-g">T2</span></td><td>5 IP</td><td class="pv-range"><span class="pv-lo">216</span> – <span class="pv-hi">1,680</span></td><td class="supply-pts">54–72</td></tr>
+        <tr><td><strong>Battalion</strong></td><td>~40 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>8 IP</td><td class="pv-range"><span class="pv-lo">480</span> – <span class="pv-hi">2,800</span></td><td class="supply-pts">120</td></tr>
+        <tr><td><strong>Augmented Battalion</strong></td><td>40M + 16 vehicles</td><td><span class="pill pill-a">T3</span></td><td>9 IP</td><td class="pv-range"><span class="pv-lo">768</span> – <span class="pv-hi">3,088</span></td><td class="supply-pts">149</td></tr>
+        <tr><td><strong>Reinforced Battalion</strong></td><td>48 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>10 IP</td><td class="pv-range"><span class="pv-lo">576</span> – <span class="pv-hi">3,360</span></td><td class="supply-pts">144</td></tr>
+        <tr><td><strong>SL Reinforced Battalion</strong></td><td>64 'Mechs</td><td><span class="pill pill-a">T3</span></td><td>12 IP</td><td class="pv-range"><span class="pv-lo">768</span> – <span class="pv-hi">4,480</span></td><td class="supply-pts">192</td></tr>
+        <tr><td><strong>Regiment</strong></td><td>108–180 'Mechs</td><td><span class="pill pill-r">T4</span></td><td>15 IP</td><td class="pv-range"><span class="pv-lo">1,296</span> – <span class="pv-hi">12,600</span></td><td class="supply-pts">324–540</td></tr>
+        <tr><td><strong>Reinforced Regiment</strong></td><td>~192 'Mechs</td><td><span class="pill pill-r">T4</span></td><td>18 IP</td><td class="pv-range"><span class="pv-lo">2,304</span> – <span class="pv-hi">13,440</span></td><td class="supply-pts">576</td></tr>
+        <tr><td><strong>Brigade</strong></td><td>3 Regiments (~324–540 'Mechs)</td><td><span class="pill pill-p">T5</span></td><td>20 IP</td><td class="pv-range"><span class="pv-lo">3,888</span> – <span class="pv-hi">37,800</span></td><td class="supply-pts">972–1,620</td></tr>
+        <tr><td><strong>Reinforced Brigade</strong></td><td>4 Regiments (~768 'Mechs)</td><td><span class="pill pill-p">T5</span></td><td>24 IP</td><td class="pv-range"><span class="pv-lo">9,216</span> – <span class="pv-hi">53,760</span></td><td class="supply-pts">2,304</td></tr>
+        <tr><td><strong>Provisional Brigade</strong></td><td>2–3 Regiments + support</td><td><span class="pill pill-p">T5</span></td><td>20 IP</td><td class="pv-range"><span class="pv-lo">2,592</span> – <span class="pv-hi">25,200</span></td><td class="supply-pts">648–972</td></tr>
       </tbody>
     </table>
-  </div>
-
-  <div class="callout">
-    <strong>Errant Force Note:</strong> Cannot be requisitioned cold. Must be earned through documented unsupported engagements in the campaign log. Minimum 5 years Jihad veteran experience, 1 year as organized unit, 2 documented unsupported combat instances.
   </div>
 </div>
 
