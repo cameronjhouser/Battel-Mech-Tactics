@@ -658,6 +658,31 @@
     border-radius:3px; background:#122828; color:var(--teal); border:1px solid #1e4040;
     margin-left:6px; vertical-align:middle;
   }
+  /* pip tracks */
+  .lb-pip-track { display:flex; flex-wrap:wrap; align-items:center; gap:2px; margin-top:3px; }
+  .lb-pip-label { font-size:8px; font-family:var(--mono); color:var(--text3); text-transform:uppercase; width:10px; flex-shrink:0; }
+  .lb-pip {
+    width:9px; height:9px; border-radius:50%; border:1.5px solid; cursor:pointer;
+    display:inline-block; flex-shrink:0; transition:background .1s;
+  }
+  .lb-pip.armor   { border-color:var(--orange); background:transparent; }
+  .lb-pip.armor.hit   { background:var(--orange); opacity:.45; }
+  .lb-pip.internal    { border-color:var(--red);    background:transparent; }
+  .lb-pip.internal.hit{ background:var(--red);    opacity:.45; }
+  /* lance stats bar */
+  .lb-lance-stats {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;
+    padding:7px 12px 8px; border-top:1px solid var(--border);
+  }
+  .lb-lstat-group { display:flex; flex-direction:column; gap:2px; }
+  .lb-lstat-title { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; }
+  .lb-lstat-val { font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); }
+  .lb-lstat-dmg { font-family:var(--mono); font-size:12px; font-weight:700; }
+  .lb-skill-sel {
+    background:var(--bg3); border:1px solid var(--border); color:var(--text);
+    font-size:11px; border-radius:3px; padding:2px 4px; width:100%; cursor:pointer;
+  }
+  .lb-skill-sel:focus { outline:none; border-color:var(--accent); }
 </style>
 </head>
 <body>
@@ -2643,6 +2668,100 @@ function lbRenderLanceOutput(fDef, specKey, unresolved, remaining) {
   document.getElementById('lb-formation-out').innerHTML = html;
 }
 
+function lbCalcTMM(u) {
+  if (u.BFTMM !== undefined && u.BFTMM !== null) return parseInt(u.BFTMM) || 0;
+  const mv = lbGetMV(u);
+  if (mv <= 4)  return 0;
+  if (mv <= 8)  return 1;
+  if (mv <= 12) return 2;
+  if (mv <= 18) return 3;
+  if (mv <= 24) return 4;
+  return 5;
+}
+
+function lbMakePips(count, cls) {
+  return Array.from({length: count}, (_, i) =>
+    `<span class="lb-pip ${cls}" onclick="this.classList.toggle('hit')" title="${cls==='armor'?'Armor':'IS'} ${i+1}"></span>`
+  ).join('');
+}
+
+function lbRenderUnitRow(u, li, si, specKey) {
+  const sz      = u.BFSize||0;
+  const dmg     = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
+  const chassis = lbGetChassis(u.Name);
+  const armor   = parseInt(u.BFArmor)     || 0;
+  const intr    = parseInt(u.BFStructure) || 0;
+  return `<div class="lb-unit-row" id="lb-unit-${li}-${si}">
+    <span class="lb-rpill ${LB_SZ_CLS[sz]}" style="flex-shrink:0;align-self:flex-start;margin-top:2px">${LB_SZ[sz]||'?'}</span>
+    <div class="lb-unit-name" style="min-width:0;flex:1">
+      <select class="lb-unit-select"
+        data-lance="${li}" data-slot="${si}" data-chassis="${chassis}" data-speckey="${specKey||''}"
+        onchange="lbSwapUnit(${li},${si},this)"
+        onfocus="lbLoadVariants(this)">
+        <option value="${u.Id??u.Name}">${u.Name}</option>
+        <option value="__loading__" disabled>⏳ Loading variants…</option>
+      </select>
+      <small>${u.Tonnage||'?'}t · ${u.Role?u.Role.Name:'—'} · MV ${u.BFMove||'?'} · TMM ${lbCalcTMM(u)}</small>
+      <div class="lb-pip-track" title="Armor: ${armor}">
+        <span class="lb-pip-label">A</span>${lbMakePips(armor,'armor')}
+      </div>
+      <div class="lb-pip-track" title="Internal Structure: ${intr}">
+        <span class="lb-pip-label">I</span>${lbMakePips(intr,'internal')}
+      </div>
+    </div>
+    <span class="lb-unit-dmg">${u.BFPointValue||'?'}pv<br>S${dmg}</span>
+  </div>`;
+}
+
+function lbLanceStatsHtml(units, li) {
+  const totS   = units.reduce((s,u) => s + (parseInt(u.BFDamageShort) ||0), 0);
+  const totM   = units.reduce((s,u) => s + (parseInt(u.BFDamageMedium)||0), 0);
+  const totL   = units.reduce((s,u) => s + (parseInt(u.BFDamageLong)  ||0), 0);
+  const avgTMM = units.length
+    ? (units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length).toFixed(1)
+    : '—';
+  return `<div class="lb-lance-stats" id="lb-stats-${li}">
+    <div class="lb-lstat-group">
+      <span class="lb-lstat-title">Lance Damage</span>
+      <span class="lb-lstat-dmg" id="lb-ldmg-${li}">
+        <span style="color:var(--text3);font-size:9px">S</span> <strong style="color:var(--text)">${totS}</strong>
+        &nbsp;<span style="color:var(--text3);font-size:9px">M</span> <strong style="color:var(--text)">${totM}</strong>
+        &nbsp;<span style="color:var(--text3);font-size:9px">L</span> <strong style="color:var(--text)">${totL}</strong>
+      </span>
+    </div>
+    <div class="lb-lstat-group">
+      <span class="lb-lstat-title">Avg TMM</span>
+      <span class="lb-lstat-val" id="lb-tmm-${li}">${avgTMM}</span>
+    </div>
+    <div class="lb-lstat-group">
+      <span class="lb-lstat-title">Lance Skill</span>
+      <select class="lb-skill-sel" id="lb-skill-${li}">
+        <option value="1">Skill 1 — Elite</option>
+        <option value="2">Skill 2 — Veteran</option>
+        <option value="3" selected>Skill 3 — Regular</option>
+        <option value="4">Skill 4 — Green</option>
+      </select>
+    </div>
+  </div>`;
+}
+
+function lbUpdateLanceStats(li) {
+  const units  = lbCurrentLances[li];
+  const totS   = units.reduce((s,u) => s + (parseInt(u.BFDamageShort) ||0), 0);
+  const totM   = units.reduce((s,u) => s + (parseInt(u.BFDamageMedium)||0), 0);
+  const totL   = units.reduce((s,u) => s + (parseInt(u.BFDamageLong)  ||0), 0);
+  const avgTMM = units.length
+    ? (units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length).toFixed(1)
+    : '—';
+  const dmgEl = document.getElementById(`lb-ldmg-${li}`);
+  const tmmEl = document.getElementById(`lb-tmm-${li}`);
+  if (dmgEl) dmgEl.innerHTML =
+    `<span style="color:var(--text3);font-size:9px">S</span> <strong style="color:var(--text)">${totS}</strong>` +
+    `&nbsp;<span style="color:var(--text3);font-size:9px">M</span> <strong style="color:var(--text)">${totM}</strong>` +
+    `&nbsp;<span style="color:var(--text3);font-size:9px">L</span> <strong style="color:var(--text)">${totL}</strong>`;
+  if (tmmEl) tmmEl.textContent = avgTMM;
+}
+
 function lbRenderLanceBlock(units, li, specKey) {
   const lancePV = units.reduce((s, u) => s + (u.BFPointValue||0), 0);
   const counts  = [0,0,0,0,0];
@@ -2656,26 +2775,9 @@ function lbRenderLanceBlock(units, li, specKey) {
       <span class="lb-lance-pv" id="lb-lance-pv-${li}">${lancePV} PV</span>
     </div>`;
 
-  units.forEach((u, si) => {
-    const sz      = u.BFSize||0;
-    const dmg     = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
-    const chassis = lbGetChassis(u.Name);
-    html += `<div class="lb-unit-row" id="lb-unit-${li}-${si}">
-      <span class="lb-rpill ${LB_SZ_CLS[sz]}" style="flex-shrink:0">${LB_SZ[sz]||'?'}</span>
-      <div class="lb-unit-name" style="min-width:0;flex:1">
-        <select class="lb-unit-select"
-          data-lance="${li}" data-slot="${si}" data-chassis="${chassis}" data-speckey="${specKey||''}"
-          onchange="lbSwapUnit(${li},${si},this)"
-          onfocus="lbLoadVariants(this)">
-          <option value="${u.Id??u.Name}" data-pv="${u.BFPointValue||0}">${u.Name}</option>
-          <option value="__loading__" disabled>⏳ Loading variants…</option>
-        </select>
-        <small id="lb-unit-meta-${li}-${si}">${u.Tonnage||'?'}t · ${u.Role?u.Role.Name:'—'} · MV ${u.BFMove||'?'}</small>
-      </div>
-      <span class="lb-unit-dmg" id="lb-unit-dmg-${li}-${si}">${u.BFPointValue||'?'}pv<br>S${dmg}</span>
-    </div>`;
-  });
+  units.forEach((u, si) => { html += lbRenderUnitRow(u, li, si, specKey); });
 
+  html += lbLanceStatsHtml(units, li);
   html += `<div class="lb-lance-analysis" id="lb-analysis-${li}">${compStr} &nbsp;·&nbsp; ${eligible}</div>
   </div>`;
   return html;
@@ -2715,23 +2817,23 @@ async function lbLoadVariants(selectEl) {
 function lbSwapUnit(li, si, selectEl) {
   const opt = selectEl.options[selectEl.selectedIndex];
   if (!opt || opt.value === '__loading__' || !opt._unitData) return;
-  const newUnit = opt._unitData;
+  const newUnit  = opt._unitData;
+  const specKey  = selectEl.dataset.speckey || '';
 
   lbCurrentLances[li][si] = newUnit;
   lbFormationDirty = true;
 
-  // Update meta and dmg inline
-  const sz  = newUnit.BFSize||0;
-  const dmg = `${newUnit.BFDamageShort??'–'}/${newUnit.BFDamageMedium??'–'}/${newUnit.BFDamageLong??'–'}`;
-  const metaEl = document.getElementById(`lb-unit-meta-${li}-${si}`);
-  const dmgEl  = document.getElementById(`lb-unit-dmg-${li}-${si}`);
-  if (metaEl) metaEl.textContent = `${newUnit.Tonnage||'?'}t · ${newUnit.Role?newUnit.Role.Name:'—'} · MV ${newUnit.BFMove||'?'}`;
-  if (dmgEl)  dmgEl.innerHTML    = `${newUnit.BFPointValue||'?'}pv<br>S${dmg}`;
+  // Re-render the whole unit row so armor/IS pips update correctly
+  const rowEl = document.getElementById(`lb-unit-${li}-${si}`);
+  if (rowEl) rowEl.outerHTML = lbRenderUnitRow(newUnit, li, si, specKey);
 
   // Update lance PV
   const lancePV = lbCurrentLances[li].reduce((s, u) => s + (u.BFPointValue||0), 0);
   const pvEl = document.getElementById(`lb-lance-pv-${li}`);
   if (pvEl) pvEl.textContent = lancePV + ' PV';
+
+  // Update lance damage totals + avg TMM
+  lbUpdateLanceStats(li);
 
   // Update formation total PV & supply
   const totalPV = lbCurrentLances.flat().reduce((s, u) => s + (u.BFPointValue||0), 0);
