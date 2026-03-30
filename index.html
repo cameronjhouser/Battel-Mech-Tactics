@@ -2819,7 +2819,8 @@ function lbPrintLances() {
     .unit-abil { font-size:10px; color:#006; margin-top:1px; }
     .unit-bonus { font-size:10px; color:#a60; font-weight:700; margin-top:2px; }
     .unit-bonus-desc { font-size:9px; color:#777; }
-    .pips { font-size:9px; letter-spacing:1px; margin-top:2px; }
+    .pips { font-size:12px; letter-spacing:2px; margin-top:4px; line-height:1.6; word-break:break-all; }
+    .pips-lbl { font-size:10px; font-weight:700; color:#333; display:inline-block; width:18px; }
     .lance-stats { padding:5px 10px; background:#f5f5f5; font-size:10px; color:#555; border-top:1px solid #ddd; }
     .lance-abilities { padding:5px 10px; background:#fffbe6; font-size:10px; border-top:1px solid #ddd; }
     .lw-abil { color:#a60; font-weight:700; }
@@ -2862,7 +2863,8 @@ function lbPrintLances() {
         <div class="unit-meta">Dmg S/M/L: ${dmgStr} · Armor: ${armor} · IS: ${intr}</div>
         ${abil ? `<div class="unit-abil">${abil}</div>` : ''}
         ${bonus ? `<div class="unit-bonus">★ ${bonus}</div><div class="unit-bonus-desc">${LB_ABILITY_DESC[bonus]||''}</div>` : ''}
-        <div class="pips">A: ${'○'.repeat(Math.min(armor,30))}${armor>30?`(+${armor-30})`:''}  I: ${'○'.repeat(Math.min(intr,15))}${intr>15?`(+${intr-15})`:''}</div>
+        <div class="pips"><span class="pips-lbl">A:</span> ${'○'.repeat(Math.min(armor,30))}${armor>30?` (+${armor-30})`:''}  [${armor}]</div>
+        <div class="pips"><span class="pips-lbl">IS:</span> ${'○'.repeat(Math.min(intr,15))}${intr>15?` (+${intr-15})`:''}  [${intr}]</div>
       </div>`;
     });
 
@@ -3152,10 +3154,13 @@ function lbReplanLances() {
 
 function lbLanceTypeChanged(li, val) {
   lbLanceTypes[li] = val;
-  // Mark dirty so user knows to replan
   lbFormationDirty = true;
   const bar = document.getElementById('lb-replan-bar');
   if (bar) bar.style.display = 'flex';
+  // Re-render the lance block so abilities + perUnit pickers update immediately
+  const block = document.getElementById(`lb-block-${li}`);
+  if (block) block.outerHTML = lbRenderLanceBlock(lbCurrentLances[li], li, val);
+  lbSkillChanged(li);
 }
 
 /* ── Drag-and-drop ─────────────────────────────────────── */
