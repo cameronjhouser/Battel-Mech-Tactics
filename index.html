@@ -486,6 +486,104 @@
   .hx-spot   { background: #1a2e20; color: var(--green); }
   .hx-supply { background: #1a2238; color: var(--blue); }
   .hx-neutral{ background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+
+  /* ── LANCE BUILDER ─────────────────────────────────── */
+  .lb-layout { display:grid; grid-template-columns:1fr 340px; gap:16px; align-items:start; }
+  @media(max-width:800px){ .lb-layout { grid-template-columns:1fr; } }
+
+  .lb-search-form { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .lb-search-form input, .lb-search-form select {
+    background:var(--bg3); border:1px solid var(--border2); color:var(--text);
+    font-family:var(--sans); font-size:13px; padding:7px 10px; border-radius:4px;
+    flex:1 1 160px;
+  }
+  .lb-search-form input:focus, .lb-search-form select:focus { outline:none; border-color:var(--accent); }
+  .lb-btn {
+    background:var(--accent); color:#000; font-family:var(--cond); font-weight:700;
+    font-size:13px; letter-spacing:.06em; border:none; border-radius:4px;
+    padding:7px 18px; cursor:pointer; white-space:nowrap;
+  }
+  .lb-btn:hover { background:var(--accent2); }
+  .lb-btn-sm {
+    background:var(--bg4); color:var(--text2); font-family:var(--cond); font-weight:600;
+    font-size:11px; letter-spacing:.04em; border:1px solid var(--border2);
+    border-radius:3px; padding:3px 9px; cursor:pointer;
+  }
+  .lb-btn-sm:hover { border-color:var(--accent); color:var(--accent); }
+  .lb-btn-rm { color:var(--red); border-color:#3a2020; }
+  .lb-btn-rm:hover { border-color:var(--red); background:var(--bg3); }
+
+  .lb-status { font-size:12px; color:var(--text3); margin-bottom:10px; min-height:18px; }
+  .lb-status.err { color:var(--red); }
+
+  /* results list */
+  .lb-results { max-height:480px; overflow-y:auto; border:1px solid var(--border); border-radius:5px; }
+  .lb-result-row {
+    display:flex; align-items:center; gap:10px; padding:8px 12px;
+    border-bottom:1px solid var(--border); cursor:default;
+  }
+  .lb-result-row:last-child { border-bottom:none; }
+  .lb-result-row:hover { background:var(--bg3); }
+  .lb-rname { flex:1; font-size:13px; font-weight:500; color:var(--text); }
+  .lb-rname small { display:block; font-size:10px; color:var(--text3); font-weight:400; }
+  .lb-rpill {
+    font-family:var(--mono); font-size:10px; padding:2px 6px; border-radius:3px;
+    white-space:nowrap;
+  }
+  .lb-rpill.sz1 { background:#1a2238; color:var(--blue); }
+  .lb-rpill.sz2 { background:#1a2e20; color:var(--green); }
+  .lb-rpill.sz3 { background:#2e2010; color:var(--orange); }
+  .lb-rpill.sz4 { background:#2e1a1a; color:var(--red); }
+  .lb-rpv { font-family:var(--mono); font-size:12px; color:var(--accent); min-width:36px; text-align:right; }
+
+  /* AS card in roster */
+  .lb-roster { display:flex; flex-direction:column; gap:10px; }
+  .lb-slot {
+    background:var(--bg2); border:1px solid var(--border); border-radius:5px; padding:10px 12px;
+    min-height:72px; display:flex; align-items:center; justify-content:center;
+    color:var(--text3); font-size:12px; font-style:italic;
+  }
+  .lb-slot.filled { display:block; }
+  .lb-card-header {
+    display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;
+  }
+  .lb-card-name { font-family:var(--cond); font-weight:700; font-size:14px; color:var(--text); }
+  .lb-card-sub { font-size:10px; color:var(--text3); margin-top:1px; }
+  .lb-card-pv { font-family:var(--mono); font-size:16px; color:var(--accent); font-weight:700; }
+  .lb-card-stats {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin:6px 0;
+    font-family:var(--mono); font-size:11px;
+  }
+  .lb-stat { background:var(--bg3); border:1px solid var(--border); border-radius:3px; padding:3px 6px; }
+  .lb-stat-lbl { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; }
+  .lb-stat-val { color:var(--text); font-size:12px; }
+  .lb-card-abilities { font-size:10px; color:var(--teal); margin-top:4px; font-family:var(--mono); }
+  .lb-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+
+  /* lance totals + analysis */
+  .lb-totals {
+    background:var(--bg3); border:1px solid var(--border2); border-radius:5px;
+    padding:10px 14px; margin-top:6px;
+    display:flex; justify-content:space-between; font-family:var(--mono); font-size:13px;
+  }
+  .lb-totals-pv { color:var(--accent); }
+  .lb-totals-sp { color:var(--green); }
+
+  .lb-analysis { margin-top:14px; }
+  .lb-analysis-row {
+    display:flex; align-items:center; gap:8px; padding:6px 10px;
+    border-radius:4px; margin-bottom:4px; font-size:12px;
+    background:var(--bg2); border:1px solid var(--border);
+  }
+  .lb-a-label { font-family:var(--cond); font-weight:700; font-size:11px; letter-spacing:.06em;
+    text-transform:uppercase; min-width:140px; color:var(--text2); }
+  .lb-a-ok  { color:var(--green); }
+  .lb-a-no  { color:var(--text3); }
+  .lb-a-warn{ color:var(--orange); }
+  .lb-comp-bar { display:flex; gap:4px; flex-wrap:wrap; }
+  .lb-comp-pip {
+    font-size:10px; font-family:var(--mono); padding:2px 7px; border-radius:3px;
+  }
 </style>
 </head>
 <body>
@@ -1761,6 +1859,54 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ LANCE BUILDER -->
+<div class="page" id="page-lance">
+  <div class="page-title">Lance Builder</div>
+  <div class="page-sub">Search the Master Unit List to find Alpha Strike units and auto-build your lance.</div>
+
+  <div class="lb-layout">
+    <!-- LEFT: search + results -->
+    <div>
+      <div class="lb-search-form">
+        <input id="lb-name" type="text" placeholder="Unit name (e.g. Warhammer, Atlas, Locust…)" />
+        <select id="lb-weight">
+          <option value="">All weights</option>
+          <option value="20,35">Light (20–35t)</option>
+          <option value="40,55">Medium (40–55t)</option>
+          <option value="60,75">Heavy (60–75t)</option>
+          <option value="80,100">Assault (80–100t)</option>
+        </select>
+        <select id="lb-type">
+          <option value="18">BattleMech</option>
+          <option value="">All types</option>
+          <option value="23">Combat Vehicle</option>
+          <option value="21">Battle Armor</option>
+          <option value="22">Aerospace</option>
+        </select>
+        <button class="lb-btn" onclick="lbSearch()">Search MUL</button>
+      </div>
+      <div id="lb-status" class="lb-status">Enter a unit name and hit Search.</div>
+      <div id="lb-results" class="lb-results" style="display:none"></div>
+    </div>
+
+    <!-- RIGHT: lance roster -->
+    <div>
+      <div class="sec-label" style="margin-bottom:10px">Lance Roster</div>
+      <div class="lb-roster" id="lb-roster">
+        <div class="lb-slot" id="lb-slot-0">Slot 1 — empty</div>
+        <div class="lb-slot" id="lb-slot-1">Slot 2 — empty</div>
+        <div class="lb-slot" id="lb-slot-2">Slot 3 — empty</div>
+        <div class="lb-slot" id="lb-slot-3">Slot 4 — empty</div>
+      </div>
+      <div class="lb-totals">
+        <span>Total PV: <span class="lb-totals-pv" id="lb-totalpv">0</span></span>
+        <span>Supply: <span class="lb-totals-sp" id="lb-supply">0</span></span>
+      </div>
+      <div class="lb-analysis" id="lb-analysis"></div>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <footer>BMT — BATTLEMECH TOURNAMENT &nbsp;·&nbsp; RULEBOOK v1.0 &nbsp;·&nbsp; ALL RULES SUBJECT TO GM DISCRETION</footer>
@@ -1778,6 +1924,7 @@ const pages = [
   { id: 'movement',     label: 'Movement' },
   { id: 'lancecombat',  label: 'Lance Combat' },
   { id: 'hexmap',       label: 'Hex Map Example' },
+  { id: 'lance',        label: 'Lance Builder' },
 ];
 
 const HNS='http://www.w3.org/2000/svg',HS=33,HHW=HS*Math.sqrt(3),HPAD=18,HCOLS=9,HROWS=6;
@@ -1929,6 +2076,243 @@ function hMapInit() {
   hRefresh();
   hUpdateInfo();
 }
+
+/* ══════════════════════════════════════════════════════
+   LANCE BUILDER
+══════════════════════════════════════════════════════ */
+const MUL_API = 'https://masterunitlist.azurewebsites.net/Unit/QuickList';
+const LB_SZ = ['','Light','Medium','Heavy','Assault'];
+const LB_SZ_CLS = ['','sz1','sz2','sz3','sz4'];
+let lbLance = [null, null, null, null]; // 4 slots
+
+async function lbSearch() {
+  const name = document.getElementById('lb-name').value.trim();
+  const weight = document.getElementById('lb-weight').value;
+  const type = document.getElementById('lb-type').value;
+  const status = document.getElementById('lb-status');
+  const resultsEl = document.getElementById('lb-results');
+
+  if (!name && !weight) {
+    status.textContent = 'Enter a unit name or select a weight class to search.';
+    status.className = 'lb-status err';
+    return;
+  }
+
+  status.textContent = 'Searching Master Unit List…';
+  status.className = 'lb-status';
+  resultsEl.style.display = 'none';
+
+  const params = new URLSearchParams();
+  if (name) params.set('Name', name);
+  if (type) params.set('Types', type);
+  if (weight) {
+    const [min, max] = weight.split(',');
+    params.set('MinTons', min);
+    params.set('MaxTons', max);
+  }
+
+  try {
+    const res = await fetch(`${MUL_API}?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const units = data.Units || data;
+    if (!units || units.length === 0) {
+      status.textContent = 'No units found. Try a different name or filter.';
+      return;
+    }
+    status.textContent = `${units.length} unit${units.length !== 1 ? 's' : ''} found — click a row to add to lance.`;
+    lbRenderResults(units);
+  } catch(e) {
+    status.textContent = `Error: ${e.message}. Check your connection and try again.`;
+    status.className = 'lb-status err';
+  }
+}
+
+function lbRenderResults(units) {
+  const el = document.getElementById('lb-results');
+  el.innerHTML = units.map(u => {
+    const sz = u.BFSize || 0;
+    const role = u.Role ? u.Role.Name : '—';
+    const mv = u.BFMove || '?';
+    const pv = u.BFPointValue || '?';
+    return `<div class="lb-result-row" onclick="lbAdd(${u.Id})">
+      <div class="lb-rname">
+        ${u.Name}
+        <small>${u.Tonnage || '?'}t &nbsp;·&nbsp; ${role} &nbsp;·&nbsp; MV ${mv}</small>
+      </div>
+      <span class="lb-rpill ${LB_SZ_CLS[sz]}">${LB_SZ[sz] || '?'}</span>
+      <span class="lb-rpv">${pv} PV</span>
+      <button class="lb-btn-sm" onclick="event.stopPropagation();lbAdd(${u.Id})">+ Add</button>
+    </div>`;
+  }).join('');
+  el.style.display = 'block';
+  // store lookup map
+  el._units = {};
+  units.forEach(u => el._units[u.Id] = u);
+}
+
+function lbAdd(id) {
+  const el = document.getElementById('lb-results');
+  const unit = el._units && el._units[id];
+  if (!unit) return;
+  const slot = lbLance.findIndex(s => s === null);
+  if (slot === -1) {
+    alert('Lance is full (4 units max). Remove a unit first.');
+    return;
+  }
+  lbLance[slot] = unit;
+  lbRenderLance();
+}
+
+function lbRemove(i) {
+  lbLance[i] = null;
+  lbRenderLance();
+}
+
+function lbRenderLance() {
+  lbLance.forEach((unit, i) => {
+    const el = document.getElementById(`lb-slot-${i}`);
+    if (!unit) {
+      el.className = 'lb-slot';
+      el.innerHTML = `Slot ${i+1} — empty`;
+      return;
+    }
+    const sz = unit.BFSize || 0;
+    const role = unit.Role ? unit.Role.Name : '—';
+    const mv = unit.BFMove || '?';
+    const pv = unit.BFPointValue || '?';
+    const dmg = `${unit.BFDamageShort??'–'}/${unit.BFDamageMedium??'–'}/${unit.BFDamageLong??'–'}/${unit.BFDamageExtreme??'–'}`;
+    const ov = unit.BFOverheat ?? '?';
+    const armor = unit.BFArmor ?? '?';
+    const struct = unit.BFStructure ?? '?';
+    const abil = unit.BFAbilities || '—';
+    el.className = 'lb-slot filled';
+    el.innerHTML = `
+      <div class="lb-card-header">
+        <div>
+          <div class="lb-card-name">${unit.Name}</div>
+          <div class="lb-card-sub">
+            <span class="lb-rpill ${LB_SZ_CLS[sz]}" style="margin-right:4px">${LB_SZ[sz]||'?'}</span>
+            ${role} &nbsp;·&nbsp; ${unit.Tonnage||'?'}t
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="lb-card-pv">${pv}</div>
+          <div style="font-size:10px;color:var(--text3)">PV</div>
+        </div>
+      </div>
+      <div class="lb-card-stats">
+        <div class="lb-stat"><div class="lb-stat-lbl">MV</div><div class="lb-stat-val">${mv}</div></div>
+        <div class="lb-stat"><div class="lb-stat-lbl">A / S</div><div class="lb-stat-val">${armor} / ${struct}</div></div>
+        <div class="lb-stat"><div class="lb-stat-lbl">OV</div><div class="lb-stat-val">${ov}</div></div>
+        <div class="lb-stat" style="grid-column:1/-1"><div class="lb-stat-lbl">DMG S / M / L / E</div><div class="lb-stat-val">${dmg}</div></div>
+      </div>
+      <div class="lb-card-abilities">${abil}</div>
+      <div class="lb-card-footer">
+        <span style="font-size:10px;color:var(--text3)">${unit.Type ? unit.Type.Name : ''}</span>
+        <button class="lb-btn-sm lb-btn-rm" onclick="lbRemove(${i})">Remove</button>
+      </div>`;
+  });
+
+  // totals
+  const filled = lbLance.filter(u => u !== null);
+  const totalPV = filled.reduce((s, u) => s + (u.BFPointValue || 0), 0);
+  const supply = Math.ceil(totalPV * 0.1);
+  document.getElementById('lb-totalpv').textContent = totalPV;
+  document.getElementById('lb-supply').textContent = supply;
+
+  lbAnalyze(filled);
+}
+
+function lbAnalyze(units) {
+  const el = document.getElementById('lb-analysis');
+  if (units.length === 0) { el.innerHTML = ''; return; }
+
+  const counts = [0,0,0,0,0]; // idx 1-4 = Light/Med/Heavy/Assault
+  units.forEach(u => { const s = u.BFSize||0; if(s>=1&&s<=4) counts[s]++; });
+  const total = units.length;
+
+  // Composition bar
+  const compBar = [1,2,3,4].map(s => counts[s] > 0
+    ? `<span class="lb-comp-pip ${LB_SZ_CLS[s]}">${counts[s]}× ${LB_SZ[s]}</span>`
+    : '').join('');
+
+  // General lance type checks
+  const checks = [
+    {
+      name: 'Light Lance',
+      ok: counts[1] >= 2 && counts[3] === 0 && counts[4] === 0,
+      needs: 'Light 2+, no Heavy/Assault'
+    },
+    {
+      name: 'Medium Lance',
+      ok: counts[2] >= 2 && counts[4] === 0,
+      needs: 'Medium 2+, no Assault'
+    },
+    {
+      name: 'Heavy Lance',
+      ok: counts[3] >= 2,
+      needs: 'Heavy 2+'
+    },
+    {
+      name: 'Assault Lance',
+      ok: counts[4] >= 2 && counts[1] === 0,
+      needs: 'Assault 2+, no Light'
+    },
+  ];
+
+  // Special lance type checks (simplified — movement/role data not always in API)
+  const specials = [
+    {
+      name: 'Fire Lance',
+      ok: total >= 3, // full check needs role data
+      note: 'Needs ≥3 Missile Boat/Sniper role units'
+    },
+    {
+      name: 'Battle / Line Lance',
+      ok: (counts[3] + counts[4]) >= Math.ceil(total / 2),
+      note: '≥50% Heavy/Assault'
+    },
+    {
+      name: 'Assault Lance (Special)',
+      ok: (counts[3] + counts[4]) >= 3 && counts[1] === 0,
+      note: '≥3 Heavy/Assault, no Light'
+    },
+  ];
+
+  const generalRows = checks.map(c => `
+    <div class="lb-analysis-row">
+      <span class="lb-a-label">${c.name}</span>
+      <span class="${c.ok ? 'lb-a-ok' : 'lb-a-no'}">${c.ok ? '✓ Eligible' : '✗ ' + c.needs}</span>
+    </div>`).join('');
+
+  const specialRows = specials.map(c => `
+    <div class="lb-analysis-row">
+      <span class="lb-a-label">${c.name}</span>
+      <span class="${c.ok ? 'lb-a-ok' : 'lb-a-no'}">${c.ok ? '✓ May qualify' : '✗ ' + c.note}</span>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="sec-label" style="margin:10px 0 8px">Lance Analysis</div>
+    <div class="lb-analysis-row">
+      <span class="lb-a-label">Composition</span>
+      <div class="lb-comp-bar">${compBar || '<span style="color:var(--text3)">—</span>'}</div>
+    </div>
+    <div style="font-size:10px;color:var(--text3);font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">General Lance Types</div>
+    ${generalRows}
+    <div style="font-size:10px;color:var(--text3);font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">Special Lance Types</div>
+    ${specialRows}
+    <div class="lb-analysis-row" style="margin-top:4px;border-color:var(--text3)">
+      <span class="lb-a-label" style="color:var(--text3)">Speed/Role checks</span>
+      <span class="lb-a-warn">Recon, Strike, Pursuit — verify MV 10+ manually</span>
+    </div>`;
+}
+
+// allow Enter key to trigger search
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('lb-name');
+  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') lbSearch(); });
+});
 
 function hmTab(m) {
   hmode = m; hsel = null; hcut = false; hcr = 'long'; hflank = false;
