@@ -2487,6 +2487,45 @@ const LB_CMD_ABILITIES = [
   "Eagle's Eyes", 'Marksman', 'Multi-Tasker', '★ Tactical Genius',
 ];
 
+// Per-lance-type abilities (single = fixed bonus, multiple = unit picks one)
+const LB_TYPE_ABILITIES = {
+  recon:        ["Eagle's Eyes", 'Forward Observer', 'Maneuvering Ace'],
+  strike:       ['Speed Demon'],
+  fire:         ['Sniper'],
+  battle:       ['Lucky'],
+  'assault-sp': ['Demoralizer', 'Multi-Tasker'],
+  command:      ['Antagonizer', 'Blood Stalker', 'Combat Intuition', "Eagle's Eyes", 'Marksman', 'Multi-Tasker', '★ Tactical Genius'],
+  pursuit:      ['Blood Stalker'],
+};
+
+let lbUnitBonuses = {}; // `${li}-${si}` -> chosen ability string
+
+function lbLanceQualifies(units, specKey) {
+  if (!specKey || !units.length) return true;
+  const spec = LB_SPECIAL_TYPES[specKey];
+  if (!spec) return false;
+  if (spec.noSizes    && units.some(u => spec.noSizes.includes(u.BFSize||0)))                        return false;
+  if (spec.needMV     && units.some(u => lbGetMV(u) < spec.needMV))                                  return false;
+  if (spec.needMVorJ  && units.some(u => lbGetMV(u) < spec.needMVorJ && lbGetJump(u) < spec.needMVorJ)) return false;
+  if (spec.minRoleCount) {
+    if (units.filter(u => spec.roleCheck(u)).length < spec.minRoleCount) return false;
+  }
+  if (spec.minRolePct) {
+    if (units.filter(u => spec.roleCheck(u)).length / units.length < spec.minRolePct) return false;
+  }
+  if (spec.heavyAssaultPct) {
+    if (units.filter(u => (u.BFSize||0) >= 3).length / units.length < spec.heavyAssaultPct) return false;
+  }
+  if (spec.heavyAssaultMin) {
+    if (units.filter(u => (u.BFSize||0) >= 3).length < spec.heavyAssaultMin) return false;
+  }
+  return true;
+}
+
+function lbSetUnitBonus(li, si, ability) {
+  lbUnitBonuses[`${li}-${si}`] = ability;
+}
+
 const LB_SPECIAL_TYPES = {
   recon:       { name:'Recon / Scout Lance',      noSizes:[],  needMV:10, roleCheck:u=>['Scout','Striker'].includes(u.Role?.Name),                         minRoleCount:2 },
   strike:      { name:'Strike / Striker Lance',   noSizes:[4], needMVorJ:10, roleCheck:u=>['Striker','Skirmisher'].includes(u.Role?.Name),                 minRolePct:.5  },
@@ -2654,6 +2693,7 @@ function lbBuildFormation() {
   lbLanceTypes     = typeKeys.slice();
   lbFormationDirty = false;
   lbCmdState       = {};
+  lbUnitBonuses    = {};
 
   lbRenderLanceOutput(fDef, unresolved, remaining);
 }
@@ -2720,12 +2760,27 @@ function lbRenderUnitRow(u, li, si, specKey) {
   const chassis = lbGetChassis(u.Name);
   const armor   = parseInt(u.BFArmor)     || 0;
   const intr    = parseInt(u.BFStructure) || 0;
-  const abil    = (u.BFAbilities || '').trim();
-  const key     = `${li}-${si}`;
-  const isCmd   = key in lbCmdState;
-  const cmdAbil = lbCmdState[key] || '';
-  const cmdOpts = LB_CMD_ABILITIES.map(a =>
+  const abil       = (u.BFAbilities || '').trim();
+  const key        = `${li}-${si}`;
+  const isCmd      = key in lbCmdState;
+  const cmdAbil    = lbCmdState[key] || '';
+  const cmdOpts    = LB_CMD_ABILITIES.map(a =>
     `<option value="${a}" ${a===cmdAbil?'selected':''}>${a}</option>`).join('');
+  const typeBonuses = LB_TYPE_ABILITIES[specKey] || [];
+  const unitBonus   = lbUnitBonuses[key] || '';
+  let bonusHtml = '';
+  if (typeBonuses.length === 1) {
+    bonusHtml = `<div class="lb-unit-abil" style="color:var(--orange)">★ ${typeBonuses[0]}</div>`;
+  } else if (typeBonuses.length > 1) {
+    const bOpts = typeBonuses.map(a =>
+      `<option value="${a}" ${a===unitBonus?'selected':''}>${a}</option>`).join('');
+    bonusHtml = `<div class="lb-cmd-pick">
+      <select onchange="lbSetUnitBonus(${li},${si},this.value)">
+        <option value="">— pick bonus —</option>${bOpts}
+      </select>
+      ${unitBonus ? `<span class="lb-cmd-abil-label" style="color:var(--orange)">★ ${unitBonus}</span>` : ''}
+    </div>`;
+  }
 
   return `<div class="lb-unit-row" id="lb-unit-${li}-${si}"
     draggable="true"
@@ -2745,6 +2800,7 @@ function lbRenderUnitRow(u, li, si, specKey) {
       </select>
       <small>${u.Tonnage||'?'}t · ${u.Role?u.Role.Name:'—'} · MV ${u.BFMove||'?'} · TMM ${lbCalcTMM(u)}</small>
       ${abil ? `<div class="lb-unit-abil">${abil}</div>` : ''}
+      ${bonusHtml}
       ${isCmd ? `<div class="lb-cmd-pick">
         <select onchange="lbSetCmdAbility(${li},${si},this.value)">
           <option value="">— pick CMD ability —</option>${cmdOpts}
@@ -2775,10 +2831,14 @@ function lbLanceStatsHtml(units, li) {
     ? Math.round(units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length)
     : '—';
   const curType = lbLanceTypes[li] || '';
-  const typeOpts = [['','Standard'],['recon','Recon / Scout'],['strike','Strike / Striker'],
+  const typeOpts = [['','— Select Type —'],['recon','Recon / Scout'],['strike','Strike / Striker'],
     ['fire','Fire'],['battle','Battle / Line'],['assault-sp','Assault (Special)'],
     ['command','Command'],['pursuit','Pursuit']]
-    .map(([v,n]) => `<option value="${v}" ${v===curType?'selected':''}>${n}</option>`).join('');
+    .filter(([v]) => !v || v === curType || lbLanceQualifies(units, v))
+    .map(([v,n]) => {
+      const noLongerQual = v && v === curType && !lbLanceQualifies(units, v);
+      return `<option value="${v}" ${v===curType?'selected':''}>${n}${noLongerQual?' (no longer qualifies)':''}</option>`;
+    }).join('');
   return `<div class="lb-lance-stats" id="lb-stats-${li}">
     <div class="lb-lstat-group">
       <span class="lb-lstat-title">Lance Damage</span>
@@ -2938,6 +2998,7 @@ function lbReplanLances() {
   lbVariantsCache  = {};
   lbFormationDirty = false;
   lbCmdState       = {};
+  lbUnitBonuses    = {};
   lbRenderLanceOutput(fDef, [], remaining);
 }
 
@@ -2985,12 +3046,16 @@ function lbDrop(e, li, si) {
   lbCurrentLances[li][si]       = lbCurrentLances[src.li][src.si];
   lbCurrentLances[src.li][src.si] = tmp;
 
-  // Swap commander state
+  // Swap commander state and unit bonuses
   const kA = `${li}-${si}`, kB = `${src.li}-${src.si}`;
-  const cmdA = lbCmdState[kA], cmdB = lbCmdState[kB];
-  delete lbCmdState[kA]; delete lbCmdState[kB];
-  if (cmdA !== undefined) lbCmdState[kB] = cmdA;
-  if (cmdB !== undefined) lbCmdState[kA] = cmdB;
+  const cmdA = lbCmdState[kA],    cmdB = lbCmdState[kB];
+  const bonA = lbUnitBonuses[kA], bonB = lbUnitBonuses[kB];
+  delete lbCmdState[kA];    delete lbCmdState[kB];
+  delete lbUnitBonuses[kA]; delete lbUnitBonuses[kB];
+  if (cmdA !== undefined) lbCmdState[kB]    = cmdA;
+  if (cmdB !== undefined) lbCmdState[kA]    = cmdB;
+  if (bonA !== undefined) lbUnitBonuses[kB] = bonA;
+  if (bonB !== undefined) lbUnitBonuses[kA] = bonB;
 
   lbFormationDirty = true;
 
