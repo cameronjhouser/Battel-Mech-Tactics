@@ -683,11 +683,24 @@
   }
   .lb-dmg-lbl { font-size:9px; color:var(--text3); }
   .lb-dmg-num { font-size:14px; font-weight:700; color:var(--accent); }
-  .lb-skill-sel {
+  .lb-skill-sel, .lb-lance-type-sel {
     background:var(--bg3); border:1px solid var(--border); color:var(--text);
     font-size:11px; border-radius:3px; padding:2px 4px; width:100%; cursor:pointer;
   }
-  .lb-skill-sel:focus { outline:none; border-color:var(--accent); }
+  .lb-skill-sel:focus, .lb-lance-type-sel:focus { outline:none; border-color:var(--accent); }
+  /* unit abilities */
+  .lb-unit-abil { font-size:9px; color:var(--teal); font-family:var(--mono); margin-top:2px; word-break:break-word; line-height:1.4; }
+  /* drag-and-drop */
+  .lb-unit-row[draggable="true"] { cursor:grab; }
+  .lb-unit-row.lb-drag-over  { outline:2px dashed var(--accent); background:var(--bg3); }
+  .lb-unit-row.lb-dragging   { opacity:.35; }
+  /* commander */
+  .lb-cmd-btn { background:none; border:1px solid var(--border); border-radius:3px; color:var(--text3); font-size:11px; cursor:pointer; padding:1px 6px; white-space:nowrap; }
+  .lb-cmd-btn.active { border-color:gold; color:gold; background:#1c1600; }
+  .lb-cmd-badge { font-size:9px; color:gold; font-family:var(--cond); font-weight:700; letter-spacing:.04em; margin-right:2px; }
+  .lb-cmd-pick { margin-top:3px; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+  .lb-cmd-pick select { background:var(--bg3); border:1px solid gold; color:var(--text); font-size:10px; border-radius:3px; padding:1px 4px; cursor:pointer; }
+  .lb-cmd-abil-label { font-size:9px; color:gold; font-family:var(--mono); }
 </style>
 </head>
 <body>
@@ -2461,10 +2474,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ── CSV FORMATION BUILDER ───────────────────────────── */
-let lbPoolUnits    = []; // resolved units from CSV
-let lbCurrentLances= []; // [[unit,...], ...] — live formation
-let lbVariantsCache= {}; // chassis -> [unit,...]
+let lbPoolUnits     = []; // resolved units from CSV
+let lbCurrentLances = []; // [[unit,...], ...] — live formation
+let lbVariantsCache = {}; // chassis -> [unit,...]
 let lbFormationDirty = false;
+let lbLanceTypes    = []; // per-lance special type key
+let lbDragSrc       = null; // {li, si}
+let lbCmdState      = {}; // `${li}-${si}` -> ability string or ''
+
+const LB_CMD_ABILITIES = [
+  'Antagonizer', 'Blood Stalker', 'Combat Intuition',
+  "Eagle's Eyes", 'Marksman', 'Multi-Tasker', '★ Tactical Genius',
+];
 
 const LB_SPECIAL_TYPES = {
   recon:       { name:'Recon / Scout Lance',      noSizes:[],  needMV:10, roleCheck:u=>['Scout','Striker'].includes(u.Role?.Name),                         minRoleCount:2 },
@@ -2602,51 +2623,54 @@ function lbRenderPool(resolved) {
   document.getElementById('lb-csv-pool').style.display = 'block';
 }
 
-function lbBuildFormation() {
-  const fKey     = document.getElementById('lb-formation-type').value;
-  const specKey  = document.getElementById('lb-special-type').value;
-  const fDef     = LB_FORMATIONS[fKey];
-  if (!fDef) return;
-
-  const available = lbPoolUnits.filter(r => r.unit).map(r => r.unit);
-  const unresolved = lbPoolUnits.filter(r => !r.unit).map(r => r.query);
-
-  // Sort: if special type chosen, score by spec fit; else by size desc then PV desc
-  const sorted = [...available].sort((a, b) =>
-    specKey
-      ? lbSpecialScore(b, specKey) - lbSpecialScore(a, specKey)
-      : (b.BFSize||0) - (a.BFSize||0) || (b.BFPointValue||0) - (a.BFPointValue||0)
-  );
-
+function lbAssignToTypes(pool, typeKeys, upl) {
+  const remaining = [...pool];
   const lances = [];
-  const pool   = [...sorted];
-  for (let l = 0; l < fDef.lances; l++) {
-    const lance = pool.splice(0, fDef.unitsPerLance);
-    if (lance.length === 0) break;
-    lances.push(lance);
+  for (const key of typeKeys) {
+    if (remaining.length === 0) break;
+    const scored = remaining.map(u => ({ u, score: lbSpecialScore(u, key) }))
+                            .sort((a, b) => b.score - a.score);
+    const picks = scored.slice(0, upl).map(x => x.u);
+    lances.push(picks);
+    picks.forEach(u => { const i = remaining.indexOf(u); if (i !== -1) remaining.splice(i, 1); });
   }
-
-  lbCurrentLances  = lances.map(l => [...l]);
-  lbFormationDirty = false;
-
-  lbRenderLanceOutput(fDef, specKey, unresolved, pool);
+  return { lances, remaining };
 }
 
-function lbRenderLanceOutput(fDef, specKey, unresolved, remaining) {
+function lbBuildFormation() {
+  const fKey    = document.getElementById('lb-formation-type').value;
+  const specKey = document.getElementById('lb-special-type').value;
+  const fDef    = LB_FORMATIONS[fKey];
+  if (!fDef) return;
+
+  const available  = lbPoolUnits.filter(r => r.unit).map(r => r.unit);
+  const unresolved = lbPoolUnits.filter(r => !r.unit).map(r => r.query);
+
+  // Build type list — all lances get the global type initially
+  const typeKeys = Array(fDef.lances).fill(specKey);
+  const { lances, remaining } = lbAssignToTypes(available, typeKeys, fDef.unitsPerLance);
+
+  lbCurrentLances  = lances.map(l => [...l]);
+  lbLanceTypes     = typeKeys.slice();
+  lbFormationDirty = false;
+  lbCmdState       = {};
+
+  lbRenderLanceOutput(fDef, unresolved, remaining);
+}
+
+function lbRenderLanceOutput(fDef, unresolved, remaining) {
   const lances  = lbCurrentLances;
   const totalPV = lances.flat().reduce((s, u) => s + (u.BFPointValue||0), 0);
   const supply  = Math.ceil(totalPV * 0.1);
-  const specLabel = specKey && LB_SPECIAL_TYPES[specKey]
-    ? `<span class="lb-special-badge">${LB_SPECIAL_TYPES[specKey].name}</span>` : '';
 
   let html = `
   <div id="lb-replan-bar" class="lb-replan-bar" style="${lbFormationDirty?'display:flex':'display:none'}">
     <button class="lb-replan-btn" onclick="lbReplanLances()">⟳ Replan Lances</button>
-    <span class="lb-changed-note">Unit swap detected — replan to re-optimize lance assignments</span>
+    <span class="lb-changed-note">Changes made — replan to re-optimize lance assignments</span>
   </div>
   <div class="lb-formation-block">
     <div class="lb-formation-header">
-      <span class="lb-formation-title">${fDef.name}${specLabel}</span>
+      <span class="lb-formation-title">${fDef.name}</span>
       <span class="lb-formation-meta">
         ${lances.length} lance${lances.length!==1?'s':''} &nbsp;·&nbsp;
         Total PV: <span style="color:var(--accent)" id="lb-total-pv">${totalPV}</span> &nbsp;·&nbsp;
@@ -2656,7 +2680,7 @@ function lbRenderLanceOutput(fDef, specKey, unresolved, remaining) {
     <div class="lb-lances-grid">`;
 
   lances.forEach((units, li) => {
-    html += lbRenderLanceBlock(units, li, specKey);
+    html += lbRenderLanceBlock(units, li, lbLanceTypes[li] || '');
   });
 
   html += `</div></div>`;
@@ -2696,9 +2720,22 @@ function lbRenderUnitRow(u, li, si, specKey) {
   const chassis = lbGetChassis(u.Name);
   const armor   = parseInt(u.BFArmor)     || 0;
   const intr    = parseInt(u.BFStructure) || 0;
-  return `<div class="lb-unit-row" id="lb-unit-${li}-${si}">
+  const abil    = (u.BFAbilities || '').trim();
+  const key     = `${li}-${si}`;
+  const isCmd   = key in lbCmdState;
+  const cmdAbil = lbCmdState[key] || '';
+  const cmdOpts = LB_CMD_ABILITIES.map(a =>
+    `<option value="${a}" ${a===cmdAbil?'selected':''}>${a}</option>`).join('');
+
+  return `<div class="lb-unit-row" id="lb-unit-${li}-${si}"
+    draggable="true"
+    ondragstart="lbDragStart(event,${li},${si})"
+    ondragend="lbDragEnd(event)"
+    ondragover="lbDragOver(event,${li},${si})"
+    ondrop="lbDrop(event,${li},${si})">
     <span class="lb-rpill ${LB_SZ_CLS[sz]}" style="flex-shrink:0;align-self:flex-start;margin-top:2px">${LB_SZ[sz]||'?'}</span>
     <div class="lb-unit-name" style="min-width:0;flex:1">
+      ${isCmd ? '<span class="lb-cmd-badge">★ CMD</span>' : ''}
       <select class="lb-unit-select"
         data-lance="${li}" data-slot="${si}" data-chassis="${chassis}" data-speckey="${specKey||''}"
         onchange="lbSwapUnit(${li},${si},this)"
@@ -2707,14 +2744,26 @@ function lbRenderUnitRow(u, li, si, specKey) {
         <option value="__loading__" disabled>⏳ Loading variants…</option>
       </select>
       <small>${u.Tonnage||'?'}t · ${u.Role?u.Role.Name:'—'} · MV ${u.BFMove||'?'} · TMM ${lbCalcTMM(u)}</small>
+      ${abil ? `<div class="lb-unit-abil">${abil}</div>` : ''}
+      ${isCmd ? `<div class="lb-cmd-pick">
+        <select onchange="lbSetCmdAbility(${li},${si},this.value)">
+          <option value="">— pick CMD ability —</option>${cmdOpts}
+        </select>
+        ${cmdAbil ? `<span class="lb-cmd-abil-label">${cmdAbil}</span>` : ''}
+      </div>` : ''}
       <div class="lb-pip-track" title="Armor: ${armor}">
         <span class="lb-pip-label">A</span>${lbMakePips(armor,'armor')}
       </div>
-      <div class="lb-pip-track" title="Internal Structure: ${intr}">
+      <div class="lb-pip-track" title="IS: ${intr}">
         <span class="lb-pip-label">I</span>${lbMakePips(intr,'internal')}
       </div>
     </div>
-    <span class="lb-unit-dmg">${u.BFPointValue||'?'}pv<br>S${dmg}</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+      <span class="lb-unit-dmg">${u.BFPointValue||'?'}pv<br>S${dmg}</span>
+      <button class="lb-cmd-btn${isCmd?' active':''}" onclick="lbToggleCmd(${li},${si})" title="Toggle lance commander">
+        ${isCmd ? '★ CMD' : '☆ CMD'}
+      </button>
+    </div>
   </div>`;
 }
 
@@ -2723,8 +2772,13 @@ function lbLanceStatsHtml(units, li) {
   const totM   = units.reduce((s,u) => s + (parseInt(u.BFDamageMedium)||0), 0);
   const totL   = units.reduce((s,u) => s + (parseInt(u.BFDamageLong)  ||0), 0);
   const avgTMM = units.length
-    ? (units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length).toFixed(1)
+    ? Math.round(units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length)
     : '—';
+  const curType = lbLanceTypes[li] || '';
+  const typeOpts = [['','Standard'],['recon','Recon / Scout'],['strike','Strike / Striker'],
+    ['fire','Fire'],['battle','Battle / Line'],['assault-sp','Assault (Special)'],
+    ['command','Command'],['pursuit','Pursuit']]
+    .map(([v,n]) => `<option value="${v}" ${v===curType?'selected':''}>${n}</option>`).join('');
   return `<div class="lb-lance-stats" id="lb-stats-${li}">
     <div class="lb-lstat-group">
       <span class="lb-lstat-title">Lance Damage</span>
@@ -2748,6 +2802,12 @@ function lbLanceStatsHtml(units, li) {
         <option value="4">Skill 4 — Green</option>
       </select>
     </div>
+    <div class="lb-lstat-group" style="grid-column:1/-1">
+      <span class="lb-lstat-title">Lance Type</span>
+      <select class="lb-lance-type-sel" id="lb-lance-type-${li}" onchange="lbLanceTypeChanged(${li},this.value)">
+        ${typeOpts}
+      </select>
+    </div>
   </div>`;
 }
 
@@ -2757,7 +2817,7 @@ function lbUpdateLanceStats(li) {
   const totM   = units.reduce((s,u) => s + (parseInt(u.BFDamageMedium)||0), 0);
   const totL   = units.reduce((s,u) => s + (parseInt(u.BFDamageLong)  ||0), 0);
   const avgTMM = units.length
-    ? (units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length).toFixed(1)
+    ? Math.round(units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length)
     : '—';
   const dmgEl = document.getElementById(`lb-ldmg-${li}`);
   const tmmEl = document.getElementById(`lb-tmm-${li}`);
@@ -2823,15 +2883,14 @@ async function lbLoadVariants(selectEl) {
 function lbSwapUnit(li, si, selectEl) {
   const opt = selectEl.options[selectEl.selectedIndex];
   if (!opt || opt.value === '__loading__' || !opt._unitData) return;
-  const newUnit  = opt._unitData;
-  const specKey  = selectEl.dataset.speckey || '';
+  const newUnit = opt._unitData;
 
   lbCurrentLances[li][si] = newUnit;
   lbFormationDirty = true;
 
   // Re-render the whole unit row so armor/IS pips update correctly
   const rowEl = document.getElementById(`lb-unit-${li}-${si}`);
-  if (rowEl) rowEl.outerHTML = lbRenderUnitRow(newUnit, li, si, specKey);
+  if (rowEl) rowEl.outerHTML = lbRenderUnitRow(newUnit, li, si, lbLanceTypes[li]||'');
 
   // Update lance PV
   const lancePV = lbCurrentLances[li].reduce((s, u) => s + (u.BFPointValue||0), 0);
@@ -2862,31 +2921,100 @@ function lbSwapUnit(li, si, selectEl) {
 }
 
 function lbReplanLances() {
-  // Re-run build using current lances as the pool
-  const fKey    = document.getElementById('lb-formation-type').value;
-  const specKey = document.getElementById('lb-special-type').value;
-  const fDef    = LB_FORMATIONS[fKey];
+  const fKey = document.getElementById('lb-formation-type').value;
+  const fDef = LB_FORMATIONS[fKey];
   if (!fDef) return;
 
-  const pool   = lbCurrentLances.flat();
-  const sorted = [...pool].sort((a, b) =>
-    specKey
-      ? lbSpecialScore(b, specKey) - lbSpecialScore(a, specKey)
-      : (b.BFSize||0) - (a.BFSize||0) || (b.BFPointValue||0) - (a.BFPointValue||0)
-  );
+  // Read current per-lance types from the DOM
+  lbLanceTypes = lbCurrentLances.map((_, li) => {
+    const el = document.getElementById(`lb-lance-type-${li}`);
+    return el ? el.value : '';
+  });
 
-  const lances = [];
-  const remaining = [...sorted];
-  for (let l = 0; l < fDef.lances; l++) {
-    const lance = remaining.splice(0, fDef.unitsPerLance);
-    if (lance.length === 0) break;
-    lances.push(lance);
-  }
+  const pool = lbCurrentLances.flat();
+  const { lances, remaining } = lbAssignToTypes(pool, lbLanceTypes, fDef.unitsPerLance);
 
   lbCurrentLances  = lances;
-  lbVariantsCache  = {}; // reset cache so dropdowns reload
+  lbVariantsCache  = {};
   lbFormationDirty = false;
-  lbRenderLanceOutput(fDef, specKey, [], remaining);
+  lbCmdState       = {};
+  lbRenderLanceOutput(fDef, [], remaining);
+}
+
+function lbLanceTypeChanged(li, val) {
+  lbLanceTypes[li] = val;
+  // Mark dirty so user knows to replan
+  lbFormationDirty = true;
+  const bar = document.getElementById('lb-replan-bar');
+  if (bar) bar.style.display = 'flex';
+}
+
+/* ── Drag-and-drop ─────────────────────────────────────── */
+function lbDragStart(e, li, si) {
+  lbDragSrc = { li, si };
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', `${li}-${si}`);
+  setTimeout(() => {
+    const el = document.getElementById(`lb-unit-${li}-${si}`);
+    if (el) el.classList.add('lb-dragging');
+  }, 0);
+}
+
+function lbDragEnd(e) {
+  document.querySelectorAll('.lb-unit-row.lb-dragging, .lb-unit-row.lb-drag-over')
+    .forEach(el => { el.classList.remove('lb-dragging'); el.classList.remove('lb-drag-over'); });
+}
+
+function lbDragOver(e, li, si) {
+  e.preventDefault();
+  if (!lbDragSrc || (lbDragSrc.li === li && lbDragSrc.si === si)) return;
+  document.querySelectorAll('.lb-unit-row.lb-drag-over')
+    .forEach(el => el.classList.remove('lb-drag-over'));
+  const el = document.getElementById(`lb-unit-${li}-${si}`);
+  if (el) el.classList.add('lb-drag-over');
+}
+
+function lbDrop(e, li, si) {
+  e.preventDefault();
+  const src = lbDragSrc;
+  lbDragEnd(e);
+  if (!src || (src.li === li && src.si === si)) return;
+
+  // Swap units
+  const tmp = lbCurrentLances[li][si];
+  lbCurrentLances[li][si]       = lbCurrentLances[src.li][src.si];
+  lbCurrentLances[src.li][src.si] = tmp;
+
+  // Swap commander state
+  const kA = `${li}-${si}`, kB = `${src.li}-${src.si}`;
+  const cmdA = lbCmdState[kA], cmdB = lbCmdState[kB];
+  delete lbCmdState[kA]; delete lbCmdState[kB];
+  if (cmdA !== undefined) lbCmdState[kB] = cmdA;
+  if (cmdB !== undefined) lbCmdState[kA] = cmdB;
+
+  lbFormationDirty = true;
+
+  // Re-render affected lance blocks in place
+  [...new Set([li, src.li])].forEach(idx => {
+    const block = document.getElementById(`lb-block-${idx}`);
+    if (block) block.outerHTML = lbRenderLanceBlock(lbCurrentLances[idx], idx, lbLanceTypes[idx]||'');
+  });
+
+  const bar = document.getElementById('lb-replan-bar');
+  if (bar) bar.style.display = 'flex';
+}
+
+/* ── Commander ─────────────────────────────────────────── */
+function lbToggleCmd(li, si) {
+  const key = `${li}-${si}`;
+  if (key in lbCmdState) delete lbCmdState[key];
+  else lbCmdState[key] = '';
+  const block = document.getElementById(`lb-block-${li}`);
+  if (block) block.outerHTML = lbRenderLanceBlock(lbCurrentLances[li], li, lbLanceTypes[li]||'');
+}
+
+function lbSetCmdAbility(li, si, ability) {
+  lbCmdState[`${li}-${si}`] = ability;
 }
 
 function lbCheckLanceTypes(counts, total) {
