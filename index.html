@@ -2516,6 +2516,39 @@ const LB_ABILITY_DESC = {
 
 let lbUnitBonuses = {}; // `${li}-${si}` -> chosen ability string
 
+const LB_SKILL_MULT = { 0: 1.82, 1: 1.62, 2: 1.42, 3: 1.20, 4: 1.00 };
+
+function lbGetAdjLancePV(li) {
+  const skillEl = document.getElementById(`lb-skill-${li}`);
+  const skill   = skillEl ? parseInt(skillEl.value) : 3;
+  const mult    = LB_SKILL_MULT[skill] ?? 1.0;
+  const rawPV   = (lbCurrentLances[li] || []).reduce((s, u) => s + (u.BFPointValue||0), 0);
+  return Math.round(rawPV * mult);
+}
+
+function lbUpdateTotalPV() {
+  const total  = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
+  const supply = Math.ceil(total * 0.1);
+  const tEl = document.getElementById('lb-total-pv');
+  const sEl = document.getElementById('lb-total-sp');
+  if (tEl) tEl.textContent = total;
+  if (sEl) sEl.textContent = supply;
+}
+
+function lbSkillChanged(li) {
+  const skillEl = document.getElementById(`lb-skill-${li}`);
+  if (!skillEl) return;
+  const skill  = parseInt(skillEl.value);
+  const mult   = LB_SKILL_MULT[skill] ?? 1.0;
+  const rawPV  = (lbCurrentLances[li] || []).reduce((s, u) => s + (u.BFPointValue||0), 0);
+  const adjPV  = Math.round(rawPV * mult);
+  const pvEl   = document.getElementById(`lb-lance-pv-${li}`);
+  if (pvEl) pvEl.innerHTML = skill === 4
+    ? `${rawPV} PV`
+    : `${adjPV} PV <span style="font-size:9px;color:var(--text3)">×${mult.toFixed(2)}</span>`;
+  lbUpdateTotalPV();
+}
+
 function lbGetLanceTaken(li, excludeSi) {
   const s = new Set();
   (lbCurrentLances[li] || []).forEach((_, si) => {
@@ -2762,12 +2795,15 @@ function lbRenderLanceOutput(fDef, unresolved, remaining) {
   }
 
   document.getElementById('lb-formation-out').innerHTML = html;
+  // Apply skill multipliers after render (skill selects now exist in DOM)
+  lbCurrentLances.forEach((_, li) => lbSkillChanged(li));
+  lbUpdateTotalPV();
 }
 
 function lbPrintLances() {
   const fKey = document.getElementById('lb-formation-type').value;
   const fDef = LB_FORMATIONS[fKey] || {};
-  const totalPV = lbCurrentLances.flat().reduce((s,u) => s+(u.BFPointValue||0), 0);
+  const totalPV = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
 
   let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Lance Formation</title>
   <style>
@@ -2795,19 +2831,23 @@ function lbPrintLances() {
   <div class="lances">`;
 
   lbCurrentLances.forEach((units, li) => {
-    const lancePV  = units.reduce((s,u)=>s+(u.BFPointValue||0),0);
+    const lancePV  = lbGetAdjLancePV(li);
+    const rawPV    = units.reduce((s,u)=>s+(u.BFPointValue||0),0);
     const lanceType = lbLanceTypes[li] || '';
     const typeLabel = lanceType && LB_SPECIAL_TYPES[lanceType] ? LB_SPECIAL_TYPES[lanceType].name : 'Standard';
     const skillEl  = document.getElementById(`lb-skill-${li}`);
-    const skillTxt = skillEl ? `Skill ${skillEl.options[skillEl.selectedIndex].text}` : '';
+    const skill    = skillEl ? parseInt(skillEl.value) : 4;
+    const mult     = LB_SKILL_MULT[skill] ?? 1.0;
+    const skillTxt = skillEl ? skillEl.options[skillEl.selectedIndex].text : '';
     const totS = units.reduce((s,u)=>s+(parseInt(u.BFDamageShort)||0),0);
     const totM = units.reduce((s,u)=>s+(parseInt(u.BFDamageMedium)||0),0);
     const totL = units.reduce((s,u)=>s+(parseInt(u.BFDamageLong)||0),0);
     const avgTMM = units.length ? Math.round(units.reduce((s,u)=>s+lbCalcTMM(u),0)/units.length) : 0;
     const lanceWide = (LB_TYPE_ABILITIES[lanceType] || {}).lanceWide || [];
 
+    const pvLabel = skill === 4 ? `${rawPV} PV` : `${lancePV} PV (×${mult.toFixed(2)})`;
     html += `<div class="lance">
-      <div class="lance-hdr"><span>Lance ${li+1} — ${typeLabel}</span><span>${lancePV} PV</span></div>`;
+      <div class="lance-hdr"><span>Lance ${li+1} — ${typeLabel}</span><span>${pvLabel}</span></div>`;
 
     units.forEach((u, si) => {
       const bonus  = lbUnitBonuses[`${li}-${si}`] || '';
@@ -2834,6 +2874,7 @@ function lbPrintLances() {
       html += `</div>`;
     }
     html += `<div class="lance-stats">Dmg S${totS} M${totM} L${totL} · Avg TMM: ${avgTMM} · ${skillTxt}</div></div>`;
+
   });
 
   html += `</div></body></html>`;
@@ -2954,7 +2995,7 @@ function lbLanceStatsHtml(units, li) {
     </div>
     <div class="lb-lstat-group">
       <span class="lb-lstat-title">Lance Skill</span>
-      <select class="lb-skill-sel" id="lb-skill-${li}">
+      <select class="lb-skill-sel" id="lb-skill-${li}" onchange="lbSkillChanged(${li})">
         <option value="0">Skill 0 — Legendary</option>
         <option value="1">Skill 1 — Elite</option>
         <option value="2">Skill 2 — Veteran</option>
@@ -3067,20 +3108,12 @@ function lbSwapUnit(li, si, selectEl) {
     rowEl.outerHTML = lbRenderUnitRow(newUnit, li, si, sk, takenSw);
   }
 
-  // Update lance PV
-  const lancePV = lbCurrentLances[li].reduce((s, u) => s + (u.BFPointValue||0), 0);
-  const pvEl = document.getElementById(`lb-lance-pv-${li}`);
-  if (pvEl) pvEl.textContent = lancePV + ' PV';
+  // Update lance PV (skill-adjusted) + formation totals
+  lbSkillChanged(li);
+  lbUpdateTotalPV();
 
   // Update lance damage totals + avg TMM
   lbUpdateLanceStats(li);
-
-  // Update formation total PV & supply
-  const totalPV = lbCurrentLances.flat().reduce((s, u) => s + (u.BFPointValue||0), 0);
-  const tEl = document.getElementById('lb-total-pv');
-  const sEl = document.getElementById('lb-total-sp');
-  if (tEl) tEl.textContent = totalPV;
-  if (sEl) sEl.textContent = Math.ceil(totalPV * 0.1);
 
   // Update analysis row
   const counts = [0,0,0,0,0];
