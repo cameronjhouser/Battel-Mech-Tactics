@@ -677,7 +677,12 @@
   .lb-lstat-group { display:flex; flex-direction:column; gap:2px; }
   .lb-lstat-title { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; }
   .lb-lstat-val { font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); }
-  .lb-lstat-dmg { font-family:var(--mono); font-size:12px; font-weight:700; }
+  .lb-lstat-dmg {
+    display:flex; align-items:baseline; gap:4px; white-space:nowrap;
+    font-family:var(--mono);
+  }
+  .lb-dmg-lbl { font-size:9px; color:var(--text3); }
+  .lb-dmg-num { font-size:14px; font-weight:700; color:var(--accent); }
   .lb-skill-sel {
     background:var(--bg3); border:1px solid var(--border); color:var(--text);
     font-size:11px; border-radius:3px; padding:2px 4px; width:100%; cursor:pointer;
@@ -2669,7 +2674,7 @@ function lbRenderLanceOutput(fDef, specKey, unresolved, remaining) {
 }
 
 function lbCalcTMM(u) {
-  if (u.BFTMM !== undefined && u.BFTMM !== null) return parseInt(u.BFTMM) || 0;
+  // BFTMM from QuickList is unreliable (often 0) — always derive from BFMove
   const mv = lbGetMV(u);
   if (mv <= 4)  return 0;
   if (mv <= 8)  return 1;
@@ -2724,9 +2729,9 @@ function lbLanceStatsHtml(units, li) {
     <div class="lb-lstat-group">
       <span class="lb-lstat-title">Lance Damage</span>
       <span class="lb-lstat-dmg" id="lb-ldmg-${li}">
-        <span style="color:var(--text3);font-size:9px">S</span> <strong style="color:var(--text)">${totS}</strong>
-        &nbsp;<span style="color:var(--text3);font-size:9px">M</span> <strong style="color:var(--text)">${totM}</strong>
-        &nbsp;<span style="color:var(--text3);font-size:9px">L</span> <strong style="color:var(--text)">${totL}</strong>
+        <span class="lb-dmg-lbl">S</span><span class="lb-dmg-num">${totS}</span>
+        <span class="lb-dmg-lbl">M</span><span class="lb-dmg-num">${totM}</span>
+        <span class="lb-dmg-lbl">L</span><span class="lb-dmg-num">${totL}</span>
       </span>
     </div>
     <div class="lb-lstat-group">
@@ -2736,6 +2741,7 @@ function lbLanceStatsHtml(units, li) {
     <div class="lb-lstat-group">
       <span class="lb-lstat-title">Lance Skill</span>
       <select class="lb-skill-sel" id="lb-skill-${li}">
+        <option value="0">Skill 0 — Legendary</option>
         <option value="1">Skill 1 — Elite</option>
         <option value="2">Skill 2 — Veteran</option>
         <option value="3" selected>Skill 3 — Regular</option>
@@ -2756,9 +2762,9 @@ function lbUpdateLanceStats(li) {
   const dmgEl = document.getElementById(`lb-ldmg-${li}`);
   const tmmEl = document.getElementById(`lb-tmm-${li}`);
   if (dmgEl) dmgEl.innerHTML =
-    `<span style="color:var(--text3);font-size:9px">S</span> <strong style="color:var(--text)">${totS}</strong>` +
-    `&nbsp;<span style="color:var(--text3);font-size:9px">M</span> <strong style="color:var(--text)">${totM}</strong>` +
-    `&nbsp;<span style="color:var(--text3);font-size:9px">L</span> <strong style="color:var(--text)">${totL}</strong>`;
+    `<span class="lb-dmg-lbl">S</span><span class="lb-dmg-num">${totS}</span>` +
+    `<span class="lb-dmg-lbl">M</span><span class="lb-dmg-num">${totM}</span>` +
+    `<span class="lb-dmg-lbl">L</span><span class="lb-dmg-num">${totL}</span>`;
   if (tmmEl) tmmEl.textContent = avgTMM;
 }
 
