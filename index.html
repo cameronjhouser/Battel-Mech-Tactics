@@ -2487,18 +2487,44 @@ const LB_CMD_ABILITIES = [
   "Eagle's Eyes", 'Marksman', 'Multi-Tasker', '★ Tactical Genius',
 ];
 
-// Per-lance-type abilities (single = fixed bonus, multiple = unit picks one)
+// Lance-type abilities: lanceWide = whole lance gets all listed; perUnit = each unit picks one
 const LB_TYPE_ABILITIES = {
-  recon:        ["Eagle's Eyes", 'Forward Observer', 'Maneuvering Ace'],
-  strike:       ['Speed Demon'],
-  fire:         ['Sniper'],
-  battle:       ['Lucky'],
-  'assault-sp': ['Demoralizer', 'Multi-Tasker'],
-  command:      ['Antagonizer', 'Blood Stalker', 'Combat Intuition', "Eagle's Eyes", 'Marksman', 'Multi-Tasker', '★ Tactical Genius'],
-  pursuit:      ['Blood Stalker'],
+  recon:        { lanceWide: ["Eagle's Eyes", 'Forward Observer', 'Maneuvering Ace'] },
+  strike:       { lanceWide: ['Speed Demon'] },
+  fire:         { lanceWide: ['Sniper'] },
+  battle:       { lanceWide: ['Lucky'] },
+  'assault-sp': { lanceWide: ['Demoralizer', 'Multi-Tasker'] },
+  command:      { perUnit:   ['Antagonizer', 'Blood Stalker', 'Combat Intuition', "Eagle's Eyes", 'Marksman', 'Multi-Tasker', '★ Tactical Genius'] },
+  pursuit:      { lanceWide: ['Blood Stalker'] },
+};
+
+const LB_ABILITY_DESC = {
+  "Eagle's Eyes":     "Gains RCN keyword · +2\" sensor range · auto-reveal hidden ≤2\" · +2 minefield avoid",
+  "Forward Observer": "Spot for indirect fire while attacking (no penalty) · multiple friendlies at once",
+  "Maneuvering Ace":  "Reduced movement penalty through woods and rough terrain",
+  "Speed Demon":      "+2\" movement per turn without raising TMM",
+  "Sniper":           "Half range penalties: +1 at medium (not +2) · +2 at long (not +4)",
+  "Lucky":            "Reroll one failed to-hit roll per game (extra uses in larger formations)",
+  "Demoralizer":      "Once/turn: enemies ≤6\" roll 2d6; on 8− → half MV & TMM, penalty to hit this lance",
+  "Multi-Tasker":     "Split damage across two different targets in one attack",
+  "Antagonizer":      "Enemies ≤6\" roll 2d6; fail → must move toward you and can only shoot you",
+  "Blood Stalker":    "Pick 1 enemy at game start: −1 to hit that target · +2 vs all others",
+  "Combat Intuition": "Win initiative → move and shoot immediately (3-turn cooldown)",
+  "Marksman":         "Trade half damage & MV for Through-Armor Critical chance on hit by 3+",
+  "★ Tactical Genius":"Leader only — reroll initiative once every 2 turns",
 };
 
 let lbUnitBonuses = {}; // `${li}-${si}` -> chosen ability string
+
+function lbGetLanceTaken(li, excludeSi) {
+  const s = new Set();
+  (lbCurrentLances[li] || []).forEach((_, si) => {
+    if (si === excludeSi) return;
+    const b = lbUnitBonuses[`${li}-${si}`];
+    if (b) s.add(b);
+  });
+  return s;
+}
 
 function lbLanceQualifies(units, specKey) {
   if (!specKey || !units.length) return true;
@@ -2715,6 +2741,7 @@ function lbRenderLanceOutput(fDef, unresolved, remaining) {
         ${lances.length} lance${lances.length!==1?'s':''} &nbsp;·&nbsp;
         Total PV: <span style="color:var(--accent)" id="lb-total-pv">${totalPV}</span> &nbsp;·&nbsp;
         Supply: <span style="color:var(--green)" id="lb-total-sp">${supply}</span>
+        &nbsp;·&nbsp; <button class="lb-btn-sm" onclick="lbPrintLances()" style="padding:2px 10px">🖨 Print</button>
       </span>
     </div>
     <div class="lb-lances-grid">`;
@@ -2737,6 +2764,83 @@ function lbRenderLanceOutput(fDef, unresolved, remaining) {
   document.getElementById('lb-formation-out').innerHTML = html;
 }
 
+function lbPrintLances() {
+  const fKey = document.getElementById('lb-formation-type').value;
+  const fDef = LB_FORMATIONS[fKey] || {};
+  const totalPV = lbCurrentLances.flat().reduce((s,u) => s+(u.BFPointValue||0), 0);
+
+  let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Lance Formation</title>
+  <style>
+    body { font-family:Arial,sans-serif; font-size:11px; color:#000; margin:20px; }
+    h1 { font-size:18px; margin-bottom:2px; }
+    .meta { font-size:11px; color:#555; margin-bottom:16px; }
+    .lances { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+    .lance { border:1px solid #999; border-radius:4px; page-break-inside:avoid; }
+    .lance-hdr { background:#ddd; padding:6px 10px; font-weight:700; display:flex; justify-content:space-between; border-radius:4px 4px 0 0; }
+    .unit { border-top:1px solid #ddd; padding:6px 10px; }
+    .unit-name { font-weight:700; font-size:12px; }
+    .unit-meta { font-size:10px; color:#555; }
+    .unit-abil { font-size:10px; color:#006; margin-top:1px; }
+    .unit-bonus { font-size:10px; color:#a60; font-weight:700; margin-top:2px; }
+    .unit-bonus-desc { font-size:9px; color:#777; }
+    .pips { font-size:9px; letter-spacing:1px; margin-top:2px; }
+    .lance-stats { padding:5px 10px; background:#f5f5f5; font-size:10px; color:#555; border-top:1px solid #ddd; }
+    .lance-abilities { padding:5px 10px; background:#fffbe6; font-size:10px; border-top:1px solid #ddd; }
+    .lw-abil { color:#a60; font-weight:700; }
+    .lw-desc { color:#666; font-size:9px; }
+    @media print { body { margin:10px; } }
+  </style></head><body>
+  <h1>${fDef.name || 'Formation'}</h1>
+  <div class="meta">Total PV: ${totalPV} &nbsp;·&nbsp; Supply Points: ${Math.ceil(totalPV*0.1)}</div>
+  <div class="lances">`;
+
+  lbCurrentLances.forEach((units, li) => {
+    const lancePV  = units.reduce((s,u)=>s+(u.BFPointValue||0),0);
+    const lanceType = lbLanceTypes[li] || '';
+    const typeLabel = lanceType && LB_SPECIAL_TYPES[lanceType] ? LB_SPECIAL_TYPES[lanceType].name : 'Standard';
+    const skillEl  = document.getElementById(`lb-skill-${li}`);
+    const skillTxt = skillEl ? `Skill ${skillEl.options[skillEl.selectedIndex].text}` : '';
+    const totS = units.reduce((s,u)=>s+(parseInt(u.BFDamageShort)||0),0);
+    const totM = units.reduce((s,u)=>s+(parseInt(u.BFDamageMedium)||0),0);
+    const totL = units.reduce((s,u)=>s+(parseInt(u.BFDamageLong)||0),0);
+    const avgTMM = units.length ? Math.round(units.reduce((s,u)=>s+lbCalcTMM(u),0)/units.length) : 0;
+    const lanceWide = (LB_TYPE_ABILITIES[lanceType] || {}).lanceWide || [];
+
+    html += `<div class="lance">
+      <div class="lance-hdr"><span>Lance ${li+1} — ${typeLabel}</span><span>${lancePV} PV</span></div>`;
+
+    units.forEach((u, si) => {
+      const bonus  = lbUnitBonuses[`${li}-${si}`] || '';
+      const isCmd  = `${li}-${si}` in lbCmdState;
+      const abil   = (u.BFAbilities || '').trim();
+      const armor  = parseInt(u.BFArmor)||0;
+      const intr   = parseInt(u.BFStructure)||0;
+      const dmgStr = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
+      html += `<div class="unit">
+        <div class="unit-name">${isCmd?'★ ':''}${u.Name}${isCmd?' (CMD)':''}</div>
+        <div class="unit-meta">${LB_SZ[u.BFSize||0]} · ${u.Tonnage||'?'}t · ${u.Role?.Name||'—'} · MV ${u.BFMove||'?'} · TMM ${lbCalcTMM(u)} · ${u.BFPointValue||'?'} PV</div>
+        <div class="unit-meta">Dmg S/M/L: ${dmgStr} · Armor: ${armor} · IS: ${intr}</div>
+        ${abil ? `<div class="unit-abil">${abil}</div>` : ''}
+        ${bonus ? `<div class="unit-bonus">★ ${bonus}</div><div class="unit-bonus-desc">${LB_ABILITY_DESC[bonus]||''}</div>` : ''}
+        <div class="pips">A: ${'○'.repeat(Math.min(armor,30))}${armor>30?`(+${armor-30})`:''}  I: ${'○'.repeat(Math.min(intr,15))}${intr>15?`(+${intr-15})`:''}</div>
+      </div>`;
+    });
+
+    if (lanceWide.length) {
+      html += `<div class="lance-abilities">`;
+      lanceWide.forEach(a => {
+        html += `<div><span class="lw-abil">★ ${a}</span> <span class="lw-desc">${LB_ABILITY_DESC[a]||''}</span></div>`;
+      });
+      html += `</div>`;
+    }
+    html += `<div class="lance-stats">Dmg S${totS} M${totM} L${totL} · Avg TMM: ${avgTMM} · ${skillTxt}</div></div>`;
+  });
+
+  html += `</div></body></html>`;
+  const w = window.open('','_blank');
+  if (w) { w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
+}
+
 function lbCalcTMM(u) {
   // BFTMM from QuickList is unreliable (often 0) — always derive from BFMove
   const mv = lbGetMV(u);
@@ -2754,32 +2858,34 @@ function lbMakePips(count, cls) {
   ).join('');
 }
 
-function lbRenderUnitRow(u, li, si, specKey) {
+function lbRenderUnitRow(u, li, si, specKey, lanceTaken) {
   const sz      = u.BFSize||0;
   const dmg     = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
   const chassis = lbGetChassis(u.Name);
   const armor   = parseInt(u.BFArmor)     || 0;
   const intr    = parseInt(u.BFStructure) || 0;
-  const abil       = (u.BFAbilities || '').trim();
-  const key        = `${li}-${si}`;
-  const isCmd      = key in lbCmdState;
-  const cmdAbil    = lbCmdState[key] || '';
-  const cmdOpts    = LB_CMD_ABILITIES.map(a =>
-    `<option value="${a}" ${a===cmdAbil?'selected':''}>${a}</option>`).join('');
-  const typeBonuses = LB_TYPE_ABILITIES[specKey] || [];
+  const abil    = (u.BFAbilities || '').trim();
+  const key     = `${li}-${si}`;
+  const isCmd   = key in lbCmdState;
+  const taken   = lanceTaken || new Set();
+
+  // Per-unit ability picker (Command Lance only — each unit picks one unique ability)
+  const typeInfo    = LB_TYPE_ABILITIES[specKey] || {};
+  const perUnitList = typeInfo.perUnit || [];
   const unitBonus   = lbUnitBonuses[key] || '';
-  let bonusHtml = '';
-  if (typeBonuses.length === 1) {
-    bonusHtml = `<div class="lb-unit-abil" style="color:var(--orange)">★ ${typeBonuses[0]}</div>`;
-  } else if (typeBonuses.length > 1) {
-    const bOpts = typeBonuses.map(a =>
+  let perUnitHtml   = '';
+  if (perUnitList.length > 0) {
+    const available = perUnitList.filter(a => !taken.has(a) || a === unitBonus);
+    const bOpts = available.map(a =>
       `<option value="${a}" ${a===unitBonus?'selected':''}>${a}</option>`).join('');
-    bonusHtml = `<div class="lb-cmd-pick">
+    perUnitHtml = `<div class="lb-cmd-pick">
       <select onchange="lbSetUnitBonus(${li},${si},this.value)">
-        <option value="">— pick bonus —</option>${bOpts}
+        <option value="">— pick ability —</option>${bOpts}
       </select>
-      ${unitBonus ? `<span class="lb-cmd-abil-label" style="color:var(--orange)">★ ${unitBonus}</span>` : ''}
     </div>`;
+    if (unitBonus) perUnitHtml +=
+      `<div class="lb-unit-abil" style="color:var(--orange)">★ ${unitBonus}</div>` +
+      `<div class="lb-unit-abil" style="color:var(--text3)">${LB_ABILITY_DESC[unitBonus]||''}</div>`;
   }
 
   return `<div class="lb-unit-row" id="lb-unit-${li}-${si}"
@@ -2792,7 +2898,7 @@ function lbRenderUnitRow(u, li, si, specKey) {
     <div class="lb-unit-name" style="min-width:0;flex:1">
       ${isCmd ? '<span class="lb-cmd-badge">★ CMD</span>' : ''}
       <select class="lb-unit-select"
-        data-lance="${li}" data-slot="${si}" data-chassis="${chassis}" data-speckey="${specKey||''}"
+        data-lance="${li}" data-slot="${si}" data-chassis="${chassis}"
         onchange="lbSwapUnit(${li},${si},this)"
         onfocus="lbLoadVariants(this)">
         <option value="${u.Id??u.Name}">${u.Name}</option>
@@ -2800,13 +2906,7 @@ function lbRenderUnitRow(u, li, si, specKey) {
       </select>
       <small>${u.Tonnage||'?'}t · ${u.Role?u.Role.Name:'—'} · MV ${u.BFMove||'?'} · TMM ${lbCalcTMM(u)}</small>
       ${abil ? `<div class="lb-unit-abil">${abil}</div>` : ''}
-      ${bonusHtml}
-      ${isCmd ? `<div class="lb-cmd-pick">
-        <select onchange="lbSetCmdAbility(${li},${si},this.value)">
-          <option value="">— pick CMD ability —</option>${cmdOpts}
-        </select>
-        ${cmdAbil ? `<span class="lb-cmd-abil-label">${cmdAbil}</span>` : ''}
-      </div>` : ''}
+      ${perUnitHtml}
       <div class="lb-pip-track" title="Armor: ${armor}">
         <span class="lb-pip-label">A</span>${lbMakePips(armor,'armor')}
       </div>
@@ -2867,6 +2967,12 @@ function lbLanceStatsHtml(units, li) {
       <select class="lb-lance-type-sel" id="lb-lance-type-${li}" onchange="lbLanceTypeChanged(${li},this.value)">
         ${typeOpts}
       </select>
+      ${(LB_TYPE_ABILITIES[curType]?.lanceWide || []).map(a =>
+        `<div style="margin-top:4px">
+          <span class="lb-unit-abil" style="color:var(--orange)">★ ${a}</span>
+          <div class="lb-unit-abil">${LB_ABILITY_DESC[a]||''}</div>
+        </div>`
+      ).join('')}
     </div>
   </div>`;
 }
@@ -2901,7 +3007,11 @@ function lbRenderLanceBlock(units, li, specKey) {
       <span class="lb-lance-pv" id="lb-lance-pv-${li}">${lancePV} PV</span>
     </div>`;
 
-  units.forEach((u, si) => { html += lbRenderUnitRow(u, li, si, specKey); });
+  const typeInfo = LB_TYPE_ABILITIES[specKey] || {};
+  units.forEach((u, si) => {
+    const taken = typeInfo.perUnit ? lbGetLanceTaken(li, si) : new Set();
+    html += lbRenderUnitRow(u, li, si, specKey, taken);
+  });
 
   html += lbLanceStatsHtml(units, li);
   html += `<div class="lb-lance-analysis" id="lb-analysis-${li}">${compStr} &nbsp;·&nbsp; ${eligible}</div>
@@ -2950,7 +3060,12 @@ function lbSwapUnit(li, si, selectEl) {
 
   // Re-render the whole unit row so armor/IS pips update correctly
   const rowEl = document.getElementById(`lb-unit-${li}-${si}`);
-  if (rowEl) rowEl.outerHTML = lbRenderUnitRow(newUnit, li, si, lbLanceTypes[li]||'');
+  if (rowEl) {
+    const sk = lbLanceTypes[li] || '';
+    const typeInfoSw = LB_TYPE_ABILITIES[sk] || {};
+    const takenSw = typeInfoSw.perUnit ? lbGetLanceTaken(li, si) : new Set();
+    rowEl.outerHTML = lbRenderUnitRow(newUnit, li, si, sk, takenSw);
+  }
 
   // Update lance PV
   const lancePV = lbCurrentLances[li].reduce((s, u) => s + (u.BFPointValue||0), 0);
