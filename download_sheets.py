@@ -377,6 +377,8 @@ def load_csv(path):
 # Entry point
 # ---------------------------------------------------------------------------
 def main():
+    global OUTPUT_DIR, DELAY   # must be declared before any reference to these names
+
     parser = argparse.ArgumentParser(
         description="Download Classic BT record sheets from mordel.net",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -401,7 +403,6 @@ def main():
                         help="Seconds between requests (default: 2.5)")
     args = parser.parse_args()
 
-    global OUTPUT_DIR, DELAY
     OUTPUT_DIR = args.out
     DELAY      = args.delay
 
