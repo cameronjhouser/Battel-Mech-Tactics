@@ -108,6 +108,14 @@ def parse_era(era_str):
         sys.exit(1)
 
 
+def safe_year(val):
+    """Convert a DateIntroduced value to int safely; returns 0 on any failure."""
+    try:
+        return int(val or 0)
+    except (ValueError, TypeError):
+        return 0
+
+
 def fetch_all_from_mul(unit_types, era_range):
     """
     Query the MUL API for all units of the requested types.
@@ -160,7 +168,7 @@ def fetch_all_from_mul(unit_types, era_range):
             before = len(all_units)
             all_units = [
                 u for u in all_units
-                if min_y <= int(u.get("DateIntroduced") or 0) <= max_y
+                if min_y <= safe_year(u.get("DateIntroduced")) <= max_y
             ]
             print("  %d %ss in era %d-%d  (of %d total)"
                   % (len(all_units), utype, min_y, max_y, before))
