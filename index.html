@@ -698,6 +698,8 @@
   .lb-cmd-btn { background:none; border:1px solid var(--border); border-radius:3px; color:var(--text3); font-size:11px; cursor:pointer; padding:1px 6px; white-space:nowrap; }
   .lb-cmd-btn.active { border-color:gold; color:gold; background:#1c1600; }
   .lb-cmd-badge { font-size:9px; color:gold; font-family:var(--cond); font-weight:700; letter-spacing:.04em; margin-right:2px; }
+  .lb-card-link { font-size:13px; text-decoration:none; opacity:0.55; margin-top:2px; line-height:1; cursor:pointer; }
+  .lb-card-link:hover { opacity:1; }
   .lb-cmd-pick { margin-top:3px; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
   .lb-cmd-pick select { background:var(--bg3); border:1px solid gold; color:var(--text); font-size:10px; border-radius:3px; padding:1px 4px; cursor:pointer; }
   .lb-cmd-abil-label { font-size:9px; color:gold; font-family:var(--mono); }
@@ -2837,6 +2839,7 @@ function lbRenderLanceOutput(fDef, unresolved, remaining) {
         Total PV: <span style="color:var(--accent)" id="lb-total-pv">${totalPV}</span> &nbsp;·&nbsp;
         Supply: <span style="color:var(--green)" id="lb-total-sp">${supply}</span>
         &nbsp;·&nbsp; <button class="lb-btn-sm" onclick="lbPrintLances()" style="padding:2px 10px">🖨 Print</button>
+        &nbsp; <button class="lb-btn-sm" onclick="lbDownloadCards()" style="padding:2px 10px">📇 Cards</button>
       </span>
     </div>
     <div class="lb-lances-grid">`;
@@ -2946,6 +2949,68 @@ function lbPrintLances() {
   if (w) { w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
 }
 
+function lbDownloadCards() {
+  const units = lbCurrentLances.flat().filter(u => u && u.Id);
+  if (!units.length) return;
+  const fKey    = document.getElementById('lb-formation-type').value;
+  const fDef    = LB_FORMATIONS[fKey] || {};
+  const totalPV = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
+  const MUL_CARD = 'https://masterunitlist.azurewebsites.net/Unit/Card/';
+
+  let cardRows = '';
+  lbCurrentLances.forEach((lUnits, li) => {
+    const lanceType = lbLanceTypes[li] || '';
+    const typeLabel = lanceType && LB_SPECIAL_TYPES[lanceType]
+      ? LB_SPECIAL_TYPES[lanceType].name : 'Standard';
+    const lancePV = lbGetAdjLancePV(li);
+    cardRows += `<div class="lance-label">Lance ${li+1} — ${typeLabel} &nbsp;·&nbsp; ${lancePV} PV</div><div class="card-row">`;
+    lUnits.forEach(u => {
+      if (!u || !u.Id) return;
+      cardRows += `<div class="card-wrap">
+        <img src="${MUL_CARD}${u.Id}" alt="${u.Name}"
+          onerror="this.style.outline='2px dashed #c00';this.style.padding='8px';this.alt='Card unavailable: ${u.Name.replace(/'/g,"\\'")}'"
+        >
+        <div class="card-name">${u.Name}</div>
+      </div>`;
+    });
+    cardRows += `</div>`;
+  });
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>${fDef.name||'Formation'} — Alpha Strike Cards</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:Arial,sans-serif; background:#fff; }
+    .header { padding:12px 16px; border-bottom:2px solid #333; margin-bottom:10px; }
+    .header h1 { font-size:16px; }
+    .header p  { font-size:11px; color:#555; margin-top:3px; }
+    .lance-label { font-size:11px; font-weight:700; color:#444; padding:8px 12px 3px; border-top:1px solid #ccc; margin-top:6px; }
+    .card-row { display:flex; flex-wrap:wrap; gap:10px; padding:6px 12px 10px; }
+    .card-wrap { display:flex; flex-direction:column; align-items:center; }
+    .card-wrap img { width:340px; height:auto; border:1px solid #bbb; border-radius:4px; display:block; }
+    .card-name { font-size:9px; color:#888; margin-top:3px; text-align:center; width:340px; }
+    @media print {
+      body { margin:0; }
+      .lance-label { page-break-before:auto; }
+      .card-wrap { page-break-inside:avoid; }
+    }
+  </style></head><body>
+  <div class="header">
+    <h1>${fDef.name||'Formation'} — Alpha Strike Cards</h1>
+    <p>Total PV: ${totalPV} &nbsp;·&nbsp; Supply Points: ${Math.ceil(totalPV*0.1)} &nbsp;·&nbsp; ${units.length} units &nbsp;·&nbsp; Use <strong>Print → Save as PDF</strong> to download</p>
+  </div>
+  ${cardRows}
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+    // Give images time to load before triggering the save/print dialog
+    w.addEventListener('load', () => setTimeout(() => w.print(), 500));
+  }
+}
+
 function lbCalcTMM(u) {
   // BFTMM from QuickList is unreliable (often 0) — always derive from BFMove
   const mv = lbGetMV(u);
@@ -3024,6 +3089,7 @@ function lbRenderUnitRow(u, li, si, specKey, lanceTaken) {
       <button class="lb-cmd-btn${isCmd?' active':''}" onclick="lbToggleCmd(${li},${si})" title="Toggle lance commander">
         ${isCmd ? '★ CMD' : '☆ CMD'}
       </button>
+      ${u.Id ? `<a href="https://masterunitlist.azurewebsites.net/Unit/Card/${u.Id}" target="_blank" class="lb-card-link" title="View Alpha Strike card">🃏</a>` : ''}
     </div>
   </div>`;
 }
