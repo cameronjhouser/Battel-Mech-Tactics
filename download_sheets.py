@@ -1,36 +1,34 @@
 #!/usr/bin/env python3
 """
 download_sheets.py
-──────────────────
+------------------
 Downloads Classic BattleTech record sheets from mordel.net and saves them
 to a local ./sheets/ folder. Once downloaded, commit the sheets/ folder to
 the repo and GitHub Pages will serve them automatically.
 
 Usage
-─────
-  # Single units
-  python download_sheets.py "Atlas AS7-D" "Warhammer WHM-6R"
+-----
+  # Download all BattleMechs from the Clan Invasion era
+  py download_sheets.py --all --type BattleMech --era 3050-3061
 
-  # From a text file (one name per line)
-  python download_sheets.py --txt my_units.txt
+  # Download all mechs AND tanks from Succession Wars
+  py download_sheets.py --all --type BattleMech --type "Combat Vehicle" --era 2781-3049
+
+  # Download every BattleMech (takes hours -- run overnight)
+  py download_sheets.py --all --type BattleMech
 
   # From the same CSV you upload to the Lance Builder
-  python download_sheets.py --csv "Unit List for Company.csv"
+  py download_sheets.py --csv "Unit List for Company.csv"
+
+  # Single units by name
+  py download_sheets.py "Atlas AS7-D" "Warhammer WHM-6R"
 
   # Retry previously failed units
-  python download_sheets.py --txt sheets/_failed.txt
+  py download_sheets.py --txt sheets/_failed.txt
 
 Requirements
-────────────
-  pip install requests beautifulsoup4
-
-Notes
-─────
-  • Adds a 2-second delay between requests to be polite to mordel's servers.
-  • Already-downloaded sheets are skipped automatically (safe to re-run).
-  • Any units not found are saved to sheets/_failed.txt for review.
-  • PDFs are named exactly as the MUL unit name so the Lance Builder
-    can find them automatically (e.g. "Atlas AS7-D.pdf").
+------------
+  py -m pip install requests beautifulsoup4
 """
 
 import argparse
@@ -42,27 +40,41 @@ import sys
 import time
 from datetime import datetime, timezone
 from urllib.parse import quote
-from xml.etree import ElementTree
 
 try:
     import requests
     from bs4 import BeautifulSoup
+    from xml.etree import ElementTree
 except ImportError:
-    print("Missing dependencies. Run:  pip install requests beautifulsoup4")
+    print("Missing dependencies. Run:  py -m pip install requests beautifulsoup4")
     sys.exit(1)
 
-# ── Configuration ──────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
 MORDEL_BASE = "https://mordel.net"
-MORDEL_AJAX = f"{MORDEL_BASE}/includes/themes/Default/ajax/tro.ajax.module.php"
+MORDEL_AJAX = MORDEL_BASE + "/includes/themes/Default/ajax/tro.ajax.module.php"
+MUL_API     = "https://masterunitlist.azurewebsites.net/Unit/QuickList"
 OUTPUT_DIR  = "sheets"
-DELAY       = 2.5   # seconds between requests
+DELAY       = 2.5   # seconds between requests -- be polite
 
-USER_AGENT  = (
+USER_AGENT = (
     "BMT-SheetDownloader/1.0 "
     "(BattleMech Tactics rulebook; "
     "github.com/cameronjhouser/Battel-Mech-Tactics)"
 )
 
+# MUL type ID lookup (case-insensitive)
+MUL_TYPE_IDS = {
+    "battlemech":     18,
+    "combat vehicle": 23,
+    "battle armor":   21,
+    "aerospace":      22,
+    "industrialmech": 19,
+    "protomech":      20,
+}
+
+# Mordel unit-type codes
 UT_CODE_TO_TYPE = {
     "bm":   "BattleMech",
     "cv":   "Combat Vehicle",
@@ -72,14 +84,81 @@ UT_CODE_TO_TYPE = {
     "aero": "Aerospace",
 }
 
-# ── Session setup ──────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# Session
+# ---------------------------------------------------------------------------
 session = requests.Session()
 session.headers.update({"User-Agent": USER_AGENT})
 
 
-# ── Step 1: Search mordel by name, return list of candidate dicts ──────────────
-def search_mordel(name: str) -> list[dict]:
-    url = f"{MORDEL_BASE}/tro.php?a=v&fltr=qf.000.Name~Contains~{quote(name)}"
+# ---------------------------------------------------------------------------
+# MUL bulk query  (used by --all)
+# ---------------------------------------------------------------------------
+def parse_era(era_str):
+    """Parse '3050-3061' into (3050, 3061). Returns None if era_str is empty."""
+    if not era_str:
+        return None
+    parts = era_str.strip().split("-")
+    try:
+        if len(parts) == 2:
+            return int(parts[0]), int(parts[1])
+        return 0, int(parts[0])   # single year = up-to
+    except ValueError:
+        print("ERROR: --era must be a year range like 3050-3061")
+        sys.exit(1)
+
+
+def fetch_all_from_mul(unit_types, era_range):
+    """
+    Query the MUL API for all units of the requested types.
+    Returns a list of unit name strings, filtered by era_range if given.
+    """
+    all_names = []
+
+    for utype in unit_types:
+        type_id = MUL_TYPE_IDS.get(utype.lower().strip())
+        if type_id is None:
+            valid = ", ".join(MUL_TYPE_IDS.keys())
+            print("Unknown type: %r   Valid options: %s" % (utype, valid))
+            continue
+
+        print("Querying MUL for all %ss..." % utype)
+        try:
+            r = session.get(MUL_API, params={"Types": type_id}, timeout=30)
+            r.raise_for_status()
+            data = r.json()
+        except Exception as e:
+            print("  MUL query failed: %s" % e)
+            continue
+
+        units = data.get("Units", data) if isinstance(data, dict) else data
+        if not units:
+            print("  No results returned from MUL for type %r" % utype)
+            continue
+
+        # Apply era filter using DateIntroduced
+        if era_range:
+            min_y, max_y = era_range
+            before = len(units)
+            units = [
+                u for u in units
+                if min_y <= int(u.get("DateIntroduced") or 0) <= max_y
+            ]
+            print("  %d %ss in era %d-%d  (of %d total)"
+                  % (len(units), utype, min_y, max_y, before))
+        else:
+            print("  %d %ss found" % (len(units), utype))
+
+        all_names.extend(u["Name"] for u in units if u.get("Name"))
+
+    return all_names
+
+
+# ---------------------------------------------------------------------------
+# Step 1: Search mordel by name
+# ---------------------------------------------------------------------------
+def search_mordel(name):
+    url = MORDEL_BASE + "/tro.php?a=v&fltr=qf.000.Name~Contains~" + quote(name)
     r = session.get(url, timeout=20)
     r.raise_for_status()
     soup = BeautifulSoup(r.text, "html.parser")
@@ -99,24 +178,23 @@ def search_mordel(name: str) -> list[dict]:
     return results
 
 
-def best_match(query: str, candidates: list[dict]) -> dict | None:
+def best_match(query, candidates):
     if not candidates:
         return None
     q = query.lower()
-    # Exact match
     for c in candidates:
         if c["name"].lower() == q:
             return c
-    # Query contained in result or vice-versa
     for c in candidates:
         if q in c["name"].lower() or c["name"].lower() in q:
             return c
-    # Fallback: first result
     return candidates[0]
 
 
-# ── Step 2: POST to mordel to trigger server-side PDF generation ───────────────
-def generate_sheet(mordel_id: str, ut_code: str) -> tuple[str, str] | None:
+# ---------------------------------------------------------------------------
+# Step 2: POST to mordel to trigger PDF generation
+# ---------------------------------------------------------------------------
+def generate_sheet(mordel_id, ut_code):
     unit_type = UT_CODE_TO_TYPE.get(ut_code, "BattleMech")
     payload = {
         "action":      "GenerateFormat",
@@ -133,7 +211,7 @@ def generate_sheet(mordel_id: str, ut_code: str) -> tuple[str, str] | None:
     try:
         root = ElementTree.fromstring(r.text)
     except ElementTree.ParseError as e:
-        print(f"    ✗ XML parse error: {e}  (response: {r.text[:120]})")
+        print("    XML parse error: %s  (response: %s)" % (e, r.text[:120]))
         return None
 
     status     = root.findtext("status", "")
@@ -143,24 +221,24 @@ def generate_sheet(mordel_id: str, ut_code: str) -> tuple[str, str] | None:
 
     if status == "SUCCESS" and uniquename:
         return uniquename, filename
-    print(f"    ✗ mordel returned status={status!r}  message={message!r}")
+    print("    mordel error: status=%r  message=%r" % (status, message))
     return None
 
 
-# ── Step 3: Download the generated PDF ────────────────────────────────────────
-def download_pdf(uniquename: str, ut_code: str, display_name: str, out_path: str) -> bool:
-    url = (
-        f"{MORDEL_BASE}/tro.php"
-        f"?a=dlf&ut={ut_code}"
-        f"&file={quote(uniquename)}"
-        f"&nfile={quote(display_name)}"
-    )
+# ---------------------------------------------------------------------------
+# Step 3: Download the generated PDF
+# ---------------------------------------------------------------------------
+def download_pdf(uniquename, ut_code, display_name, out_path):
+    url = (MORDEL_BASE + "/tro.php"
+           + "?a=dlf&ut=" + ut_code
+           + "&file=" + quote(uniquename)
+           + "&nfile=" + quote(display_name))
     r = session.get(url, timeout=30, stream=True)
     r.raise_for_status()
 
     ct = r.headers.get("Content-Type", "")
     if "pdf" not in ct.lower() and "octet-stream" not in ct.lower():
-        print(f"    ✗ Unexpected Content-Type: {ct!r}")
+        print("    Unexpected Content-Type: %r" % ct)
         return False
 
     with open(out_path, "wb") as f:
@@ -169,50 +247,53 @@ def download_pdf(uniquename: str, ut_code: str, display_name: str, out_path: str
     return True
 
 
-# ── Full pipeline for one unit name ───────────────────────────────────────────
-def process_unit(unit_name: str) -> bool:
+# ---------------------------------------------------------------------------
+# Full pipeline for one unit name
+# ---------------------------------------------------------------------------
+def process_unit(unit_name):
     safe_name = re.sub(r'[<>:"/\\|?*]', "_", unit_name).strip()
     out_path  = os.path.join(OUTPUT_DIR, safe_name + ".pdf")
 
-    print(f"\n→ {unit_name}")
+    print("\n-> %s" % unit_name)
 
     if os.path.exists(out_path):
         size_kb = os.path.getsize(out_path) // 1024
-        print(f"  ✓ Already downloaded ({size_kb} KB) — skipping")
+        print("  Already downloaded (%d KB) -- skipping" % size_kb)
         return True
 
-    # ── Search ────────────────────────────────────────────────────────────────
-    print("  Searching mordel.net…")
+    # Search
+    print("  Searching mordel.net...")
     try:
         candidates = search_mordel(unit_name)
     except Exception as e:
-        print(f"  ✗ Search failed: {e}")
+        print("  Search failed: %s" % e)
         return False
 
     if not candidates:
         chassis = unit_name.split()[0]
-        print(f"  No exact results — retrying with chassis name "{chassis}"…")
+        print('  No results -- retrying with chassis name "%s"...' % chassis)
         time.sleep(DELAY)
         try:
             candidates = search_mordel(chassis)
         except Exception as e:
-            print(f"  ✗ Chassis search failed: {e}")
+            print("  Chassis search failed: %s" % e)
             return False
 
     match = best_match(unit_name, candidates)
     if not match:
-        print("  ✗ Unit not found on mordel.net")
+        print("  Not found on mordel.net")
         return False
 
-    print(f'  Found: "{match["name"]}"  (mordel id={match["id"]}, type={match["ut_code"]})')
+    print('  Found: "%s"  (mordel id=%s, type=%s)'
+          % (match["name"], match["id"], match["ut_code"]))
     time.sleep(DELAY)
 
-    # ── Generate ──────────────────────────────────────────────────────────────
-    print("  Requesting PDF generation…")
+    # Generate
+    print("  Requesting PDF generation...")
     try:
         result = generate_sheet(match["id"], match["ut_code"])
     except Exception as e:
-        print(f"  ✗ Generation request failed: {e}")
+        print("  Generation failed: %s" % e)
         return False
 
     if not result:
@@ -221,8 +302,8 @@ def process_unit(unit_name: str) -> bool:
     uniquename, display_name = result
     time.sleep(DELAY)
 
-    # ── Download ──────────────────────────────────────────────────────────────
-    print("  Downloading PDF…")
+    # Download
+    print("  Downloading PDF...")
     try:
         ok = download_pdf(
             uniquename, match["ut_code"],
@@ -230,44 +311,44 @@ def process_unit(unit_name: str) -> bool:
             out_path,
         )
     except Exception as e:
-        print(f"  ✗ Download failed: {e}")
+        print("  Download failed: %s" % e)
         return False
 
     if ok:
         size_kb = os.path.getsize(out_path) // 1024
-        print(f"  ✓ Saved: {safe_name}.pdf  ({size_kb} KB)")
+        print("  Saved: %s.pdf  (%d KB)" % (safe_name, size_kb))
     return ok
 
 
-# ── Manifest writer ───────────────────────────────────────────────────────────
-def write_manifest(out_dir: str) -> None:
-    """Scan out_dir for PDFs and write manifest.json — consumed by the Lance Builder."""
-    sheets: dict[str, str] = {}
+# ---------------------------------------------------------------------------
+# Manifest writer
+# ---------------------------------------------------------------------------
+def write_manifest(out_dir):
+    sheets = {}
     for fname in sorted(os.listdir(out_dir)):
         if fname.lower().endswith(".pdf") and not fname.startswith("_"):
-            unit_name = fname[:-4]   # filename without .pdf == the safe unit name
-            sheets[unit_name] = fname
+            sheets[fname[:-4]] = fname   # key = name without .pdf
     manifest = {
         "generated": datetime.now(timezone.utc).isoformat(),
-        "count": len(sheets),
-        "sheets": sheets,
+        "count":     len(sheets),
+        "sheets":    sheets,
     }
     path = os.path.join(out_dir, "manifest.json")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
-    print(f"  Manifest updated → {path}  ({len(sheets)} sheet(s))")
+    print("Manifest updated -> %s  (%d sheets)" % (path, len(sheets)))
 
 
-# ── Input helpers ──────────────────────────────────────────────────────────────
-def load_txt(path: str) -> list[str]:
+# ---------------------------------------------------------------------------
+# Input helpers
+# ---------------------------------------------------------------------------
+def load_txt(path):
     with open(path, encoding="utf-8") as f:
-        return [
-            line.strip() for line in f
-            if line.strip() and not line.startswith("#")
-        ]
+        return [line.strip() for line in f
+                if line.strip() and not line.startswith("#")]
 
 
-def load_csv(path: str) -> list[str]:
+def load_csv(path):
     names = []
     with open(path, newline="", encoding="utf-8-sig") as f:
         reader = csv.reader(f)
@@ -277,12 +358,11 @@ def load_csv(path: str) -> list[str]:
                 continue
             if headers is None:
                 lower = [c.strip().lower() for c in row]
-                # Detect whether first row is a header
                 if any(h in ("name", "unit", "mech", "unit name") for h in lower):
                     headers = lower
                     continue
                 else:
-                    headers = []          # no header — treat col 0 as name
+                    headers = []
             col = next(
                 (i for i, h in enumerate(headers)
                  if h in ("name", "unit", "mech", "unit name")),
@@ -293,7 +373,9 @@ def load_csv(path: str) -> list[str]:
     return names
 
 
-# ── Entry point ────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
 def main():
     parser = argparse.ArgumentParser(
         description="Download Classic BT record sheets from mordel.net",
@@ -302,22 +384,40 @@ def main():
     )
     parser.add_argument("units", nargs="*", metavar="UNIT",
                         help='Unit names, e.g. "Atlas AS7-D"')
-    parser.add_argument("--csv",   metavar="FILE",
-                        help="CSV file with unit names (same format as Lance Builder)")
-    parser.add_argument("--txt",   metavar="FILE",
-                        help="Text file — one unit name per line")
-    parser.add_argument("--out",   metavar="DIR", default=OUTPUT_DIR,
-                        help=f"Output folder (default: {OUTPUT_DIR})")
-    parser.add_argument("--delay", metavar="SEC", type=float, default=DELAY,
-                        help=f"Seconds between requests (default: {DELAY})")
+    parser.add_argument("--all",    action="store_true",
+                        help="Fetch unit list from MUL API instead of providing names")
+    parser.add_argument("--type",   metavar="TYPE", action="append", dest="types",
+                        help='Unit type for --all (e.g. BattleMech, "Combat Vehicle"). '
+                             "Repeat for multiple types.")
+    parser.add_argument("--era",    metavar="RANGE",
+                        help='Year range for --all, e.g. 3050-3061 or 2781-3049')
+    parser.add_argument("--csv",    metavar="FILE",
+                        help="CSV file with unit names")
+    parser.add_argument("--txt",    metavar="FILE",
+                        help="Text file -- one unit name per line")
+    parser.add_argument("--out",    metavar="DIR", default=OUTPUT_DIR,
+                        help="Output folder (default: sheets)")
+    parser.add_argument("--delay",  metavar="SEC", type=float, default=DELAY,
+                        help="Seconds between requests (default: 2.5)")
     args = parser.parse_args()
 
     global OUTPUT_DIR, DELAY
     OUTPUT_DIR = args.out
     DELAY      = args.delay
 
-    # Collect names
-    names: list[str] = list(args.units)
+    names = list(args.units)
+
+    # --all: pull unit list from MUL
+    if args.all:
+        unit_types = args.types or ["BattleMech"]
+        era_range  = parse_era(args.era)
+        print("Fetching unit list from MUL...")
+        mul_names = fetch_all_from_mul(unit_types, era_range)
+        if not mul_names:
+            print("No units returned from MUL. Check your --type and --era values.")
+            sys.exit(1)
+        names += mul_names
+
     if args.csv:
         names += load_csv(args.csv)
     if args.txt:
@@ -328,13 +428,13 @@ def main():
         sys.exit(1)
 
     # Deduplicate while preserving order
-    seen: set[str] = set()
-    names = [n for n in names if not (n in seen or seen.add(n))]  # type: ignore
+    seen = set()
+    names = [n for n in names if not (n in seen or seen.add(n))]
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    print(f"BMT Sheet Downloader  —  {len(names)} unit(s)  →  ./{OUTPUT_DIR}/")
-    print("─" * 56)
+    print("\nBMT Sheet Downloader  --  %d unit(s)  ->  ./%s/" % (len(names), OUTPUT_DIR))
+    print("-" * 56)
 
     ok_count  = 0
     fail_list = []
@@ -346,26 +446,25 @@ def main():
             fail_list.append(name)
         time.sleep(DELAY)
 
-    # ── Summary ───────────────────────────────────────────────────────────────
-    print("\n" + "─" * 56)
-    print(f"Complete: {ok_count}/{len(names)} downloaded to ./{OUTPUT_DIR}/")
+    # Summary
+    print("\n" + "-" * 56)
+    print("Complete: %d/%d downloaded to ./%s/" % (ok_count, len(names), OUTPUT_DIR))
 
     if fail_list:
-        print(f"\nFailed ({len(fail_list)}):")
+        print("\nFailed (%d):" % len(fail_list))
         for n in fail_list:
-            print(f"  • {n}")
+            print("  * %s" % n)
         fail_path = os.path.join(OUTPUT_DIR, "_failed.txt")
         with open(fail_path, "w", encoding="utf-8") as f:
             f.write("\n".join(fail_list) + "\n")
-        print(f"\n  Saved to {fail_path}")
-        print(f"  Retry with:  python download_sheets.py --txt {fail_path}")
+        print("\n  Saved to %s" % fail_path)
+        print("  Retry with:  py download_sheets.py --txt %s" % fail_path)
 
-    # Always (re)write manifest so it reflects current folder contents
     write_manifest(OUTPUT_DIR)
 
     if ok_count > 0:
-        print(f"\nNext step — commit sheets to the repo so GitHub Pages serves them:")
-        print(f"  cd <repo>  &&  git add sheets/  &&  git commit -m 'Add record sheets'  &&  git push")
+        print("\nNext step -- commit sheets to the repo:")
+        print("  git add sheets/  &&  git commit -m \"Add record sheets\"  &&  git push")
 
 
 if __name__ == "__main__":
