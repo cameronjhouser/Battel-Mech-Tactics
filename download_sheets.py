@@ -111,6 +111,7 @@ def parse_era(era_str):
 def fetch_all_from_mul(unit_types, era_range):
     """
     Query the MUL API for all units of the requested types.
+    The MUL requires a Name parameter, so we query A-Z and deduplicate by ID.
     Returns a list of unit name strings, filtered by era_range if given.
     """
     all_names = []
@@ -122,34 +123,51 @@ def fetch_all_from_mul(unit_types, era_range):
             print("Unknown type: %r   Valid options: %s" % (utype, valid))
             continue
 
-        print("Querying MUL for all %ss..." % utype)
-        try:
-            r = session.get(MUL_API, params={"Types": type_id}, timeout=30)
-            r.raise_for_status()
-            data = r.json()
-        except Exception as e:
-            print("  MUL query failed: %s" % e)
-            continue
+        print("Querying MUL for all %ss (scanning A-Z)..." % utype)
+        seen_ids = set()
+        all_units = []
 
-        units = data.get("Units", data) if isinstance(data, dict) else data
-        if not units:
+        for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+            try:
+                r = session.get(MUL_API,
+                                params={"Name": letter, "Types": type_id},
+                                timeout=30)
+                r.raise_for_status()
+                data = r.json()
+            except Exception as e:
+                print("  [%s] query failed: %s" % (letter, e))
+                time.sleep(1)
+                continue
+
+            units = data.get("Units", data) if isinstance(data, dict) else data
+            new = 0
+            for u in (units or []):
+                uid = u.get("Id")
+                if uid and uid not in seen_ids:
+                    seen_ids.add(uid)
+                    all_units.append(u)
+                    new += 1
+            print("  [%s] %d new units (total so far: %d)" % (letter, new, len(all_units)))
+            time.sleep(0.5)   # brief pause between letter queries
+
+        if not all_units:
             print("  No results returned from MUL for type %r" % utype)
             continue
 
         # Apply era filter using DateIntroduced
         if era_range:
             min_y, max_y = era_range
-            before = len(units)
-            units = [
-                u for u in units
+            before = len(all_units)
+            all_units = [
+                u for u in all_units
                 if min_y <= int(u.get("DateIntroduced") or 0) <= max_y
             ]
             print("  %d %ss in era %d-%d  (of %d total)"
-                  % (len(units), utype, min_y, max_y, before))
+                  % (len(all_units), utype, min_y, max_y, before))
         else:
-            print("  %d %ss found" % (len(units), utype))
+            print("  %d %ss found total" % (len(all_units), utype))
 
-        all_names.extend(u["Name"] for u in units if u.get("Name"))
+        all_names.extend(u["Name"] for u in all_units if u.get("Name"))
 
     return all_names
 
