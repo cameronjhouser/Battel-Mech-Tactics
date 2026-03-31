@@ -2959,18 +2959,54 @@ function lbDownloadCards() {
 
   let cardRows = '';
   lbCurrentLances.forEach((lUnits, li) => {
-    const lanceType = lbLanceTypes[li] || '';
-    const typeLabel = lanceType && LB_SPECIAL_TYPES[lanceType]
+    const lanceType  = lbLanceTypes[li] || '';
+    const typeLabel  = lanceType && LB_SPECIAL_TYPES[lanceType]
       ? LB_SPECIAL_TYPES[lanceType].name : 'Standard';
-    const lancePV = lbGetAdjLancePV(li);
-    cardRows += `<div class="lance-label">Lance ${li+1} — ${typeLabel} &nbsp;·&nbsp; ${lancePV} PV</div><div class="card-row">`;
-    lUnits.forEach(u => {
+    const lancePV    = lbGetAdjLancePV(li);
+    const skillEl    = document.getElementById(`lb-skill-${li}`);
+    const skillTxt   = skillEl ? skillEl.options[skillEl.selectedIndex].text : '';
+    const lanceWide  = (LB_TYPE_ABILITIES[lanceType] || {}).lanceWide || [];
+
+    // Lance header row
+    cardRows += `<div class="lance-hdr">
+      <span class="lhdr-title">Lance ${li+1} — ${typeLabel}</span>
+      <span class="lhdr-meta">${lancePV} PV &nbsp;·&nbsp; ${skillTxt}</span>
+    </div>`;
+
+    // Lance-wide abilities strip (shown once per lance, above the cards)
+    if (lanceWide.length) {
+      cardRows += `<div class="lance-wide">`;
+      lanceWide.forEach(a => {
+        cardRows += `<div class="lw-row"><span class="lw-tag">★ LANCE</span> <strong>${a}</strong> — <span class="lw-desc">${LB_ABILITY_DESC[a]||''}</span></div>`;
+      });
+      cardRows += `</div>`;
+    }
+
+    cardRows += `<div class="card-row">`;
+    lUnits.forEach((u, si) => {
       if (!u || !u.Id) return;
-      cardRows += `<div class="card-wrap">
+      const isCmd   = `${li}-${si}` in lbCmdState;
+      const bonus   = lbUnitBonuses[`${li}-${si}`] || '';
+      const safeName = u.Name.replace(/'/g, "\\'");
+
+      // Build annotation strip below the card image
+      let annot = '';
+      if (isCmd) {
+        annot += `<div class="annot-cmd">★ LANCE COMMANDER</div>`;
+      }
+      if (bonus) {
+        annot += `<div class="annot-bonus">
+          <span class="annot-bonus-name">★ ${bonus}</span>
+          <span class="annot-bonus-desc">${LB_ABILITY_DESC[bonus]||''}</span>
+        </div>`;
+      }
+
+      cardRows += `<div class="card-wrap${isCmd?' card-cmd':''}">
         <img src="${MUL_CARD}${u.Id}" alt="${u.Name}"
-          onerror="this.style.outline='2px dashed #c00';this.style.padding='8px';this.alt='Card unavailable: ${u.Name.replace(/'/g,"\\'")}'"
+          onerror="this.style.outline='2px dashed #c00';this.style.padding='8px';this.alt='Card unavailable: ${safeName}'"
         >
-        <div class="card-name">${u.Name}</div>
+        ${annot}
+        <div class="card-name">${isCmd ? '★ ' : ''}${u.Name}</div>
       </div>`;
     });
     cardRows += `</div>`;
@@ -2984,14 +3020,43 @@ function lbDownloadCards() {
     .header { padding:12px 16px; border-bottom:2px solid #333; margin-bottom:10px; }
     .header h1 { font-size:16px; }
     .header p  { font-size:11px; color:#555; margin-top:3px; }
-    .lance-label { font-size:11px; font-weight:700; color:#444; padding:8px 12px 3px; border-top:1px solid #ccc; margin-top:6px; }
-    .card-row { display:flex; flex-wrap:wrap; gap:10px; padding:6px 12px 10px; }
-    .card-wrap { display:flex; flex-direction:column; align-items:center; }
+
+    /* Lance section */
+    .lance-hdr { display:flex; justify-content:space-between; align-items:baseline;
+                 padding:8px 14px 4px; margin-top:14px;
+                 border-top:2px solid #333; background:#f0f0f0; }
+    .lhdr-title { font-size:13px; font-weight:700; }
+    .lhdr-meta  { font-size:10px; color:#555; }
+
+    /* Lance-wide abilities */
+    .lance-wide { padding:4px 14px 6px; background:#fffbe6; border-bottom:1px solid #e8d96a; }
+    .lw-row  { font-size:10px; color:#555; padding:1px 0; }
+    .lw-tag  { background:#d4a800; color:#fff; font-size:8px; font-weight:700;
+               border-radius:2px; padding:1px 4px; margin-right:4px; letter-spacing:.04em; }
+    .lw-desc { color:#777; }
+
+    /* Card grid */
+    .card-row  { display:flex; flex-wrap:wrap; gap:12px; padding:10px 14px 6px; }
+    .card-wrap { display:flex; flex-direction:column; align-items:center; width:340px; }
     .card-wrap img { width:340px; height:auto; border:1px solid #bbb; border-radius:4px; display:block; }
-    .card-name { font-size:9px; color:#888; margin-top:3px; text-align:center; width:340px; }
+    .card-wrap.card-cmd img { border:2px solid #c8a800; box-shadow:0 0 6px rgba(200,168,0,.5); }
+
+    /* Annotation strip below each card */
+    .annot-cmd { width:340px; background:#1a1400; color:#ffd700;
+                 font-size:10px; font-weight:700; letter-spacing:.08em;
+                 text-align:center; padding:3px 6px; border-radius:0 0 3px 3px;
+                 margin-top:-2px; }
+    .annot-bonus { width:340px; background:#2a1800; color:#ffb347;
+                   font-size:10px; padding:3px 8px; border-radius:3px; margin-top:3px;
+                   display:flex; flex-direction:column; gap:1px; }
+    .annot-bonus-name { font-weight:700; }
+    .annot-bonus-desc { font-size:9px; color:#cc8833; }
+
+    .card-name { font-size:9px; color:#888; margin-top:3px; text-align:center; }
+
     @media print {
       body { margin:0; }
-      .lance-label { page-break-before:auto; }
+      .lance-hdr { page-break-before:auto; }
       .card-wrap { page-break-inside:avoid; }
     }
   </style></head><body>
@@ -3006,7 +3071,6 @@ function lbDownloadCards() {
   if (w) {
     w.document.write(html);
     w.document.close();
-    // Give images time to load before triggering the save/print dialog
     w.addEventListener('load', () => setTimeout(() => w.print(), 500));
   }
 }
