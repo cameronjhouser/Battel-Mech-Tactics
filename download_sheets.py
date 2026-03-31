@@ -35,10 +35,12 @@ Notes
 
 import argparse
 import csv
+import json
 import os
 import re
 import sys
 import time
+from datetime import datetime, timezone
 from urllib.parse import quote
 from xml.etree import ElementTree
 
@@ -237,6 +239,25 @@ def process_unit(unit_name: str) -> bool:
     return ok
 
 
+# ── Manifest writer ───────────────────────────────────────────────────────────
+def write_manifest(out_dir: str) -> None:
+    """Scan out_dir for PDFs and write manifest.json — consumed by the Lance Builder."""
+    sheets: dict[str, str] = {}
+    for fname in sorted(os.listdir(out_dir)):
+        if fname.lower().endswith(".pdf") and not fname.startswith("_"):
+            unit_name = fname[:-4]   # filename without .pdf == the safe unit name
+            sheets[unit_name] = fname
+    manifest = {
+        "generated": datetime.now(timezone.utc).isoformat(),
+        "count": len(sheets),
+        "sheets": sheets,
+    }
+    path = os.path.join(out_dir, "manifest.json")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2, ensure_ascii=False)
+    print(f"  Manifest updated → {path}  ({len(sheets)} sheet(s))")
+
+
 # ── Input helpers ──────────────────────────────────────────────────────────────
 def load_txt(path: str) -> list[str]:
     with open(path, encoding="utf-8") as f:
@@ -338,6 +359,9 @@ def main():
             f.write("\n".join(fail_list) + "\n")
         print(f"\n  Saved to {fail_path}")
         print(f"  Retry with:  python download_sheets.py --txt {fail_path}")
+
+    # Always (re)write manifest so it reflects current folder contents
+    write_manifest(OUTPUT_DIR)
 
     if ok_count > 0:
         print(f"\nNext step — commit sheets to the repo so GitHub Pages serves them:")
