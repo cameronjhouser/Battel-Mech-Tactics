@@ -2000,6 +2000,18 @@
             <option value="60,75">Heavy (60–75t)</option>
             <option value="80,100">Assault (80–100t)</option>
           </select>
+          <select id="lb-era">
+            <option value="">All Eras</option>
+            <option value="0-2570">Age of War (≤ 2570)</option>
+            <option value="2571-2780">Star League (2571–2780)</option>
+            <option value="2781-3049">Succession Wars (2781–3049)</option>
+            <option value="3050-3061">Clan Invasion (3050–3061)</option>
+            <option value="3062-3067">Civil War (3062–3067)</option>
+            <option value="3068-3080">Jihad (3068–3080)</option>
+            <option value="3081-3130">Republic Era (3081–3130)</option>
+            <option value="3131-3150">Dark Age (3131–3150)</option>
+            <option value="3151-9999">ilClan (3151+)</option>
+          </select>
           <select id="lb-type">
             <option value="18">BattleMech</option>
             <option value="">All types</option>
@@ -2054,6 +2066,18 @@
         <option value="assault-sp">Assault Lance (Special)</option>
         <option value="command">Command Lance</option>
         <option value="pursuit">Pursuit Lance</option>
+      </select>
+      <select id="lb-csv-era" style="flex:1 1 180px" title="Only include units introduced in this era or earlier">
+        <option value="">All Eras</option>
+        <option value="0-2570">Age of War (≤ 2570)</option>
+        <option value="2571-2780">Star League (2571–2780)</option>
+        <option value="2781-3049">Succession Wars (2781–3049)</option>
+        <option value="3050-3061">Clan Invasion (3050–3061)</option>
+        <option value="3062-3067">Civil War (3062–3067)</option>
+        <option value="3068-3080">Jihad (3068–3080)</option>
+        <option value="3081-3130">Republic Era (3081–3130)</option>
+        <option value="3131-3150">Dark Age (3131–3150)</option>
+        <option value="3151-9999">ilClan (3151+)</option>
       </select>
       <button class="lb-btn" id="lb-build-btn" onclick="lbBuildFormation()" disabled>Build Formation</button>
     </div>
@@ -2274,10 +2298,22 @@ async function lbSearch() {
     const res = await fetch(`${MUL_API}?${params}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const units = data.Units || data;
+    let units = data.Units || data;
     if (!units || units.length === 0) {
       status.textContent = 'No units found. Try a different name or filter.';
       return;
+    }
+    // Client-side era filter using DateIntroduced
+    const eraRange = lbParseEraVal(document.getElementById('lb-era')?.value);
+    if (eraRange) {
+      units = units.filter(u => {
+        const y = parseInt(u.DateIntroduced) || 0;
+        return y >= eraRange.min && y <= eraRange.max;
+      });
+      if (units.length === 0) {
+        status.textContent = 'No units found for that era. Try a different era or name.';
+        return;
+      }
     }
     status.textContent = `${units.length} unit${units.length !== 1 ? 's' : ''} found — click a row to add to lance.`;
     lbRenderResults(units);
@@ -2297,7 +2333,7 @@ function lbRenderResults(units) {
     return `<div class="lb-result-row" onclick="lbAdd(${u.Id})">
       <div class="lb-rname">
         ${u.Name}
-        <small>${u.Tonnage || '?'}t &nbsp;·&nbsp; ${role} &nbsp;·&nbsp; MV ${mv}</small>
+        <small>${u.Tonnage || '?'}t &nbsp;·&nbsp; ${role} &nbsp;·&nbsp; MV ${mv} &nbsp;·&nbsp; ${u.DateIntroduced||'?'}</small>
       </div>
       <span class="lb-rpill ${LB_SZ_CLS[sz]}">${LB_SZ[sz] || '?'}</span>
       <span class="lb-rpv">${pv} PV</span>
@@ -2486,6 +2522,25 @@ const LB_CMD_ABILITIES = [
   'Antagonizer', 'Blood Stalker', 'Combat Intuition',
   "Eagle's Eyes", 'Marksman', 'Multi-Tasker', '★ Tactical Genius',
 ];
+
+const LB_ERAS = [
+  { label: 'All Eras',                    min: 0,    max: 9999 },
+  { label: 'Age of War (≤ 2570)',         min: 0,    max: 2570 },
+  { label: 'Star League (2571–2780)',     min: 2571, max: 2780 },
+  { label: 'Succession Wars (2781–3049)', min: 2781, max: 3049 },
+  { label: 'Clan Invasion (3050–3061)',   min: 3050, max: 3061 },
+  { label: 'Civil War (3062–3067)',       min: 3062, max: 3067 },
+  { label: 'Jihad (3068–3080)',           min: 3068, max: 3080 },
+  { label: 'Republic Era (3081–3130)',    min: 3081, max: 3130 },
+  { label: 'Dark Age (3131–3150)',        min: 3131, max: 3150 },
+  { label: 'ilClan (3151+)',             min: 3151, max: 9999 },
+];
+
+function lbParseEraVal(val) {
+  if (!val) return null;
+  const parts = val.split('-').map(Number);
+  return parts.length === 2 ? { min: parts[0], max: parts[1] } : { min: 0, max: parts[0] };
+}
 
 // Lance-type abilities: lanceWide = whole lance gets all listed; perUnit = each unit picks one
 const LB_TYPE_ABILITIES = {
@@ -2741,7 +2796,14 @@ function lbBuildFormation() {
   const fDef    = LB_FORMATIONS[fKey];
   if (!fDef) return;
 
-  const available  = lbPoolUnits.filter(r => r.unit).map(r => r.unit);
+  const eraRange   = lbParseEraVal(document.getElementById('lb-csv-era')?.value);
+  let available    = lbPoolUnits.filter(r => r.unit).map(r => r.unit);
+  if (eraRange) {
+    available = available.filter(u => {
+      const y = parseInt(u.DateIntroduced) || 0;
+      return y >= eraRange.min && y <= eraRange.max;
+    });
+  }
   const unresolved = lbPoolUnits.filter(r => !r.unit).map(r => r.query);
 
   // Build type list — all lances get the global type initially
@@ -2947,7 +3009,7 @@ function lbRenderUnitRow(u, li, si, specKey, lanceTaken) {
         <option value="${u.Id??u.Name}">${u.Name}</option>
         <option value="__loading__" disabled>⏳ Loading variants…</option>
       </select>
-      <small>${u.Tonnage||'?'}t · ${u.Role?u.Role.Name:'—'} · MV ${u.BFMove||'?'} · TMM ${lbCalcTMM(u)}</small>
+      <small>${u.Tonnage||'?'}t · ${u.Role?u.Role.Name:'—'} · MV ${u.BFMove||'?'} · TMM ${lbCalcTMM(u)} · ${u.DateIntroduced||'?'}</small>
       ${abil ? `<div class="lb-unit-abil">${abil}</div>` : ''}
       ${perUnitHtml}
       <div class="lb-pip-track" title="Armor: ${armor}">
