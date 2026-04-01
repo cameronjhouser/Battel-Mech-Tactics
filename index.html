@@ -2058,6 +2058,15 @@
         <option value="aug-company">Augmented Company (12 units · 3 lances)</option>
         <option value="ctf">Company Task Force (18–24 units · 4–6 lances)</option>
         <option value="battalion">Battalion (40 units · 10 lances)</option>
+        <option value="air-lance">Air Lance (8 units · 2 lances)</option>
+        <option value="aug-battalion">Augmented Battalion (56 units · 14 lances)</option>
+        <option value="reinf-battalion">Reinforced Battalion (48 units · 12 lances)</option>
+        <option value="sl-battalion">SL Reinforced Battalion (64 units · 16 lances)</option>
+        <option value="regiment">Regiment (108 units · 27 lances)</option>
+        <option value="reinf-regiment">Reinforced Regiment (192 units · 48 lances)</option>
+        <option value="brigade">Brigade (324 units · 81 lances)</option>
+        <option value="reinf-brigade">Reinforced Brigade (432 units · 108 lances)</option>
+        <option value="prov-brigade">Provisional Brigade (216 units · 54 lances)</option>
       </select>
       <select id="lb-special-type" style="flex:1 1 180px" title="Optionally group lances by special type">
         <option value="">Standard (sort by weight)</option>
@@ -2685,7 +2694,16 @@ const LB_FORMATIONS = {
   'company':     { name:'Company',              lances:3,  unitsPerLance:4,  total:12 },
   'aug-company': { name:'Augmented Company',    lances:3,  unitsPerLance:4,  total:12 },
   'ctf':         { name:'Company Task Force',   lances:5,  unitsPerLance:4,  total:20 },
-  'battalion':   { name:'Battalion',            lances:10, unitsPerLance:4,  total:40 },
+  'battalion':      { name:'Battalion',                lances:10,  unitsPerLance:4, total:40  },
+  'air-lance':      { name:'Air Lance',                lances:2,   unitsPerLance:4, total:8   },
+  'aug-battalion':  { name:'Augmented Battalion',      lances:14,  unitsPerLance:4, total:56  },
+  'reinf-battalion':{ name:'Reinforced Battalion',     lances:12,  unitsPerLance:4, total:48  },
+  'sl-battalion':   { name:'SL Reinforced Battalion',  lances:16,  unitsPerLance:4, total:64  },
+  'regiment':       { name:'Regiment',                 lances:27,  unitsPerLance:4, total:108 },
+  'reinf-regiment': { name:'Reinforced Regiment',      lances:48,  unitsPerLance:4, total:192 },
+  'brigade':        { name:'Brigade',                  lances:81,  unitsPerLance:4, total:324 },
+  'reinf-brigade':  { name:'Reinforced Brigade',       lances:108, unitsPerLance:4, total:432 },
+  'prov-brigade':   { name:'Provisional Brigade',      lances:54,  unitsPerLance:4, total:216 },
 };
 
 function lbSwitchMode(mode) {
