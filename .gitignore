@@ -1,0 +1,8 @@
+# Local BattleMech sheet PDFs — served via directory junction, never committed
+sheets/pdfs/
+
+# Claude session data
+.claude/
+
+# Other local artifacts
+sheets/_failed.txt

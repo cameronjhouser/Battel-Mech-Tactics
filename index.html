@@ -3893,21 +3893,31 @@ async function lbOpenSheets() {
   const totalPV = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
   const MORDEL  = 'https://mordel.net/tro.php?a=v&fltr=qf.000.Name~Contains~';
 
-  // Base URL for the sheets/ folder (works on GitHub Pages and local)
+  // Manifest is always served alongside index.html in the sheets/ folder
   const sheetsBase = new URL('sheets/', window.location.href).href;
+  // PDFs: on localhost use the dedicated sheet server (port 3002, no CORS issue for <object>)
+  // On GitHub Pages or any other host, fall back to sheets/pdfs/ subfolder
+  const isLocal = ['localhost','127.0.0.1'].includes(window.location.hostname);
+  const pdfBase = isLocal ? 'http://localhost:3002/' : sheetsBase + 'pdfs/';
 
-  // Fetch manifest — maps safe unit name → filename
+  // Fetch manifest — maps unit name → PDF filename
   let manifest = {};
   try {
     const res = await fetch(sheetsBase + 'manifest.json');
     if (res.ok) manifest = (await res.json()).sheets || {};
-  } catch (_) { /* no manifest yet — all units fall back to mordel links */ }
+  } catch (_) { /* no manifest — all units fall back to mordel links */ }
 
-  // Helper: look up a unit name in the manifest (exact, then safe-name match)
+  // Helper: look up a unit name in the manifest.
+  // Tries exact name, then MUL-style variants (spaces→underscores, brackets stripped).
   function sheetFile(name) {
     if (!name) return null;
+    if (manifest[name]) return manifest[name];
+    // Try stripping parenthetical suffixes: "Atlas AS7-D (Ares)" → "Atlas AS7-D"
+    const stripped = name.replace(/\s*\(.*?\)\s*$/, '').trim();
+    if (manifest[stripped]) return manifest[stripped];
+    // Try safe-name (replace illegal FS chars)
     const safe = name.replace(/[<>:"/\\|?*]/g, '_').trim();
-    return manifest[name] || manifest[safe] || null;
+    return manifest[safe] || null;
   }
 
   // Build per-lance sections
@@ -3946,7 +3956,7 @@ async function lbOpenSheets() {
       if (file) {
         // ── Sheet available — embed PDF inline ──────────────────────────────
         embeddedCount++;
-        const pdfUrl = sheetsBase + encodeURIComponent(file);
+        const pdfUrl = pdfBase + encodeURIComponent(file);
         lanceSections += `<div class="sheet-block">
           ${metaBar}
           <object class="sheet-embed" data="${pdfUrl}" type="application/pdf">
@@ -3982,10 +3992,10 @@ async function lbOpenSheets() {
 
   const missingCount = lbCurrentLances.flat().filter(Boolean).length - embeddedCount;
   const statusLine = embeddedCount === 0
-    ? `<div class="status-bar missing-all">No local sheets found — run <code>download_sheets.py</code> then commit the sheets/ folder.</div>`
+    ? `<div class="status-bar missing-all">No local sheets found — run <code>serve_sheets.bat</code> in the repo folder to start the sheet server on port 3002, then try again.</div>`
     : missingCount > 0
-      ? `<div class="status-bar partial">${embeddedCount} sheet(s) embedded · ${missingCount} missing (shown with mordel links)</div>`
-      : `<div class="status-bar ok">All ${embeddedCount} sheets embedded ✓</div>`;
+      ? `<div class="status-bar partial">${embeddedCount} sheet${embeddedCount!==1?'s':''} embedded · ${missingCount} missing (shown with mordel links)</div>`
+      : `<div class="status-bar ok">All ${embeddedCount} sheet${embeddedCount!==1?'s':''} embedded ✓</div>`;
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
   <title>${fDef.name||'Formation'} — Classic BT Sheets</title>
