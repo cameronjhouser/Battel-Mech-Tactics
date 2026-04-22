@@ -4067,38 +4067,53 @@ async function lbOpenSheets() {
         prog.textContent = 'Loading pdf-lib…';
         const { PDFDocument } = await import('https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.min.js');
 
-        const urls = window._pdfUrls;
-        if (!urls.length) { alert('No sheets found to merge.'); return; }
+        const urls = window._pdfUrls || [];
+        if (!urls.length) { prog.textContent = 'No sheets to merge.'; return; }
 
         const merged = await PDFDocument.create();
-        let i = 0;
+        let i = 0, skipped = 0;
         for (const url of urls) {
           i++;
-          prog.textContent = 'Fetching sheet ' + i + ' / ' + urls.length + '…';
+          prog.textContent = 'Loading sheet ' + i + ' / ' + urls.length + '…';
           try {
-            const buf = await fetch(url).then(r => r.arrayBuffer());
+            const r = await fetch(url, { mode: 'cors' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            const buf = await r.arrayBuffer();
             const src = await PDFDocument.load(buf, { ignoreEncryption: true });
             const copied = await merged.copyPagesFrom(src, src.getPageIndices());
             copied.forEach(p => merged.addPage(p));
-          } catch(e) { console.warn('Skipped', url, e); }
+          } catch(e) { skipped++; console.warn('Skipped', url, e); }
         }
 
-        prog.textContent = 'Saving…';
-        const bytes = await merged.save();
-        const blob  = new Blob([bytes], { type: 'application/pdf' });
+        const pageCount = merged.getPageCount();
+        if (pageCount === 0) {
+          prog.textContent = 'Error: all ' + urls.length + ' fetches failed — check browser console (F12) for details.';
+          return;
+        }
+
+        prog.textContent = 'Saving ' + pageCount + ' pages…';
+        const bytes   = await merged.save();
+        const blob    = new Blob([bytes], { type: 'application/pdf' });
         const blobUrl = URL.createObjectURL(blob);
 
         if (action === 'print') {
-          prog.textContent = 'Opening for print…';
-          const w = window.open(blobUrl, '_blank');
-          if (w) { w.onload = () => { w.focus(); w.print(); }; }
+          // Open merged PDF in a new tab — Chrome's PDF viewer handles printing cleanly
+          // Auto-triggering print() on a blob PDF is unreliable; Ctrl+P is instant once open
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.click();
+          prog.textContent = '✓ ' + pageCount + '-page PDF opened — press Ctrl+P in that tab to print'
+            + (skipped ? ' (' + skipped + ' sheets skipped)' : '');
         } else {
           const a = document.createElement('a');
           a.href = blobUrl;
           a.download = 'battletech-sheets.pdf';
           a.click();
+          prog.textContent = '✓ Downloading ' + pageCount + '-page PDF'
+            + (skipped ? ' (' + skipped + ' sheets skipped)' : '');
         }
-        prog.textContent = 'Done (' + urls.length + ' sheets merged).';
       } catch(e) {
         console.error(e);
         prog.textContent = 'Error: ' + e.message;
