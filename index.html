@@ -3896,9 +3896,8 @@ async function lbOpenSheets() {
   // Manifest is always served alongside index.html in the sheets/ folder
   const sheetsBase = new URL('sheets/', window.location.href).href;
   // PDFs: on localhost use the dedicated sheet server (port 3002, no CORS issue for <object>)
-  // On GitHub Pages or any other host, fall back to sheets/pdfs/ subfolder
-  const isLocal = ['localhost','127.0.0.1'].includes(window.location.hostname);
-  const pdfBase = isLocal ? 'http://localhost:3002/' : sheetsBase + 'pdfs/';
+  // PDFs hosted on Cloudflare R2 — no local server needed
+  const pdfBase = 'https://pub-559e9d410348415c956e2de7e0b1ba46.r2.dev/';
 
   // Fetch manifest — maps unit name → PDF filename
   let manifest = {};
