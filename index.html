@@ -3922,6 +3922,7 @@ async function lbOpenSheets() {
   // Build per-lance sections
   let lanceSections = '';
   let embeddedCount = 0;
+  const pdfUrls = [];   // collected for "Print All / Download All"
 
   lbCurrentLances.forEach((lUnits, li) => {
     const lanceType = lbLanceTypes[li] || '';
@@ -3956,6 +3957,7 @@ async function lbOpenSheets() {
         // ── Sheet available — embed PDF inline ──────────────────────────────
         embeddedCount++;
         const pdfUrl = pdfBase + encodeURIComponent(file);
+        pdfUrls.push(pdfUrl);
         lanceSections += `<div class="sheet-block">
           ${metaBar}
           <object class="sheet-embed" data="${pdfUrl}" type="application/pdf">
@@ -4037,15 +4039,84 @@ async function lbOpenSheets() {
     .btn-chassis { background:#666; color:#fff; text-decoration:none; font-size:10px;
                    padding:5px 10px; border-radius:4px; white-space:nowrap; }
     @media print {
-      .page-header, .status-bar, .sheet-actions, .lance-hdr { display:none; }
+      .page-header, .status-bar, .sheet-actions, .lance-hdr, .print-bar { display:none; }
       .sheet-block { page-break-after:always; }
       .sheet-embed { height:100vh; }
       body { background:#fff; }
     }
-  </style></head><body>
+    .print-bar { background:#0d1117; padding:8px 20px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .print-bar span { color:#aaa; font-size:11px; }
+    .btn-print-all  { background:#2e7d32; color:#fff; border:none; padding:7px 18px; border-radius:5px;
+                      font-size:12px; font-weight:700; cursor:pointer; }
+    .btn-print-all:disabled { background:#555; cursor:default; }
+    .btn-dl-all     { background:#1565c0; color:#fff; border:none; padding:7px 18px; border-radius:5px;
+                      font-size:12px; font-weight:700; cursor:pointer; }
+    .btn-dl-all:disabled { background:#555; cursor:default; }
+    #merge-progress { font-size:11px; color:#8bc34a; font-style:italic; }
+  </style>
+  <script>
+    window._pdfUrls = ${JSON.stringify(pdfUrls)};
+
+    async function mergeAllPdfs(action) {
+      const printBtn = document.getElementById('btn-print-all');
+      const dlBtn    = document.getElementById('btn-dl-all');
+      const prog     = document.getElementById('merge-progress');
+      [printBtn, dlBtn].forEach(b => b.disabled = true);
+
+      try {
+        prog.textContent = 'Loading pdf-lib…';
+        const { PDFDocument } = await import('https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.min.js');
+
+        const urls = window._pdfUrls;
+        if (!urls.length) { alert('No sheets found to merge.'); return; }
+
+        const merged = await PDFDocument.create();
+        let i = 0;
+        for (const url of urls) {
+          i++;
+          prog.textContent = 'Fetching sheet ' + i + ' / ' + urls.length + '…';
+          try {
+            const buf = await fetch(url).then(r => r.arrayBuffer());
+            const src = await PDFDocument.load(buf, { ignoreEncryption: true });
+            const copied = await merged.copyPagesFrom(src, src.getPageIndices());
+            copied.forEach(p => merged.addPage(p));
+          } catch(e) { console.warn('Skipped', url, e); }
+        }
+
+        prog.textContent = 'Saving…';
+        const bytes = await merged.save();
+        const blob  = new Blob([bytes], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(blob);
+
+        if (action === 'print') {
+          prog.textContent = 'Opening for print…';
+          const w = window.open(blobUrl, '_blank');
+          if (w) { w.onload = () => { w.focus(); w.print(); }; }
+        } else {
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = 'battletech-sheets.pdf';
+          a.click();
+        }
+        prog.textContent = 'Done (' + urls.length + ' sheets merged).';
+      } catch(e) {
+        console.error(e);
+        prog.textContent = 'Error: ' + e.message;
+      } finally {
+        [printBtn, dlBtn].forEach(b => b.disabled = false);
+      }
+    }
+  </script>
+  </head><body>
   <div class="page-header">
     <h1>${fDef.name||'Formation'} — Classic BattleTech Record Sheets</h1>
     <p>Total PV: ${totalPV} · Supply: ${Math.ceil(totalPV*0.1)}</p>
+  </div>
+  <div class="print-bar">
+    <button id="btn-print-all" class="btn-print-all" onclick="mergeAllPdfs('print')">🖨 Print All Sheets</button>
+    <button id="btn-dl-all"    class="btn-dl-all"    onclick="mergeAllPdfs('download')">📥 Download as One PDF</button>
+    <span id="merge-progress"></span>
+    <span style="margin-left:auto">${embeddedCount} sheet${embeddedCount!==1?'s':''} · merges into one PDF for printing</span>
   </div>
   ${statusLine}
   ${lanceSections}
