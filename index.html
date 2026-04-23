@@ -4084,9 +4084,14 @@ async function lbOpenSheetsCore(cfg) {
                    font-size:11px; width:38px; text-align:center; font-weight:700; }
     .pilot-hint  { font-size:9px; color:#888; margin-left:4px; }
   </style>
+  <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"><\/script>
   <script>
     window._pdfUrls   = ${JSON.stringify(pdfUrls)};
     window._unitNames = ${JSON.stringify(unitNames)};
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
   <\/script>
   <script src="${new URL('sheets-popup.js', window.location.href).href}?v=${Date.now()}"><\/script>
   </head><body>

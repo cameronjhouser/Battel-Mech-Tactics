@@ -40,22 +40,16 @@ var _calLabels = [
 async function calibratePilotPos() {
   var urls = window._pdfUrls || [];
   if (!urls.length) { alert('No PDFs loaded — build a formation with sheets first.'); return; }
-
-  // Dynamically load pdf.js (only once)
   if (!window.pdfjsLib) {
-    await new Promise(function(res, rej) {
-      var s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js';
-      s.onload = res; s.onerror = rej;
-      document.head.appendChild(s);
-    });
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
+    alert('pdf.js is not loaded yet. Wait a moment for the page to finish loading, then try again.');
+    return;
   }
+
+  try {
 
   // Fetch first PDF
   var resp = await fetch(urls[0], { mode: 'cors' });
-  if (!resp.ok) { alert('Could not fetch PDF for calibration (HTTP ' + resp.status + ').'); return; }
+  if (!resp.ok) throw new Error('HTTP ' + resp.status + ' fetching PDF');
   var buf  = await resp.arrayBuffer();
   var pdf  = await pdfjsLib.getDocument({ data: buf }).promise;
   var page = await pdf.getPage(1);
@@ -194,6 +188,13 @@ async function calibratePilotPos() {
       closeBtn.textContent = '✕ Cancel (discard calibration)';
     }
   });
+
+  } catch(err) {
+    console.error('Calibration error:', err);
+    alert('Calibration failed: ' + err.message + '\n\nCheck the browser console (F12) for details.');
+    var existing = document.getElementById('cal-overlay');
+    if (existing) document.body.removeChild(existing);
+  }
 }
 
 /* ── Merge PDFs, burn in pilot data, then print or download ─────────────── */
