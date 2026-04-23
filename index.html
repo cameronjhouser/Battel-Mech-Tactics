@@ -4061,91 +4061,16 @@ async function lbOpenSheets() {
   <script>
     window._pdfUrls   = ${JSON.stringify(pdfUrls)};
     window._unitNames = ${JSON.stringify(unitNames)};
-
-    function exportUnitList() {
-      const names = window._unitNames || [];
-      if (!names.length) { alert('No units in formation.'); return; }
-      const text = names.join('\\n');
-      const blob = new Blob([text], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'formation-sheets.txt';
-      a.click();
-    }
-
-    async function mergeAllPdfs(action) {
-      const printBtn = document.getElementById('btn-print-all');
-      const dlBtn    = document.getElementById('btn-dl-all');
-      const prog     = document.getElementById('merge-progress');
-      [printBtn, dlBtn].forEach(b => b.disabled = true);
-
-      try {
-        prog.textContent = 'Loading pdf-lib…';
-        const { PDFDocument } = await import('https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.min.js');
-
-        const urls = window._pdfUrls || [];
-        if (!urls.length) { prog.textContent = 'No sheets to merge.'; return; }
-
-        const merged = await PDFDocument.create();
-        let i = 0, skipped = 0;
-        for (const url of urls) {
-          i++;
-          prog.textContent = 'Loading sheet ' + i + ' / ' + urls.length + '…';
-          try {
-            const r = await fetch(url, { mode: 'cors' });
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            const buf = await r.arrayBuffer();
-            const src = await PDFDocument.load(buf, { ignoreEncryption: true });
-            const copied = await merged.copyPagesFrom(src, src.getPageIndices());
-            copied.forEach(p => merged.addPage(p));
-          } catch(e) { skipped++; console.warn('Skipped', url, e); }
-        }
-
-        const pageCount = merged.getPageCount();
-        if (pageCount === 0) {
-          prog.textContent = 'Error: all ' + urls.length + ' fetches failed — check browser console (F12) for details.';
-          return;
-        }
-
-        prog.textContent = 'Saving ' + pageCount + ' pages…';
-        const bytes   = await merged.save();
-        const blob    = new Blob([bytes], { type: 'application/pdf' });
-        const blobUrl = URL.createObjectURL(blob);
-
-        if (action === 'print') {
-          // Open merged PDF in a new tab — Chrome's PDF viewer handles printing cleanly
-          // Auto-triggering print() on a blob PDF is unreliable; Ctrl+P is instant once open
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.target = '_blank';
-          a.rel = 'noopener';
-          a.click();
-          prog.textContent = '✓ ' + pageCount + '-page PDF opened — press Ctrl+P in that tab to print'
-            + (skipped ? ' (' + skipped + ' sheets skipped)' : '');
-        } else {
-          const a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = 'battletech-sheets.pdf';
-          a.click();
-          prog.textContent = '✓ Downloading ' + pageCount + '-page PDF'
-            + (skipped ? ' (' + skipped + ' sheets skipped)' : '');
-        }
-      } catch(e) {
-        console.error(e);
-        prog.textContent = 'Error: ' + e.message;
-      } finally {
-        [printBtn, dlBtn].forEach(b => b.disabled = false);
-      }
-    }
   <\/script>
+  <script src="${new URL('sheets-popup.js', window.location.href).href}"><\/script>
   </head><body>
   <div class="page-header">
     <h1>${fDef.name||'Formation'} — Classic BattleTech Record Sheets</h1>
     <p>Total PV: ${totalPV} · Supply: ${Math.ceil(totalPV*0.1)}</p>
   </div>
   <div class="print-bar">
-    <button id="btn-print-all" class="btn-print-all" onclick="mergeAllPdfs('print')">🖨 Print All Sheets</button>
-    <button id="btn-dl-all"    class="btn-dl-all"    onclick="mergeAllPdfs('download')">📥 Download as One PDF</button>
+    <button id="btn-print-all" class="btn-print-all" onclick="mergeAllPdfs('print')" ${embeddedCount===0?'disabled':''}>🖨 Print All Sheets</button>
+    <button id="btn-dl-all"    class="btn-dl-all"    onclick="mergeAllPdfs('download')" ${embeddedCount===0?'disabled':''}>📥 Download as One PDF</button>
     <button class="btn-export-list" onclick="exportUnitList()" title="Download unit names for merge_sheets.py">📋 Export Unit List</button>
     <span id="merge-progress"></span>
     <span style="margin-left:auto">${unitNames.length} unit${unitNames.length!==1?'s':''} · ${embeddedCount} sheet${embeddedCount!==1?'s':''} found</span>
