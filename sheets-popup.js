@@ -44,7 +44,7 @@ async function mergeAllPdfs(action) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         var buf = await r.arrayBuffer();
         var src = await PDFDocument.load(buf, { ignoreEncryption: true });
-        var copied = await merged.copyPagesFrom(src, src.getPageIndices());
+        var copied = await merged.copyPages(src, src.getPageIndices());
         copied.forEach(function(p) { merged.addPage(p); });
       } catch(e) {
         skipped++;
