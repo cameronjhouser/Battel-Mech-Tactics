@@ -6,8 +6,7 @@
 
 // ── WARRIOR DATA field positions ─────────────────────────────────────────────
 // Percentages from the LEFT edge (xPct) and from the TOP edge (yPct) of the page.
-// All mordel.net sheets share the same FPDF template, so one set of values works.
-// If the text lands in the wrong spot, tweak these and re-run Download as One PDF.
+// Use 🎯 Calibrate Positions to set these precisely on your actual sheets.
 var PILOT_POS = {
   name: { xPct: 0.597, yPct: 0.091 },  // after "Name:"
   gu:   { xPct: 0.646, yPct: 0.110 },  // after "Gunnery Skill:"
@@ -24,6 +23,177 @@ function exportUnitList() {
   a.href = URL.createObjectURL(blob);
   a.download = 'formation-sheets.txt';
   a.click();
+}
+
+/* ── Calibration tool ────────────────────────────────────────────────────── */
+// Renders the first sheet on a canvas; click Name → GU → PI fields in order.
+// Applies immediately for the session and shows code to paste into sheets-popup.js.
+
+var _calStep   = 0;
+var _calFields = ['name', 'gu', 'pi'];
+var _calLabels = [
+  'Step 1 of 3 — Click right after the "Name:" label in the WARRIOR DATA box',
+  'Step 2 of 3 — Click right after the "Gunnery Skill:" label',
+  'Step 3 of 3 — Click right after the "Piloting Skill:" label'
+];
+
+async function calibratePilotPos() {
+  var urls = window._pdfUrls || [];
+  if (!urls.length) { alert('No PDFs loaded — build a formation with sheets first.'); return; }
+
+  // Dynamically load pdf.js (only once)
+  if (!window.pdfjsLib) {
+    await new Promise(function(res, rej) {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
+  }
+
+  // Fetch first PDF
+  var resp = await fetch(urls[0], { mode: 'cors' });
+  if (!resp.ok) { alert('Could not fetch PDF for calibration (HTTP ' + resp.status + ').'); return; }
+  var buf  = await resp.arrayBuffer();
+  var pdf  = await pdfjsLib.getDocument({ data: buf }).promise;
+  var page = await pdf.getPage(1);
+  var nativeVp = page.getViewport({ scale: 1 });
+  var scale    = Math.min(1.5, (window.innerWidth - 40) / nativeVp.width);
+  var vp       = page.getViewport({ scale: scale });
+
+  // ── Build full-screen overlay ──
+  var ov = document.createElement('div');
+  ov.style.cssText = [
+    'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;',
+    'display:flex;flex-direction:column;align-items:center;overflow:auto;gap:0;'
+  ].join('');
+
+  var banner = document.createElement('div');
+  banner.style.cssText = [
+    'width:100%;padding:10px 16px;background:#0d47a1;color:#fff;',
+    'font-size:13px;font-weight:700;text-align:center;flex-shrink:0;'
+  ].join('');
+  banner.textContent = _calLabels[0];
+
+  var hint = document.createElement('div');
+  hint.style.cssText = 'width:100%;padding:4px 16px;background:#1a237e;color:#90caf9;font-size:11px;text-align:center;flex-shrink:0;';
+  hint.textContent = 'Zoom in or scroll to find the WARRIOR DATA box (upper-right of the sheet). Crosshair shows cursor position.';
+
+  var canvas = document.createElement('canvas');
+  canvas.width  = vp.width;
+  canvas.height = vp.height;
+  canvas.style.cssText = 'cursor:crosshair;border:3px solid #ffd600;display:block;flex-shrink:0;max-width:100%;';
+
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕ Cancel calibration';
+  closeBtn.style.cssText = 'margin:10px;padding:6px 22px;background:#b71c1c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;flex-shrink:0;';
+  closeBtn.onclick = function() { document.body.removeChild(ov); };
+
+  ov.appendChild(banner);
+  ov.appendChild(hint);
+  ov.appendChild(canvas);
+  ov.appendChild(closeBtn);
+  document.body.appendChild(ov);
+
+  // Render page
+  var ctx = canvas.getContext('2d');
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  var baseImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  var dots = [];
+
+  // Helper: convert mouse event → canvas pixel coords
+  function evToCanvas(e) {
+    var r  = canvas.getBoundingClientRect();
+    var sx = canvas.width  / r.width;
+    var sy = canvas.height / r.height;
+    return { px: (e.clientX - r.left) * sx, py: (e.clientY - r.top) * sy };
+  }
+
+  // Redraw base + dots + crosshair
+  function redraw(crossX, crossY) {
+    ctx.putImageData(baseImg, 0, 0);
+    dots.forEach(function(d) {
+      // Dot
+      ctx.fillStyle = d.c;
+      ctx.beginPath(); ctx.arc(d.x, d.y, 6, 0, Math.PI * 2); ctx.fill();
+      // Label
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(d.label, d.x + 9, d.y + 4);
+    });
+    if (crossX !== undefined) {
+      ctx.strokeStyle = 'rgba(255,214,0,.65)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(crossX, 0); ctx.lineTo(crossX, canvas.height); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, crossY); ctx.lineTo(canvas.width, crossY);  ctx.stroke();
+    }
+  }
+
+  canvas.addEventListener('mousemove', function(e) {
+    var c = evToCanvas(e);
+    redraw(c.px, c.py);
+  });
+
+  _calStep = 0;
+  var newPos = {};
+  var dotColors = ['#f44336', '#4caf50', '#2196f3'];
+  var dotLabels = ['Name', 'GU', 'PI'];
+
+  canvas.addEventListener('click', function handler(e) {
+    var c    = evToCanvas(e);
+    var xPct = Math.round(c.px / canvas.width  * 1000) / 1000;
+    var yPct = Math.round(c.py / canvas.height * 1000) / 1000;
+
+    dots.push({ x: c.px, y: c.py, c: dotColors[_calStep % 3], label: dotLabels[_calStep] });
+    newPos[_calFields[_calStep]] = { xPct: xPct, yPct: yPct };
+    _calStep++;
+
+    if (_calStep < _calFields.length) {
+      banner.textContent = _calLabels[_calStep];
+      redraw();
+    } else {
+      // All 3 clicked — apply and show result
+      canvas.removeEventListener('click', handler);
+      redraw();
+
+      PILOT_POS.name = newPos.name;
+      PILOT_POS.gu   = newPos.gu;
+      PILOT_POS.pi   = newPos.pi;
+
+      var code = 'var PILOT_POS = {\n' +
+        '  name: ' + JSON.stringify(newPos.name) + ',\n' +
+        '  gu:   ' + JSON.stringify(newPos.gu)   + ',\n' +
+        '  pi:   ' + JSON.stringify(newPos.pi)   + ',\n' +
+        '  size: 7.5\n};';
+
+      banner.textContent = '✅ Calibration applied! Test with Download as One PDF, then paste into sheets-popup.js to make it permanent:';
+      banner.style.background = '#1b5e20';
+      hint.style.display = 'none';
+
+      var ta = document.createElement('textarea');
+      ta.readOnly = true;
+      ta.value = code;
+      ta.style.cssText = [
+        'width:90%;max-width:640px;height:110px;',
+        'font-family:monospace;font-size:12px;',
+        'background:#111;color:#8bc34a;border:1px solid #333;',
+        'padding:8px;margin:8px 0;display:block;resize:none;flex-shrink:0;'
+      ].join('');
+      ta.addEventListener('focus', function() { ta.select(); document.execCommand('copy'); });
+      ta.title = 'Click to select & copy';
+
+      var applyBtn = document.createElement('button');
+      applyBtn.textContent = '✓ Close & test Download as One PDF';
+      applyBtn.style.cssText = 'margin:6px;padding:7px 22px;background:#2e7d32;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;flex-shrink:0;';
+      applyBtn.onclick = function() { document.body.removeChild(ov); };
+
+      ov.insertBefore(ta, closeBtn);
+      ov.insertBefore(applyBtn, closeBtn);
+      closeBtn.textContent = '✕ Cancel (discard calibration)';
+    }
+  });
 }
 
 /* ── Merge PDFs, burn in pilot data, then print or download ─────────────── */

@@ -4072,6 +4072,8 @@ async function lbOpenSheetsCore(cfg) {
     .btn-dl-all:disabled { background:#555; cursor:default; }
     .btn-export-list { background:#4a148c; color:#fff; border:none; padding:7px 18px; border-radius:5px;
                        font-size:12px; font-weight:700; cursor:pointer; }
+    .btn-calibrate   { background:#e65100; color:#fff; border:none; padding:7px 18px; border-radius:5px;
+                       font-size:12px; font-weight:700; cursor:pointer; }
     #merge-progress { font-size:11px; color:#8bc34a; font-style:italic; }
     .pilot-bar { display:flex; align-items:center; gap:8px; padding:5px 16px;
                  background:#eef2ff; border-bottom:1px solid #c5cae9; flex-wrap:wrap; }
@@ -4096,6 +4098,7 @@ async function lbOpenSheetsCore(cfg) {
     <button id="btn-print-all" class="btn-print-all" onclick="mergeAllPdfs('print')" ${embeddedCount===0?'disabled':''}>🖨 Print All Sheets</button>
     <button id="btn-dl-all"    class="btn-dl-all"    onclick="mergeAllPdfs('download')" ${embeddedCount===0?'disabled':''}>📥 Download as One PDF</button>
     <button class="btn-export-list" onclick="exportUnitList()" title="Download unit names for merge_sheets.py">📋 Export Unit List</button>
+    <button class="btn-calibrate" onclick="calibratePilotPos()" title="Click to set exact pilot data field positions on your sheets">🎯 Calibrate Positions</button>
     <span id="merge-progress"></span>
     <span style="margin-left:auto">${unitNames.length} unit${unitNames.length!==1?'s':''} · ${embeddedCount} sheet${embeddedCount!==1?'s':''} found</span>
   </div>
