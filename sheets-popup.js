@@ -8,9 +8,9 @@
 // Percentages from the LEFT edge (xPct) and from the TOP edge (yPct) of the page.
 // Use 🎯 Calibrate Positions to set these precisely on your actual sheets.
 var PILOT_POS = {
-  name: { xPct: 0.597, yPct: 0.091 },  // after "Name:"
-  gu:   { xPct: 0.646, yPct: 0.110 },  // after "Gunnery Skill:"
-  pi:   { xPct: 0.833, yPct: 0.110 },  // after "Piloting Skill:"
+  name: { xPct: 0.460, yPct: 0.154 },  // after "Name:"
+  gu:   { xPct: 0.499, yPct: 0.171 },  // after "Gunnery Skill:"
+  pi:   { xPct: 0.610, yPct: 0.170 },  // after "Piloting Skill:"
   size: 7.5                              // font size in points
 };
 
