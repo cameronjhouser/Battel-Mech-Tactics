@@ -2783,6 +2783,13 @@ function lbSearchDownloadCards() {
           onerror="this.style.outline='2px dashed #c00';this.style.padding='8px';this.alt='Card unavailable: ${safeName}'"
         >${annot}
         <div class="card-name">${isCmd?'★ ':''}${u.Name}</div>
+        <div class="pilot-info">
+          <input class="p-name" type="text" placeholder="Pilot name">
+          <div class="p-skills">
+            <span>GU <input class="p-skill" type="number" min="1" max="8" value="4" title="Gunnery Skill"></span>
+            <span>PI <input class="p-skill" type="number" min="1" max="8" value="5" title="Piloting Skill"></span>
+          </div>
+        </div>
       </div>`;
     });
     cardRows += `</div>`;
@@ -2821,6 +2828,11 @@ function lbSearchDownloadCards() {
                    padding:2px 6px; width:100%; }
     .annot-bonus-name { font-weight:700; color:#a60; }
     .annot-bonus-desc { color:#777; display:block; }
+    .pilot-info { width:100%; margin-top:5px; }
+    .p-name  { width:100%; border:1px solid #aaa; border-radius:2px; padding:2px 4px; font-size:10px; }
+    .p-skills { display:flex; gap:8px; margin-top:3px; font-size:10px; font-weight:700; align-items:center; }
+    .p-skill { width:32px; border:1px solid #aaa; border-radius:2px; padding:2px 2px;
+               text-align:center; font-size:10px; font-weight:700; }
     @media print { body { margin:0; } .lance-hdr { margin-top:8px; } }
   </style></head><body>
   <div class="header">
@@ -3819,6 +3831,13 @@ function lbDownloadCards() {
         >
         ${annot}
         <div class="card-name">${isCmd ? '★ ' : ''}${u.Name}</div>
+        <div class="pilot-info">
+          <input class="p-name" type="text" placeholder="Pilot name">
+          <div class="p-skills">
+            <span>GU <input class="p-skill" type="number" min="1" max="8" value="4" title="Gunnery Skill"></span>
+            <span>PI <input class="p-skill" type="number" min="1" max="8" value="5" title="Piloting Skill"></span>
+          </div>
+        </div>
       </div>`;
     });
     cardRows += `</div>`;
@@ -3865,6 +3884,11 @@ function lbDownloadCards() {
     .annot-bonus-desc { font-size:9px; color:#cc8833; }
 
     .card-name { font-size:9px; color:#888; margin-top:3px; text-align:center; }
+    .pilot-info { width:340px; margin-top:6px; }
+    .p-name  { width:100%; border:1px solid #aaa; border-radius:2px; padding:3px 5px; font-size:11px; }
+    .p-skills { display:flex; gap:10px; margin-top:3px; font-size:11px; font-weight:700; align-items:center; }
+    .p-skill { width:36px; border:1px solid #aaa; border-radius:2px; padding:2px 3px;
+               text-align:center; font-size:11px; font-weight:700; }
 
     @media print {
       body { margin:0; }
@@ -3950,6 +3974,15 @@ async function lbOpenSheetsCore(cfg) {
         pdfUrls.push(pdfUrl);
         lanceSections += `<div class="sheet-block">
           ${metaBar}
+          <div class="pilot-bar">
+            <span class="pilot-label">Pilot</span>
+            <input class="pilot-name" type="text" placeholder="Pilot name">
+            <span class="pilot-label">GU</span>
+            <input class="pilot-skill" type="number" min="1" max="8" value="4" title="Gunnery Skill (1=best, 8=worst)">
+            <span class="pilot-label">PI</span>
+            <input class="pilot-skill" type="number" min="1" max="8" value="5" title="Piloting Skill (1=best, 8=worst)">
+            <span class="pilot-hint">Edit before printing</span>
+          </div>
           <object class="sheet-embed" data="${pdfUrl}" type="application/pdf">
             <p class="pdf-fallback">PDF could not be displayed inline.
               <a href="${pdfUrl}" target="_blank">Open sheet ↗</a></p>
@@ -4039,6 +4072,14 @@ async function lbOpenSheetsCore(cfg) {
     .btn-export-list { background:#4a148c; color:#fff; border:none; padding:7px 18px; border-radius:5px;
                        font-size:12px; font-weight:700; cursor:pointer; }
     #merge-progress { font-size:11px; color:#8bc34a; font-style:italic; }
+    .pilot-bar { display:flex; align-items:center; gap:8px; padding:5px 16px;
+                 background:#eef2ff; border-bottom:1px solid #c5cae9; flex-wrap:wrap; }
+    .pilot-label { font-size:10px; font-weight:700; color:#3949ab; }
+    .pilot-name  { border:1px solid #9fa8da; border-radius:3px; padding:2px 6px;
+                   font-size:11px; width:180px; }
+    .pilot-skill { border:1px solid #9fa8da; border-radius:3px; padding:2px 4px;
+                   font-size:11px; width:38px; text-align:center; font-weight:700; }
+    .pilot-hint  { font-size:9px; color:#888; margin-left:4px; }
   </style>
   <script>
     window._pdfUrls   = ${JSON.stringify(pdfUrls)};
