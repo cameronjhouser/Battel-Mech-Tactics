@@ -4062,7 +4062,7 @@ async function lbOpenSheets() {
     window._pdfUrls   = ${JSON.stringify(pdfUrls)};
     window._unitNames = ${JSON.stringify(unitNames)};
   <\/script>
-  <script src="${new URL('sheets-popup.js', window.location.href).href}"><\/script>
+  <script src="${new URL('sheets-popup.js', window.location.href).href}?v=${Date.now()}"><\/script>
   </head><body>
   <div class="page-header">
     <h1>${fDef.name||'Formation'} — Classic BattleTech Record Sheets</h1>
