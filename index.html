@@ -3972,9 +3972,10 @@ async function lbOpenSheetsCore(cfg) {
         embeddedCount++;
         const pdfUrl = pdfBase + encodeURIComponent(file);
         pdfUrls.push(pdfUrl);
+        const pdfIdx = pdfUrls.length - 1;
         lanceSections += `<div class="sheet-block">
           ${metaBar}
-          <div class="pilot-bar">
+          <div class="pilot-bar" data-pdf-index="${pdfIdx}">
             <span class="pilot-label">Pilot</span>
             <input class="pilot-name" type="text" placeholder="Pilot name">
             <span class="pilot-label">GU</span>

@@ -4,7 +4,18 @@
  * window._pdfUrls and window._unitNames are set by the inline script before this loads.
  */
 
-/* ── Export unit list for merge_sheets.py ───────────────────────────────── */
+// ── WARRIOR DATA field positions ─────────────────────────────────────────────
+// Percentages from the LEFT edge (xPct) and from the TOP edge (yPct) of the page.
+// All mordel.net sheets share the same FPDF template, so one set of values works.
+// If the text lands in the wrong spot, tweak these and re-run Download as One PDF.
+var PILOT_POS = {
+  name: { xPct: 0.597, yPct: 0.091 },  // after "Name:"
+  gu:   { xPct: 0.646, yPct: 0.110 },  // after "Gunnery Skill:"
+  pi:   { xPct: 0.833, yPct: 0.110 },  // after "Piloting Skill:"
+  size: 7.5                              // font size in points
+};
+
+/* ── Export unit list for merge_sheets.py ────────────────────────────────── */
 function exportUnitList() {
   var names = window._unitNames || [];
   if (!names.length) { alert('No units in formation.'); return; }
@@ -15,7 +26,7 @@ function exportUnitList() {
   a.click();
 }
 
-/* ── Merge all available PDFs into one, then print or download ───────────── */
+/* ── Merge PDFs, burn in pilot data, then print or download ─────────────── */
 async function mergeAllPdfs(action) {
   var printBtn = document.getElementById('btn-print-all');
   var dlBtn    = document.getElementById('btn-dl-all');
@@ -24,8 +35,10 @@ async function mergeAllPdfs(action) {
 
   try {
     prog.textContent = 'Loading pdf-lib\u2026';
-    var mod = await import('https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.min.js');
-    var PDFDocument = mod.PDFDocument;
+    var mod           = await import('https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.min.js');
+    var PDFDocument   = mod.PDFDocument;
+    var StandardFonts = mod.StandardFonts;
+    var rgb           = mod.rgb;
 
     var urls = window._pdfUrls || [];
     if (!urls.length) {
@@ -33,7 +46,22 @@ async function mergeAllPdfs(action) {
       return;
     }
 
+    // ── Collect pilot data from the UI inputs, keyed by pdf-index ────────────
+    var pilotData = urls.map(function() { return { name: '', gu: '', pi: '' }; });
+    document.querySelectorAll('.pilot-bar[data-pdf-index]').forEach(function(bar) {
+      var idx = parseInt(bar.getAttribute('data-pdf-index'), 10);
+      if (isNaN(idx) || idx < 0 || idx >= pilotData.length) return;
+      var nameEl = bar.querySelector('.pilot-name');
+      var skills = bar.querySelectorAll('.pilot-skill');
+      pilotData[idx].name = nameEl    ? nameEl.value.trim()    : '';
+      pilotData[idx].gu   = skills[0] ? skills[0].value.trim() : '';
+      pilotData[idx].pi   = skills[1] ? skills[1].value.trim() : '';
+    });
+
+    // ── Build merged PDF ──────────────────────────────────────────────────────
     var merged = await PDFDocument.create();
+    var font   = await merged.embedFont(StandardFonts.Helvetica);
+    var black  = rgb(0, 0, 0);
     var i = 0, skipped = 0;
 
     for (var u = 0; u < urls.length; u++) {
@@ -45,7 +73,44 @@ async function mergeAllPdfs(action) {
         var buf = await r.arrayBuffer();
         var src = await PDFDocument.load(buf, { ignoreEncryption: true });
         var copied = await merged.copyPages(src, src.getPageIndices());
-        copied.forEach(function(p) { merged.addPage(p); });
+
+        var pilot     = pilotData[u] || {};
+        var hasPilot  = pilot.name || pilot.gu || pilot.pi;
+        var firstPage = true;
+
+        copied.forEach(function(page) {
+          merged.addPage(page);
+
+          // Only burn pilot data onto the first page of each unit's sheet
+          if (firstPage && hasPilot) {
+            firstPage = false;
+            var pw = page.getWidth();
+            var ph = page.getHeight();
+            var sz = PILOT_POS.size;
+
+            if (pilot.name) {
+              page.drawText(pilot.name, {
+                x: pw * PILOT_POS.name.xPct,
+                y: ph * (1 - PILOT_POS.name.yPct),
+                size: sz, font: font, color: black
+              });
+            }
+            if (pilot.gu) {
+              page.drawText(pilot.gu, {
+                x: pw * PILOT_POS.gu.xPct,
+                y: ph * (1 - PILOT_POS.gu.yPct),
+                size: sz, font: font, color: black
+              });
+            }
+            if (pilot.pi) {
+              page.drawText(pilot.pi, {
+                x: pw * PILOT_POS.pi.xPct,
+                y: ph * (1 - PILOT_POS.pi.yPct),
+                size: sz, font: font, color: black
+              });
+            }
+          }
+        });
       } catch(e) {
         skipped++;
         console.warn('Skipped', urls[u], e);
