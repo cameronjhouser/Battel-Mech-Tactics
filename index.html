@@ -4065,7 +4065,7 @@ async function lbOpenSheets() {
     function exportUnitList() {
       const names = window._unitNames || [];
       if (!names.length) { alert('No units in formation.'); return; }
-      const text = names.join('\n');
+      const text = names.join('\\n');
       const blob = new Blob([text], { type: 'text/plain' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
