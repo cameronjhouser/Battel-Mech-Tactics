@@ -2075,6 +2075,7 @@
           </select>
           <button class="lb-btn" onclick="lbAutoRoster()">Auto Roster</button>
           <button class="lb-btn" onclick="lbSearchDownloadCards()">📇 Cards</button>
+          <button class="lb-btn" onclick="lbSearchOpenSheets()">📋 Sheets</button>
           <button class="lb-btn" onclick="lbSearchPrintFormation()">🖨 Print</button>
           <button class="lb-btn" onclick="lbClearRoster()" style="background:var(--red)">Clear</button>
         </div>
@@ -3886,68 +3887,56 @@ function lbDownloadCards() {
   }
 }
 
-async function lbOpenSheets() {
-  if (!lbCurrentLances.length) return;
-  const fKey    = document.getElementById('lb-formation-type').value;
-  const fDef    = LB_FORMATIONS[fKey] || {};
-  const totalPV = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
-  const MORDEL  = 'https://mordel.net/tro.php?a=v&fltr=qf.000.Name~Contains~';
-
-  // Manifest is always served alongside index.html in the sheets/ folder
+// ── Shared sheets-popup builder ─────────────────────────────────────────────
+// config: { lances, lanceTypes, cmdState, unitBonuses, fDef, totalPV,
+//           isClan, getLancePV(li), getSkillText(li) }
+async function lbOpenSheetsCore(cfg) {
+  const MORDEL     = 'https://mordel.net/tro.php?a=v&fltr=qf.000.Name~Contains~';
   const sheetsBase = new URL('sheets/', window.location.href).href;
-  // PDFs: on localhost use the dedicated sheet server (port 3002, no CORS issue for <object>)
-  // PDFs hosted on Cloudflare R2 — no local server needed
-  const pdfBase = 'https://battletech-sheets.cjhapril.workers.dev/';
+  const pdfBase    = 'https://battletech-sheets.cjhapril.workers.dev/';
+  const { lances, lanceTypes, cmdState, unitBonuses,
+          fDef, totalPV, isClan, getLancePV, getSkillText } = cfg;
 
-  // Fetch manifest — maps unit name → PDF filename
   let manifest = {};
   try {
     const res = await fetch(sheetsBase + 'manifest.json');
     if (res.ok) manifest = (await res.json()).sheets || {};
-  } catch (_) { /* no manifest — all units fall back to mordel links */ }
+  } catch (_) {}
 
-  // Helper: look up a unit name in the manifest.
-  // Tries exact name, then MUL-style variants (spaces→underscores, brackets stripped).
   function sheetFile(name) {
     if (!name) return null;
     if (manifest[name]) return manifest[name];
-    // Try stripping parenthetical suffixes: "Atlas AS7-D (Ares)" → "Atlas AS7-D"
     const stripped = name.replace(/\s*\(.*?\)\s*$/, '').trim();
     if (manifest[stripped]) return manifest[stripped];
-    // Try safe-name (replace illegal FS chars)
     const safe = name.replace(/[<>:"/\\|?*]/g, '_').trim();
     return manifest[safe] || null;
   }
 
-  // Build per-lance sections
   let lanceSections = '';
   let embeddedCount = 0;
-  const pdfUrls   = [];   // collected for "Print All / Download All"
-  const unitNames = [];   // collected for "Export Unit List" → merge_sheets.py
+  const pdfUrls   = [];
+  const unitNames = [];
 
-  lbCurrentLances.forEach((lUnits, li) => {
-    const lanceType = lbLanceTypes[li] || '';
+  lances.forEach((lUnits, li) => {
+    const lanceType = lanceTypes[li] || '';
     const typeLabel = lanceType && LB_SPECIAL_TYPES[lanceType]
       ? LB_SPECIAL_TYPES[lanceType].name : 'Standard';
-    const lancePV  = lbGetAdjLancePV(li);
-    const skillEl  = document.getElementById(`lb-skill-${li}`);
-    const skillTxt = skillEl ? skillEl.options[skillEl.selectedIndex].text : '';
+    const lancePV  = getLancePV(li);
+    const skillTxt = getSkillText(li);
 
-    const isClanSheets = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
     lanceSections += `<div class="lance-hdr">
-      ${lbGroupLabel(isClanSheets, li)} — ${typeLabel}
+      ${lbGroupLabel(isClan, li)} — ${typeLabel}
       <span class="lance-meta">${lancePV} PV · ${skillTxt}</span>
     </div>`;
 
     lUnits.forEach((u, si) => {
       if (!u) return;
-      unitNames.push(u.Name);   // always collect, even if no local PDF
-      const isCmd  = `${li}-${si}` in lbCmdState;
-      const bonus  = lbUnitBonuses[`${li}-${si}`] || '';
+      unitNames.push(u.Name);
+      const isCmd  = !!cmdState[`${li}-${si}`];
+      const bonus  = unitBonuses[`${li}-${si}`] || '';
       const file   = sheetFile(u.Name);
       const sz     = LB_SZ[u.BFSize||0] || '?';
 
-      // Unit meta bar (shown above the sheet or above the fallback)
       const metaBar = `<div class="unit-meta-bar${isCmd?' unit-cmd':''}">
         ${isCmd ? '<span class="cmd-badge">★ CMD</span>' : ''}
         <strong>${u.Name}</strong>
@@ -3956,17 +3945,14 @@ async function lbOpenSheets() {
       </div>`;
 
       if (file) {
-        // ── Sheet available — embed PDF inline ──────────────────────────────
         embeddedCount++;
         const pdfUrl = pdfBase + encodeURIComponent(file);
         pdfUrls.push(pdfUrl);
         lanceSections += `<div class="sheet-block">
           ${metaBar}
           <object class="sheet-embed" data="${pdfUrl}" type="application/pdf">
-            <p class="pdf-fallback">
-              PDF could not be displayed inline.
-              <a href="${pdfUrl}" target="_blank">Open sheet ↗</a>
-            </p>
+            <p class="pdf-fallback">PDF could not be displayed inline.
+              <a href="${pdfUrl}" target="_blank">Open sheet ↗</a></p>
           </object>
           <div class="sheet-actions">
             <a href="${pdfUrl}" download="${file}" class="btn-dl">⬇ Download sheet</a>
@@ -3974,16 +3960,11 @@ async function lbOpenSheets() {
           </div>
         </div>`;
       } else {
-        // ── No sheet yet — show mordel fallback ─────────────────────────────
         const search  = encodeURIComponent(u.Name);
         const chassis = encodeURIComponent((u.Name||'').split(' ')[0]);
         lanceSections += `<div class="sheet-block missing">
           ${metaBar}
-          <div class="missing-msg">
-            ⚠️ No local sheet found for <strong>${u.Name}</strong>.
-            Run <code>python download_sheets.py "${u.Name}"</code> to add it,
-            or find it on mordel.net:
-          </div>
+          <div class="missing-msg">⚠️ No local sheet found for <strong>${u.Name}</strong>. Find it on mordel.net:</div>
           <div class="mordel-links">
             <a href="${MORDEL}${search}" target="_blank" class="btn-mordel">📋 Search mordel for "${u.Name}"</a>
             <a href="${MORDEL}${chassis}" target="_blank" class="btn-chassis">Browse all ${(u.Name||'').split(' ')[0]}s →</a>
@@ -3993,9 +3974,10 @@ async function lbOpenSheets() {
     });
   });
 
-  const missingCount = lbCurrentLances.flat().filter(Boolean).length - embeddedCount;
+  const totalUnits  = lances.flat().filter(Boolean).length;
+  const missingCount = totalUnits - embeddedCount;
   const statusLine = embeddedCount === 0
-    ? `<div class="status-bar missing-all">No local sheets found — run <code>serve_sheets.bat</code> in the repo folder to start the sheet server on port 3002, then try again.</div>`
+    ? `<div class="status-bar missing-all">No sheets found for these units — they may not be in the PDF library yet.</div>`
     : missingCount > 0
       ? `<div class="status-bar partial">${embeddedCount} sheet${embeddedCount!==1?'s':''} embedded · ${missingCount} missing (shown with mordel links)</div>`
       : `<div class="status-bar ok">All ${embeddedCount} sheet${embeddedCount!==1?'s':''} embedded ✓</div>`;
@@ -4081,6 +4063,49 @@ async function lbOpenSheets() {
 
   const w = window.open('', '_blank');
   if (w) { w.document.write(html); w.document.close(); }
+}
+
+// ── CSV tab wrapper ──────────────────────────────────────────────────────────
+async function lbOpenSheets() {
+  if (!lbCurrentLances.flat().filter(Boolean).length) return;
+  const fKey   = document.getElementById('lb-formation-type').value;
+  const fDef   = LB_FORMATIONS[fKey] || {};
+  const isClan = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+  await lbOpenSheetsCore({
+    lances:      lbCurrentLances,
+    lanceTypes:  lbLanceTypes,
+    cmdState:    lbCmdState,
+    unitBonuses: lbUnitBonuses,
+    fDef,
+    totalPV:     lbCurrentLances.reduce((s,_,li)=>s+lbGetAdjLancePV(li),0),
+    isClan,
+    getLancePV:  li => lbGetAdjLancePV(li),
+    getSkillText: li => {
+      const el = document.getElementById(`lb-skill-${li}`);
+      return el ? el.options[el.selectedIndex].text : '';
+    },
+  });
+}
+
+// ── Search tab wrapper ───────────────────────────────────────────────────────
+async function lbSearchOpenSheets() {
+  if (!lbSearchLances.flat().filter(Boolean).length) {
+    alert('Add units to the roster first.'); return;
+  }
+  const skillLabels = ['Legendary','Elite','Veteran','Regular','Green'];
+  const fDef   = LB_FORMATIONS[lbSearchFormKey] || {};
+  const isClan = lbIsClanFaction(document.getElementById('lb-faction')?.value||'');
+  await lbOpenSheetsCore({
+    lances:      lbSearchLances,
+    lanceTypes:  lbSearchLanceTypes,
+    cmdState:    lbSearchCmdState,
+    unitBonuses: lbSearchUnitBonuses,
+    fDef,
+    totalPV:     lbSearchLances.reduce((s,_,li)=>s+lbSearchGetAdjPV(li),0),
+    isClan,
+    getLancePV:  li => lbSearchGetAdjPV(li),
+    getSkillText: li => skillLabels[lbSearchLanceSkills[li]??3] || 'Regular',
+  });
 }
 
 function lbCalcTMM(u) {
