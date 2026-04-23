@@ -3922,7 +3922,8 @@ async function lbOpenSheets() {
   // Build per-lance sections
   let lanceSections = '';
   let embeddedCount = 0;
-  const pdfUrls = [];   // collected for "Print All / Download All"
+  const pdfUrls   = [];   // collected for "Print All / Download All"
+  const unitNames = [];   // collected for "Export Unit List" → merge_sheets.py
 
   lbCurrentLances.forEach((lUnits, li) => {
     const lanceType = lbLanceTypes[li] || '';
@@ -3940,6 +3941,7 @@ async function lbOpenSheets() {
 
     lUnits.forEach((u, si) => {
       if (!u) return;
+      unitNames.push(u.Name);   // always collect, even if no local PDF
       const isCmd  = `${li}-${si}` in lbCmdState;
       const bonus  = lbUnitBonuses[`${li}-${si}`] || '';
       const file   = sheetFile(u.Name);
@@ -4052,10 +4054,24 @@ async function lbOpenSheets() {
     .btn-dl-all     { background:#1565c0; color:#fff; border:none; padding:7px 18px; border-radius:5px;
                       font-size:12px; font-weight:700; cursor:pointer; }
     .btn-dl-all:disabled { background:#555; cursor:default; }
+    .btn-export-list { background:#4a148c; color:#fff; border:none; padding:7px 18px; border-radius:5px;
+                       font-size:12px; font-weight:700; cursor:pointer; }
     #merge-progress { font-size:11px; color:#8bc34a; font-style:italic; }
   </style>
   <script>
-    window._pdfUrls = ${JSON.stringify(pdfUrls)};
+    window._pdfUrls   = ${JSON.stringify(pdfUrls)};
+    window._unitNames = ${JSON.stringify(unitNames)};
+
+    function exportUnitList() {
+      const names = window._unitNames || [];
+      if (!names.length) { alert('No units in formation.'); return; }
+      const text = names.join('\n');
+      const blob = new Blob([text], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'formation-sheets.txt';
+      a.click();
+    }
 
     async function mergeAllPdfs(action) {
       const printBtn = document.getElementById('btn-print-all');
@@ -4130,8 +4146,9 @@ async function lbOpenSheets() {
   <div class="print-bar">
     <button id="btn-print-all" class="btn-print-all" onclick="mergeAllPdfs('print')">🖨 Print All Sheets</button>
     <button id="btn-dl-all"    class="btn-dl-all"    onclick="mergeAllPdfs('download')">📥 Download as One PDF</button>
+    <button class="btn-export-list" onclick="exportUnitList()" title="Download unit names for merge_sheets.py">📋 Export Unit List</button>
     <span id="merge-progress"></span>
-    <span style="margin-left:auto">${embeddedCount} sheet${embeddedCount!==1?'s':''} · merges into one PDF for printing</span>
+    <span style="margin-left:auto">${unitNames.length} unit${unitNames.length!==1?'s':''} · ${embeddedCount} sheet${embeddedCount!==1?'s':''} found</span>
   </div>
   ${statusLine}
   ${lanceSections}
