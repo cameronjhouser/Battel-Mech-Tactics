@@ -6,3 +6,5 @@ sheets/pdfs/
 
 # Other local artifacts
 sheets/_failed.txt
+_screens/
+_inline-check.js

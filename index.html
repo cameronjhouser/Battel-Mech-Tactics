@@ -616,6 +616,60 @@
 
   /* AS card in roster */
   .lb-roster { display:flex; flex-direction:column; gap:0; }
+  .lb-owned-table { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:12px; }
+  .lb-owned-toolbar { display:grid; grid-template-columns:auto minmax(220px,1fr); gap:10px; align-items:center; margin-bottom:10px; }
+  .lb-owned-toolbar select {
+    background:var(--bg2); border:1px solid var(--border2); color:var(--text); border-radius:4px;
+    padding:8px 10px; font-size:12px; min-height:38px;
+  }
+  .lb-owned-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+  .lb-owned-counters { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+  .lb-owned-counter {
+    background:var(--bg2); border:1px solid var(--border); border-radius:5px; padding:7px 10px;
+    font-family:var(--mono); font-size:11px; color:var(--text2);
+  }
+  .lb-owned-counter strong { color:var(--accent); font-weight:700; }
+  .lb-owned-counter.ok strong { color:var(--green); }
+  .lb-owned-counter.warn strong { color:var(--orange); }
+  .lb-owned-counter.bad strong { color:var(--red); }
+  .lb-owned-row {
+    display:grid; grid-template-columns:28px minmax(150px,1fr) 154px 64px;
+    gap:10px; align-items:start; padding:10px; background:var(--bg2); border:1px solid var(--border); border-radius:6px;
+    font-size:12px;
+  }
+  .lb-owned-head { display:none; }
+  .lb-owned-title { font-weight:700; color:var(--text); }
+  .lb-owned-title small, .lb-owned-match small { display:block; color:var(--text3); font-size:10px; margin-top:2px; }
+  .lb-owned-main { min-width:0; display:flex; flex-direction:column; gap:8px; }
+  .lb-owned-match { min-width:0; }
+  .lb-owned-match select { width:100%; background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:4px 6px; font-size:11px; }
+  .lb-owned-unit-faction select { width:100%; background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:4px 6px; font-size:11px; }
+  .lb-owned-meta { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+  .lb-owned-unit-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:2px; }
+  .lb-owned-unit-actions .lb-btn-sm { text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+  .lb-owned-card-actions { display:flex; gap:6px; margin-top:6px; }
+  .lb-owned-card-actions .lb-btn-sm { flex:1; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+  .lb-owned-state { font-family:var(--mono); font-size:10px; text-transform:uppercase; }
+  .lb-owned-state.matched { color:var(--green); }
+  .lb-owned-state.ambiguous { color:var(--orange); }
+  .lb-owned-state.unmatched { color:var(--red); }
+  .lb-owned-card-img { width:144px; max-height:198px; object-fit:contain; display:block; border:1px solid var(--border); border-radius:4px; background:#0b0f17; }
+  .lb-owned-delete { background:var(--red); color:#fff; border:none; border-radius:4px; font-family:var(--cond); font-size:11px; font-weight:700; padding:6px 8px; cursor:pointer; }
+  .lb-owned-pool {
+    border:1px solid var(--teal); border-radius:6px; background:#071719; margin-bottom:12px; overflow:hidden;
+  }
+  .lb-owned-pool-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-bottom:1px solid rgba(90,220,210,.35); }
+  .lb-owned-pool-title { font-family:var(--cond); font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.05em; }
+  .lb-owned-pool-row { display:grid; grid-template-columns:1fr 70px auto; gap:8px; align-items:center; padding:8px 10px; border-bottom:1px solid rgba(90,220,210,.18); }
+  .lb-owned-pool-row:last-child { border-bottom:none; }
+  @media (max-width:900px) {
+    .lb-owned-toolbar { grid-template-columns:1fr; }
+    .lb-owned-actions { justify-content:flex-start; }
+    .lb-owned-table { grid-template-columns:1fr; }
+    .lb-owned-row { grid-template-columns:28px 1fr; }
+    .lb-owned-row > span, .lb-owned-row > div, .lb-owned-row > a { min-width:0; }
+    .lb-owned-card-cell { grid-column:1/-1; padding-left:38px; }
+  }
   .lb-slot {
     background:var(--bg2); border:1px solid var(--border); border-radius:5px; padding:10px 12px;
     min-height:72px; display:flex; align-items:center; justify-content:center;
@@ -2012,6 +2066,7 @@
   <!-- ── TAB SWITCHER ───────────────────────── -->
   <div style="display:flex;gap:8px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:0">
     <button class="lb-mode-btn on" id="lb-tab-search" onclick="lbSwitchMode('search')">Manual Search</button>
+    <button class="lb-mode-btn"   id="lb-tab-owned"  onclick="lbSwitchMode('owned')">Owned Units</button>
     <button class="lb-mode-btn"   id="lb-tab-csv"    onclick="lbSwitchMode('csv')">CSV Formation Builder</button>
   </div>
 
@@ -2079,6 +2134,7 @@
           <button class="lb-btn" onclick="lbSearchPrintFormation()">🖨 Print</button>
           <button class="lb-btn" onclick="lbClearRoster()" style="background:var(--red)">Clear</button>
         </div>
+        <div id="lb-owned-unassigned" class="lb-owned-pool" style="display:none"></div>
         <div class="lb-roster" id="lb-roster"></div>
         <div class="lb-totals">
           <span>Total PV: <span class="lb-totals-pv" id="lb-totalpv">0</span></span>
@@ -2087,6 +2143,68 @@
         <div class="lb-analysis" id="lb-analysis"></div>
       </div>
     </div>
+  </div>
+
+  <!-- ── OWNED UNITS MODE ──────────────────── -->
+  <div id="lb-mode-owned" style="display:none">
+    <div class="lb-owned-toolbar">
+      <label class="lb-file-label">
+        <span>📂 Upload Owned CSV</span>
+        <input type="file" id="lb-owned-input" accept=".csv,.txt" onchange="lbOwnedLoadCSV(this)">
+      </label>
+      <div class="lb-owned-actions">
+        <button class="lb-btn" onclick="lbOwnedSaveRoster()">Save Roster</button>
+        <button class="lb-btn" onclick="lbOwnedLoadRosterPrompt()">Load Roster</button>
+        <button class="lb-btn" onclick="lbOwnedDeleteRosterPrompt()" style="background:var(--red)">Delete Roster</button>
+        <button class="lb-btn" onclick="lbOwnedSelectVisible(true)">Select Visible</button>
+        <button class="lb-btn" onclick="lbOwnedSelectVisible(false)">Clear</button>
+        <button class="lb-btn" onclick="lbOwnedDeleteSelected()" style="background:var(--red)">Delete Selected</button>
+        <button class="lb-btn" onclick="lbOwnedOpenSelectedCards()">📇 Cards</button>
+        <button class="lb-btn" onclick="lbOwnedOpenSelectedSheets()">📋 Sheets</button>
+        <button class="lb-btn" onclick="lbOwnedSendToBuilder()">Send to Build Lance</button>
+      </div>
+    </div>
+    <div id="lb-owned-status" class="lb-status">Upload a CSV with Name, Variant, Quantity, Faction, and Notes columns.</div>
+    <div id="lb-owned-counters" class="lb-owned-counters"></div>
+    <div class="lb-search-form" style="margin-top:10px">
+      <input id="lb-owned-filter" type="text" placeholder="Owned unit name..." oninput="lbOwnedRender()">
+      <select id="lb-owned-source-faction" title="Filter units by faction availability"></select>
+      <select id="lb-owned-role" onchange="lbOwnedRender()">
+        <option value="">All roles</option>
+      </select>
+      <select id="lb-owned-tech" onchange="lbOwnedRender()">
+        <option value="">All tech bases</option>
+      </select>
+      <select id="lb-owned-weight" onchange="lbOwnedRender()">
+        <option value="">All weights</option>
+        <option value="20,35">Light (20–35t)</option>
+        <option value="40,55">Medium (40–55t)</option>
+        <option value="60,75">Heavy (60–75t)</option>
+        <option value="80,100">Assault (80–100t)</option>
+      </select>
+      <select id="lb-owned-era" onchange="lbOwnedRender()">
+        <option value="">All Eras</option>
+        <option value="0-2570">Age of War (≤ 2570)</option>
+        <option value="2571-2780">Star League (2571–2780)</option>
+        <option value="2781-3049">Succession Wars (2781–3049)</option>
+        <option value="3050-3061">Clan Invasion (3050–3061)</option>
+        <option value="3062-3067">Civil War (3062–3067)</option>
+        <option value="3068-3080">Jihad (3068–3080)</option>
+        <option value="3081-3130">Republic Era (3081–3130)</option>
+        <option value="3131-3150">Dark Age (3131–3150)</option>
+        <option value="3151-9999">ilClan (3151+)</option>
+      </select>
+      <select id="lb-owned-type" onchange="lbOwnedRender()">
+        <option value="">All unit types</option>
+      </select>
+      <select id="lb-owned-match-filter" onchange="lbOwnedRender()">
+        <option value="">All match states</option>
+        <option value="matched">Matched</option>
+        <option value="ambiguous">Multiple matches</option>
+        <option value="unmatched">Unmatched</option>
+      </select>
+    </div>
+    <div id="lb-owned-table" class="lb-owned-table"></div>
   </div>
 
   <!-- ── CSV FORMATION BUILDER MODE ────────── -->
@@ -3036,6 +3154,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (fEl) fEl.outerHTML = lbFactionSelectHtml('lb-faction', 'lbFactionChanged');
   const fcEl = document.getElementById('lb-csv-faction');
   if (fcEl) fcEl.outerHTML = lbFactionSelectHtml('lb-csv-faction', 'lbCsvFactionChanged');
+  const foEl = document.getElementById('lb-owned-source-faction');
+  if (foEl) foEl.outerHTML = lbFactionSelectHtml('lb-owned-source-faction', 'lbOwnedRender');
   lbRenderLance();
 });
 
@@ -3485,9 +3605,932 @@ function lbCsvFactionChanged() {
 
 function lbSwitchMode(mode) {
   document.getElementById('lb-mode-search').style.display = mode === 'search' ? '' : 'none';
+  document.getElementById('lb-mode-owned').style.display   = mode === 'owned'  ? '' : 'none';
   document.getElementById('lb-mode-csv').style.display    = mode === 'csv'    ? '' : 'none';
   document.getElementById('lb-tab-search').classList.toggle('on', mode === 'search');
+  document.getElementById('lb-tab-owned').classList.toggle('on', mode === 'owned');
   document.getElementById('lb-tab-csv').classList.toggle('on', mode === 'csv');
+}
+
+/* ── OWNED UNITS ───────────────────────────────────── */
+let lbOwnedRows = [];
+let lbOwnedVisibleIds = [];
+let lbOwnedBuildPool = [];
+let lbOwnedSheetManifest = null;
+const LB_OWNED_STORAGE_KEY = 'bmtOwnedRosters.v1';
+
+function lbEsc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
+function lbOwnedLoadCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => lbOwnedParseCSV(e.target.result, file.name);
+  reader.readAsText(file);
+}
+
+function lbOwnedParseLine(line) {
+  const out = [];
+  let cur = '', quoted = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i], next = line[i + 1];
+    if (ch === '"' && quoted && next === '"') { cur += '"'; i++; continue; }
+    if (ch === '"') { quoted = !quoted; continue; }
+    if (ch === ',' && !quoted) { out.push(cur.trim()); cur = ''; continue; }
+    cur += ch;
+  }
+  out.push(cur.trim());
+  return out;
+}
+
+function lbOwnedRowsFromCSV(text) {
+  const raw = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (!raw.length) return [];
+  const parsed = raw.map(line => lbOwnedParseLine(line));
+  const headerTokens = ['name','unit','unitname','variant','quantity','qty','count','faction','notes'];
+  const headerRowIdx = parsed.findIndex(cols => {
+    const norm = cols.map(h => h.toLowerCase().replace(/\s+/g, ''));
+    return norm.filter(h => headerTokens.includes(h)).length >= 2 ||
+      (norm.includes('name') && (norm.includes('variant') || norm.includes('quantity') || norm.includes('qty')));
+  });
+  const header = headerRowIdx >= 0 ? parsed[headerRowIdx].map(h => h.toLowerCase().replace(/\s+/g, '')) : ['name'];
+  const body = headerRowIdx >= 0 ? raw.slice(headerRowIdx + 1) : raw;
+  const idx = (...names) => names.map(n => header.indexOf(n)).find(i => i >= 0);
+  const nameIdx = idx('name','unit','unitname');
+  const varIdx = idx('variant','model');
+  const qtyIdx = idx('quantity','qty','count');
+  const factionIdx = idx('faction','factions','force','owningfaction','sourcefaction','house','clan');
+  const notesIdx = idx('notes','note');
+  const rows = [];
+
+  body.forEach((line, rowNum) => {
+    if (line.startsWith('#')) return;
+    const cols = lbOwnedParseLine(line);
+    const nonEmpty = cols.filter(Boolean);
+    const lowerLine = line.toLowerCase();
+    if (nonEmpty.length <= 1 && (
+      lowerLine === 'mech units' ||
+      lowerLine === 'unit' ||
+      lowerLine === 'units' ||
+      lowerLine.endsWith(' units') ||
+      lowerLine.endsWith(' mechs')
+    )) return;
+    const name = (cols[nameIdx >= 0 ? nameIdx : 0] || '').trim();
+    if (!name) return;
+    const variant = varIdx >= 0 ? (cols[varIdx] || '').trim() : '';
+    const qtyRaw = qtyIdx >= 0 ? parseInt(cols[qtyIdx], 10) : 1;
+    const qty = Math.max(1, Math.min(100, Number.isFinite(qtyRaw) ? qtyRaw : 1));
+    for (let copy = 1; copy <= qty; copy++) {
+      rows.push({
+        id: `owned-${Date.now()}-${rowNum}-${copy}-${Math.random().toString(36).slice(2)}`,
+        sourceName: name,
+        sourceVariant: variant,
+        displayName: `${name}${variant ? ' ' + variant : ''}${qty > 1 ? ' #' + copy : ''}`,
+        quantityIndex: copy,
+        faction: factionIdx >= 0 ? (cols[factionIdx] || '').trim() : '',
+        notes: notesIdx >= 0 ? (cols[notesIdx] || '').trim() : '',
+        selected: false,
+        matchStatus: 'unmatched',
+        matchConfidence: 0,
+        matches: [],
+        factionChecks: {},
+        matchFactionChecks: {},
+        selectedFactionId: '',
+        unit: null,
+        mulData: null,
+        filterData: {},
+      });
+    }
+  });
+  return rows;
+}
+
+function lbOwnedStoreUnitData(row, unit) {
+  row.unit = unit || null;
+  if (!unit) {
+    row.mulData = null;
+    const sourceFactions = lbOwnedFactionNamesForRow(row, []);
+    row.filterData = {
+      sourceFaction: row.faction || '',
+      factionNames: sourceFactions,
+      factionIds: lbOwnedFactionIdsForNames(sourceFactions),
+      matchStatus: row.matchStatus || 'unmatched'
+    };
+    return;
+  }
+  const mulFactions = lbOwnedExtractFactionNames(unit);
+  const factionNames = lbOwnedFactionNamesForRow(row, mulFactions);
+  row.mulData = {
+    id: unit.Id || null,
+    name: unit.Name || '',
+    type: unit.Type?.Name || '',
+    typeId: unit.Type?.Id || unit.TypeId || '',
+    role: unit.Role?.Name || '',
+    technology: unit.Technology?.Name || '',
+    tonnage: parseInt(unit.Tonnage, 10) || 0,
+    size: unit.BFSize || 0,
+    move: unit.BFMove || '',
+    tmm: lbCalcTMM(unit),
+    pv: parseInt(unit.BFPointValue, 10) || 0,
+    armor: parseInt(unit.BFArmor, 10) || 0,
+    structure: parseInt(unit.BFStructure, 10) || 0,
+    short: unit.BFDamageShort ?? '',
+    medium: unit.BFDamageMedium ?? '',
+    long: unit.BFDamageLong ?? '',
+    extreme: unit.BFDamageExtreme ?? '',
+    overheat: unit.BFOverheat ?? '',
+    abilities: unit.BFAbilities || '',
+    intro: parseInt(unit.DateIntroduced, 10) || 0,
+    factionNames,
+    factionIds: lbOwnedFactionIdsForNames(factionNames),
+    factionChecks: row.factionChecks || {},
+  };
+  row.filterData = {
+    sourceFaction: row.faction || '',
+    factionNames,
+    factionIds: lbOwnedFactionIdsForNames(factionNames),
+    type: row.mulData.type,
+    typeId: String(row.mulData.typeId || ''),
+    role: row.mulData.role,
+    technology: row.mulData.technology,
+    tonnage: row.mulData.tonnage,
+    size: row.mulData.size,
+    pv: row.mulData.pv,
+    intro: row.mulData.intro,
+    matchStatus: row.matchStatus,
+  };
+}
+
+function lbOwnedFactionNamesForRow(row, extraNames) {
+  const raw = [row.faction, ...(extraNames || [])].map(v => String(v || '').trim()).filter(Boolean);
+  const aliases = {
+    davion: ['Federated Suns'],
+    'house davion': ['Federated Suns'],
+    kurita: ['Draconis Combine'],
+    'house kurita': ['Draconis Combine'],
+    steiner: ['Lyran Commonwealth', 'Lyran Alliance'],
+    'house steiner': ['Lyran Commonwealth', 'Lyran Alliance'],
+    marik: ['Free Worlds League'],
+    'house marik': ['Free Worlds League'],
+    liao: ['Capellan Confederation'],
+    'house liao': ['Capellan Confederation'],
+    comstar: ['ComStar'],
+    'word of blake': ['Word of Blake'],
+    wob: ['Word of Blake'],
+    mercenary: ['Mercenaries'],
+    mercenaries: ['Mercenaries'],
+    clan: ['IS Clan General'],
+  };
+  const names = [...raw];
+  raw.forEach(v => {
+    const key = v.toLowerCase();
+    if (aliases[key]) names.push(...aliases[key]);
+  });
+  return [...new Set(names)];
+}
+
+function lbOwnedFactionIdsForNames(names) {
+  const ids = [];
+  (names || []).forEach(name => {
+    const id = lbOwnedFactionIdByName(name);
+    if (id) ids.push(id);
+  });
+  return [...new Set(ids)];
+}
+
+function lbOwnedExtractFactionNames(unit) {
+  const buckets = [unit.Factions, unit.Faction, unit.AvailableFactions, unit.Availability?.Factions];
+  const names = [];
+  buckets.forEach(val => {
+    if (!val) return;
+    if (Array.isArray(val)) {
+      val.forEach(f => {
+        if (typeof f === 'string') names.push(f);
+        else if (f?.Name) names.push(f.Name);
+        else if (f?.Faction?.Name) names.push(f.Faction.Name);
+      });
+    } else if (typeof val === 'string') {
+      val.split(/[,;|]/).forEach(v => names.push(v.trim()));
+    } else if (val.Name) {
+      names.push(val.Name);
+    }
+  });
+  return names.filter(Boolean);
+}
+
+async function lbOwnedParseCSV(text, filename) {
+  const status = document.getElementById('lb-owned-status');
+  lbOwnedRows = lbOwnedRowsFromCSV(text);
+  lbOwnedRefreshFactionFilter();
+  lbOwnedRender();
+  if (!lbOwnedRows.length) {
+    status.textContent = 'No owned units found. CSV needs at least a Name column.';
+    status.className = 'lb-status err';
+    return;
+  }
+  status.textContent = `Loaded ${lbOwnedRows.length} owned unit rows from ${filename}. Matching against Master Unit List...`;
+  status.className = 'lb-status';
+  await lbOwnedMatchAll();
+}
+
+function lbOwnedRefreshFactionFilter() {
+  lbOwnedRefreshSelect('lb-owned-type', 'All unit types',
+    [...new Set(lbOwnedRows.map(r => r.filterData?.type || '').filter(Boolean))]);
+  lbOwnedRefreshSelect('lb-owned-role', 'All roles',
+    [...new Set(lbOwnedRows.map(r => r.filterData?.role || '').filter(Boolean))]);
+  lbOwnedRefreshSelect('lb-owned-tech', 'All tech bases',
+    [...new Set(lbOwnedRows.map(r => r.filterData?.technology || '').filter(Boolean))]);
+}
+
+function lbOwnedRefreshSelect(id, label, values) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  const current = sel.value;
+  const opts = [...new Set(values.map(v => String(v).trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
+  sel.innerHTML = `<option value="">${lbEsc(label)}</option>` +
+    opts.map(v => `<option value="${lbEsc(v)}">${lbEsc(v)}</option>`).join('');
+  if (opts.includes(current)) sel.value = current;
+}
+
+function lbOwnedFactionChanged() {
+  lbOwnedRender();
+}
+
+async function lbOwnedFactionFilterChanged() {
+  const factionId = document.getElementById('lb-owned-source-faction')?.value || '';
+  if (!factionId) {
+    lbOwnedRender();
+    return;
+  }
+  await lbOwnedEnsureFactionAvailability(factionId);
+  lbOwnedRender();
+}
+
+function lbOwnedFactionIdByName(name) {
+  const clean = String(name || '').trim().toLowerCase();
+  const aliases = {
+    davion: 'Federated Suns',
+    kurita: 'Draconis Combine',
+    steiner: 'Lyran Commonwealth',
+    marik: 'Free Worlds League',
+    liao: 'Capellan Confederation',
+    wob: 'Word of Blake',
+  };
+  const target = (aliases[clean] || name || '').toLowerCase();
+  return LB_FACTIONS.find(f => f.name.toLowerCase() === target)?.id || '';
+}
+
+async function lbOwnedEnsureFactionAvailability(factionId) {
+  const factionName = LB_FACTIONS.find(f => f.id === String(factionId))?.name || factionId;
+  const status = document.getElementById('lb-owned-status');
+  if (!factionId) return;
+  const rows = lbOwnedRows.filter(r => r.unit && r.unit.Id && r.factionChecks?.[factionId] === undefined);
+  if (!rows.length) return;
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    if (status) {
+      status.textContent = `Checking ${factionName} availability ${i + 1} / ${rows.length}: ${row.unit.Name}...`;
+      status.className = 'lb-status';
+    }
+    let available = false;
+    try {
+      const params = new URLSearchParams({ Name: row.unit.Name, Factions: factionId });
+      const res = await fetch(`${MUL_API}?${params}`);
+      const data = res.ok ? await res.json() : [];
+      const units = data.Units || data || [];
+      available = units.some(u => String(u.Id) === String(row.unit.Id));
+      if (!available) {
+        available = units.some(u => (u.Name || '').toLowerCase() === (row.unit.Name || '').toLowerCase());
+      }
+    } catch (_) {
+      available = false;
+    }
+    row.factionChecks[factionId] = available;
+    if (available && !row.filterData.factionIds.includes(factionId)) {
+      row.filterData.factionIds.push(factionId);
+    }
+    if (available && !row.filterData.factionNames.includes(factionName)) {
+      row.filterData.factionNames.push(factionName);
+    }
+    if (i < rows.length - 1) await new Promise(r => setTimeout(r, 80));
+  }
+  const found = lbOwnedRows.filter(r => r.factionChecks?.[factionId]).length;
+  if (status) {
+    status.textContent = `${found} owned unit${found !== 1 ? 's' : ''} available to ${factionName} based on MUL faction search.`;
+    status.className = found ? 'lb-status' : 'lb-status err';
+  }
+}
+
+async function lbOwnedEnrichFactionAvailability() {
+  const status = document.getElementById('lb-owned-status');
+  const factions = LB_FACTIONS.filter(f => f.id);
+  const unitMap = new Map();
+  lbOwnedRows.forEach(row => {
+    if (!row.unit || !row.unit.Id) return;
+    const key = String(row.unit.Id);
+    if (!unitMap.has(key)) unitMap.set(key, { unit: row.unit, rows: [] });
+    unitMap.get(key).rows.push(row);
+  });
+  const entries = [...unitMap.values()];
+  let checked = 0;
+  const total = entries.length * factions.length;
+
+  for (const entry of entries) {
+    for (const faction of factions) {
+      checked++;
+      if (status && checked % 8 === 1) {
+        status.textContent = `Enriching faction availability ${checked} / ${total}: ${entry.unit.Name}`;
+      }
+      let available = entry.rows.some(row => {
+        const currentId = String(row.unit?.Id || '');
+        return currentId === String(entry.unit.Id) &&
+          ((row.filterData?.factionIds || []).includes(faction.id) ||
+           (row.filterData?.factionNames || []).includes(faction.name));
+      });
+      if (!available) {
+        try {
+          const params = new URLSearchParams({ Name: entry.unit.Name, Factions: faction.id });
+          const res = await fetch(`${MUL_API}?${params}`);
+          const data = res.ok ? await res.json() : [];
+          const units = data.Units || data || [];
+          available = units.some(u => String(u.Id) === String(entry.unit.Id)) ||
+            units.some(u => (u.Name || '').toLowerCase() === (entry.unit.Name || '').toLowerCase());
+        } catch (_) {
+          available = false;
+        }
+      }
+      entry.rows.forEach(row => {
+        if (!row.matchFactionChecks) row.matchFactionChecks = {};
+        if (!row.matchFactionChecks[entry.unit.Id]) row.matchFactionChecks[entry.unit.Id] = {};
+        row.matchFactionChecks[entry.unit.Id][faction.id] = available;
+        row.factionChecks[faction.id] = available;
+      });
+      if (checked % 16 === 0) await new Promise(r => setTimeout(r, 40));
+    }
+    entry.rows.forEach(row => {
+      const availableIds = new Set(row.filterData?.factionIds || []);
+      const availableNames = new Set(row.filterData?.factionNames || []);
+      Object.entries(row.factionChecks || {}).forEach(([fid, ok]) => {
+        if (!ok) return;
+        const f = LB_FACTIONS.find(x => x.id === fid);
+        availableIds.add(fid);
+        if (f) availableNames.add(f.name);
+      });
+      row.filterData.factionNames = [...availableNames];
+      row.filterData.factionIds = [...availableIds];
+      row.mulData.factionNames = [...availableNames];
+      row.mulData.factionIds = [...availableIds];
+      row.filterData.factionChecks = row.factionChecks;
+    });
+  }
+}
+
+function lbOwnedUnitPassesFilters(row) {
+  const u = row.unit;
+  const fd = row.filterData || {};
+  const ownedTerm = (document.getElementById('lb-owned-filter')?.value || '').toLowerCase();
+  const state = document.getElementById('lb-owned-match-filter')?.value || '';
+  const ownedFaction = document.getElementById('lb-owned-source-faction')?.value || '';
+  const role = document.getElementById('lb-owned-role')?.value || '';
+  const tech = document.getElementById('lb-owned-tech')?.value || '';
+  const weight = document.getElementById('lb-owned-weight')?.value || '';
+  const eraRange = lbParseEraVal(document.getElementById('lb-owned-era')?.value || '');
+  const type = document.getElementById('lb-owned-type')?.value || '';
+
+  const ownedHay = `${row.displayName} ${row.sourceName} ${row.sourceVariant} ${row.faction} ${row.notes}`.toLowerCase();
+  if (ownedTerm && !ownedHay.includes(ownedTerm)) return false;
+  if (state && row.matchStatus !== state) return false;
+  if (ownedFaction) {
+    const known = (fd.factionIds || []).includes(ownedFaction);
+    const checked = row.factionChecks?.[ownedFaction] === true;
+    const candidate = (row.matches || []).some(unit => lbOwnedCandidateAvailable(row, unit, ownedFaction));
+    if (!known && !checked && !candidate) return false;
+  }
+  if (role && fd.role !== role) return false;
+  if (tech && fd.technology !== tech) return false;
+  if (!u) return true;
+  if (weight) {
+    const [minT, maxT] = weight.split(',').map(Number);
+    const tons = fd.tonnage || 0;
+    if (tons < minT || tons > maxT) return false;
+  }
+  if (eraRange && (fd.intro || 0) > eraRange.max) return false;
+  if (type && fd.type !== type) return false;
+  return true;
+}
+
+function lbOwnedCandidateAvailable(row, unit, factionId) {
+  if (!unit || !factionId) return false;
+  if (String(row.unit?.Id || '') === String(unit.Id) && row.factionChecks?.[factionId] === true) return true;
+  return row.matchFactionChecks?.[unit.Id]?.[factionId] === true;
+}
+
+function lbOwnedAvailableFactionIds(row) {
+  const ids = new Set(row.filterData?.factionIds || []);
+  Object.entries(row.factionChecks || {}).forEach(([fid, ok]) => {
+    if (ok) ids.add(fid);
+  });
+  return [...ids].filter(fid => LB_FACTIONS.some(f => f.id === fid))
+    .sort((a, b) => {
+      const fa = LB_FACTIONS.find(f => f.id === a)?.name || a;
+      const fb = LB_FACTIONS.find(f => f.id === b)?.name || b;
+      return fa.localeCompare(fb);
+    });
+}
+
+function lbOwnedFactionDropdownHtml(row) {
+  const ids = lbOwnedAvailableFactionIds(row);
+  if (!ids.length) return '<small style="color:var(--text3)">No faction availability stored</small>';
+  if (!row.selectedFactionId || !ids.includes(row.selectedFactionId)) row.selectedFactionId = ids[0];
+  return `<select onchange="lbOwnedSetUnitFaction('${row.id}', this.value)">
+    ${ids.map(fid => {
+      const f = LB_FACTIONS.find(x => x.id === fid);
+      return `<option value="${fid}"${row.selectedFactionId === fid ? ' selected' : ''}>${lbEsc(f?.name || fid)}</option>`;
+    }).join('')}
+  </select>`;
+}
+
+function lbOwnedMatchScore(row, unit) {
+  const wanted = `${row.sourceName} ${row.sourceVariant}`.trim().toLowerCase();
+  const src = row.sourceName.toLowerCase();
+  const got = (unit.Name || '').toLowerCase();
+  if (got === wanted) return 100;
+  if (got === src) return 95;
+  if (row.sourceVariant && got.includes(row.sourceVariant.toLowerCase())) return 82;
+  if (got.includes(wanted) || wanted.includes(got)) return 78;
+  if (got.includes(src) || src.includes(got.split(' ')[0] || got)) return 65;
+  return 30;
+}
+
+async function lbOwnedMatchAll() {
+  const status = document.getElementById('lb-owned-status');
+  for (let i = 0; i < lbOwnedRows.length; i++) {
+    const row = lbOwnedRows[i];
+    status.textContent = `Matching ${i + 1} / ${lbOwnedRows.length}: ${row.displayName}...`;
+    try {
+      const params = new URLSearchParams({ Name: `${row.sourceName} ${row.sourceVariant}`.trim() });
+      let res = await fetch(`${MUL_API}?${params}`);
+      let data = res.ok ? await res.json() : [];
+      let units = data.Units || data || [];
+      if (!units.length && row.sourceVariant) {
+        params.set('Name', row.sourceName);
+        res = await fetch(`${MUL_API}?${params}`);
+        data = res.ok ? await res.json() : [];
+        units = data.Units || data || [];
+      }
+      units = units.filter(u => (u.BFSize || 0) > 0)
+        .map(u => ({ unit: u, score: lbOwnedMatchScore(row, u) }))
+        .sort((a, b) => b.score - a.score);
+      row.matches = units.slice(0, 8).map(x => x.unit);
+      row.matchConfidence = units[0]?.score || 0;
+      lbOwnedStoreUnitData(row, row.matches[0] || null);
+      row.matchStatus = !row.unit ? 'unmatched' : (row.matchConfidence >= 90 ? 'matched' : 'ambiguous');
+      if (row.filterData) row.filterData.matchStatus = row.matchStatus;
+    } catch (_) {
+      row.matches = [];
+      row.matchStatus = 'unmatched';
+      row.matchConfidence = 0;
+      lbOwnedStoreUnitData(row, null);
+    }
+    if (i < lbOwnedRows.length - 1) await new Promise(r => setTimeout(r, 120));
+    if (i % 3 === 0) lbOwnedRender();
+  }
+  const matched = lbOwnedRows.filter(r => r.unit).length;
+  const ambiguous = lbOwnedRows.filter(r => r.matchStatus === 'ambiguous').length;
+  status.textContent = `Matched ${matched} of ${lbOwnedRows.length} owned units${ambiguous ? ` (${ambiguous} need review)` : ''}. Enriching faction availability...`;
+  status.className = 'lb-status';
+  await lbOwnedEnrichFactionAvailability();
+  status.textContent = `Matched ${matched} of ${lbOwnedRows.length} owned units${ambiguous ? ` (${ambiguous} need review)` : ''}. Stored MUL data and faction availability are ready for filtering.`;
+  status.className = matched === lbOwnedRows.length ? 'lb-status' : 'lb-status err';
+  lbOwnedRefreshFactionFilter();
+  lbOwnedRender();
+}
+
+function lbOwnedRender() {
+  const table = document.getElementById('lb-owned-table');
+  if (!table) return;
+  const rows = lbOwnedRows.filter(lbOwnedUnitPassesFilters);
+  lbOwnedVisibleIds = rows.map(r => r.id);
+  lbOwnedRenderCounters(rows);
+  if (!lbOwnedRows.length) {
+    table.innerHTML = '';
+    return;
+  }
+  const head = `<div class="lb-owned-row lb-owned-head">
+    <span></span><span>Owned Unit</span><span>MUL Match</span><span>PV</span><span>Size</span><span>Status</span><span>Card</span><span>Delete</span>
+  </div>`;
+  table.innerHTML = head + rows.map(r => {
+    const u = r.unit;
+    const cardUrl = u && u.Id ? `https://masterunitlist.azurewebsites.net/Unit/Card/${u.Id}` : '';
+    const factionId = document.getElementById('lb-owned-source-faction')?.value || '';
+    const sortedMatches = [...(r.matches || [])].sort((a, b) => {
+      if (!factionId) return 0;
+      const av = lbOwnedCandidateAvailable(r, a, factionId) ? 1 : 0;
+      const bv = lbOwnedCandidateAvailable(r, b, factionId) ? 1 : 0;
+      if (bv !== av) return bv - av;
+      return (b.BFPointValue || 0) - (a.BFPointValue || 0);
+    });
+    const matchOptions = sortedMatches.length
+      ? `<select onchange="lbOwnedSetMatch('${r.id}', this.value)">
+          ${sortedMatches.map(m => {
+            const available = factionId && lbOwnedCandidateAvailable(r, m, factionId);
+            const tag = available ? ' · faction' : '';
+            return `<option value="${m.Id}"${u && m.Id === u.Id ? ' selected' : ''}>${lbEsc(m.Name)} (${m.BFPointValue || '?'} PV${tag})</option>`;
+          }).join('')}
+        </select>`
+      : '<small style="color:var(--red)">No MUL match found</small>';
+    return `<div class="lb-owned-row">
+      <span><input type="checkbox" ${r.selected ? 'checked' : ''} ${u ? '' : 'disabled'} onchange="lbOwnedToggle('${r.id}', this.checked)"></span>
+      <div class="lb-owned-main">
+        <div class="lb-owned-title">${lbEsc(r.displayName)}<small>${lbEsc([r.faction, r.notes].filter(Boolean).join(' · '))}</small></div>
+        <div class="lb-owned-match">${matchOptions}<small>${u ? lbEsc(u.Role?.Name || 'No role') + ' · MV ' + lbEsc(u.BFMove || '?') + ' · Intro ' + lbEsc(u.DateIntroduced || '?') : ''}</small></div>
+        <div class="lb-owned-unit-faction">${u ? lbOwnedFactionDropdownHtml(r) : ''}</div>
+        <div class="lb-owned-meta">
+          <span class="lb-rpv">${u ? lbEsc(u.BFPointValue || '?') + ' PV' : '-'}</span>
+          <span class="lb-rpill ${u ? LB_SZ_CLS[u.BFSize || 0] : ''}">${u ? lbEsc(LB_SZ[u.BFSize || 0] || '?') : '-'}</span>
+          <span class="lb-owned-state ${r.matchStatus}">${r.matchStatus}</span>
+        </div>
+      </div>
+      <span class="lb-owned-card-cell">
+        ${cardUrl ? `<a href="${cardUrl}" target="_blank" title="View Alpha Strike card"><img class="lb-owned-card-img" src="${cardUrl}" alt="${lbEsc(u.Name)} Alpha Strike card"></a>` : '-'}
+        ${u ? `<div class="lb-owned-card-actions">
+          ${cardUrl ? `<a href="${cardUrl}" target="_blank" class="lb-btn-sm">Card</a>` : ''}
+          <button class="lb-btn-sm" onclick="lbOwnedOpenSheet('${r.id}')">Sheet</button>
+        </div>` : ''}
+      </span>
+      <span><button class="lb-owned-delete" onclick="lbOwnedDeleteRow('${r.id}')">Delete</button></span>
+    </div>`;
+  }).join('');
+}
+
+function lbOwnedRenderCounters(visibleRows) {
+  const el = document.getElementById('lb-owned-counters');
+  if (!el) return;
+  if (!lbOwnedRows.length) {
+    el.innerHTML = '';
+    return;
+  }
+  const total = lbOwnedRows.length;
+  const visible = visibleRows.length;
+  const selected = lbOwnedRows.filter(r => r.selected).length;
+  const matched = lbOwnedRows.filter(r => r.matchStatus === 'matched').length;
+  const ambiguous = lbOwnedRows.filter(r => r.matchStatus === 'ambiguous').length;
+  const unmatched = lbOwnedRows.filter(r => r.matchStatus === 'unmatched').length;
+  const pv = visibleRows.reduce((s, r) => s + (r.unit ? (parseInt(r.unit.BFPointValue, 10) || 0) : 0), 0);
+  el.innerHTML = `
+    <span class="lb-owned-counter">Units <strong>${visible}</strong> / ${total}</span>
+    <span class="lb-owned-counter">Selected <strong>${selected}</strong></span>
+    <span class="lb-owned-counter ok">Matched <strong>${matched}</strong></span>
+    <span class="lb-owned-counter warn">Review <strong>${ambiguous}</strong></span>
+    <span class="lb-owned-counter bad">Unmatched <strong>${unmatched}</strong></span>
+    <span class="lb-owned-counter">Visible PV <strong>${pv}</strong></span>`;
+}
+
+function lbOwnedSetMatch(rowId, unitId) {
+  const row = lbOwnedRows.find(r => r.id === rowId);
+  if (!row) return;
+  const unit = row.matches.find(u => String(u.Id) === String(unitId)) || row.unit;
+  lbOwnedStoreUnitData(row, unit);
+  row.factionChecks = { ...(row.matchFactionChecks?.[unit?.Id] || row.factionChecks || {}) };
+  Object.entries(row.factionChecks).forEach(([fid, ok]) => {
+    if (!ok) return;
+    const f = LB_FACTIONS.find(x => x.id === fid);
+    if (!row.filterData.factionIds.includes(fid)) row.filterData.factionIds.push(fid);
+    if (f && !row.filterData.factionNames.includes(f.name)) row.filterData.factionNames.push(f.name);
+  });
+  row.matchStatus = row.unit ? 'matched' : 'unmatched';
+  row.matchConfidence = 100;
+  const availableIds = lbOwnedAvailableFactionIds(row);
+  row.selectedFactionId = availableIds[0] || '';
+  if (row.filterData) row.filterData.matchStatus = row.matchStatus;
+  lbOwnedRefreshFactionFilter();
+  lbOwnedRender();
+}
+
+function lbOwnedSetUnitFaction(rowId, factionId) {
+  const row = lbOwnedRows.find(r => r.id === rowId);
+  if (!row) return;
+  row.selectedFactionId = factionId;
+}
+
+function lbOwnedStoredRosters() {
+  try {
+    return JSON.parse(localStorage.getItem(LB_OWNED_STORAGE_KEY) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function lbOwnedSetStoredRosters(rosters) {
+  localStorage.setItem(LB_OWNED_STORAGE_KEY, JSON.stringify(rosters));
+}
+
+function lbOwnedSaveRoster() {
+  if (!lbOwnedRows.length) { alert('Upload or load owned units before saving a roster.'); return; }
+  const defaultName = localStorage.getItem('bmtOwnedRosters.lastName') || 'My Owned Units';
+  const name = prompt('Roster name:', defaultName);
+  if (!name) return;
+  const key = name.trim();
+  if (!key) return;
+  const rosters = lbOwnedStoredRosters();
+  rosters[key] = {
+    name: key,
+    updatedAt: new Date().toISOString(),
+    unitCount: lbOwnedRows.length,
+    matchedCount: lbOwnedRows.filter(r => r.unit).length,
+    rows: lbOwnedRows,
+  };
+  lbOwnedSetStoredRosters(rosters);
+  localStorage.setItem('bmtOwnedRosters.lastName', key);
+  const status = document.getElementById('lb-owned-status');
+  if (status) {
+    status.textContent = `Saved roster "${key}" locally with ${lbOwnedRows.length} units.`;
+    status.className = 'lb-status';
+  }
+}
+
+function lbOwnedRosterChoice(actionLabel) {
+  const rosters = lbOwnedStoredRosters();
+  const names = Object.keys(rosters).sort((a, b) => a.localeCompare(b));
+  if (!names.length) { alert('No saved local rosters found.'); return null; }
+  const list = names.map((n, i) => `${i + 1}. ${n} (${rosters[n].unitCount || rosters[n].rows?.length || 0} units)`).join('\n');
+  const pick = prompt(`${actionLabel} roster:\n${list}\n\nEnter number or roster name:`);
+  if (!pick) return null;
+  const idx = parseInt(pick, 10);
+  if (Number.isFinite(idx) && idx >= 1 && idx <= names.length) return names[idx - 1];
+  return names.find(n => n.toLowerCase() === pick.trim().toLowerCase()) || null;
+}
+
+function lbOwnedLoadRosterPrompt() {
+  const name = lbOwnedRosterChoice('Load');
+  if (!name) return;
+  const roster = lbOwnedStoredRosters()[name];
+  if (!roster?.rows?.length) { alert('That saved roster has no units.'); return; }
+  lbOwnedRows = roster.rows;
+  lbOwnedRows.forEach(r => {
+    if (!r.id) r.id = `owned-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    if (!r.factionChecks) r.factionChecks = {};
+    if (!r.matchFactionChecks) r.matchFactionChecks = {};
+    if (!r.filterData) r.filterData = {};
+    if (!r.matches) r.matches = [];
+  });
+  lbOwnedBuildPool = [];
+  lbOwnedRefreshFactionFilter();
+  lbOwnedRender();
+  localStorage.setItem('bmtOwnedRosters.lastName', name);
+  const status = document.getElementById('lb-owned-status');
+  if (status) {
+    status.textContent = `Loaded local roster "${name}" with ${lbOwnedRows.length} units.`;
+    status.className = 'lb-status';
+  }
+}
+
+function lbOwnedDeleteRosterPrompt() {
+  const name = lbOwnedRosterChoice('Delete');
+  if (!name) return;
+  if (!confirm(`Delete saved local roster "${name}"? This does not delete the currently displayed units.`)) return;
+  const rosters = lbOwnedStoredRosters();
+  delete rosters[name];
+  lbOwnedSetStoredRosters(rosters);
+  const status = document.getElementById('lb-owned-status');
+  if (status) {
+    status.textContent = `Deleted saved local roster "${name}".`;
+    status.className = 'lb-status';
+  }
+}
+
+function lbOwnedToggle(rowId, checked) {
+  const row = lbOwnedRows.find(r => r.id === rowId);
+  if (row && row.unit) row.selected = checked;
+}
+
+function lbOwnedSelectVisible(checked) {
+  const ids = new Set(lbOwnedVisibleIds);
+  lbOwnedRows.forEach(r => { if (ids.has(r.id) && r.unit) r.selected = checked; });
+  lbOwnedRender();
+}
+
+function lbOwnedSelectedUnits() {
+  return lbOwnedRows.filter(r => r.selected && r.unit && r.unit.Id).map(r => ({
+    ...r.unit,
+    _ownedLabel: r.displayName,
+    _ownedRowId: r.id,
+    _ownedFactionId: r.selectedFactionId || '',
+  }));
+}
+
+function lbOwnedOpenSelectedCards() {
+  const selected = lbOwnedSelectedUnits();
+  if (!selected.length) { alert('Select matched owned units first.'); return; }
+  const MUL_CARD = 'https://masterunitlist.azurewebsites.net/Unit/Card/';
+  const totalPV = selected.reduce((s, u) => s + (parseInt(u.BFPointValue, 10) || 0), 0);
+  const cardRows = selected.map(u => `<div class="card-wrap">
+    <img src="${MUL_CARD}${u.Id}" alt="${lbEsc(u.Name)}">
+    <div class="card-name">${lbEsc(u._ownedLabel || u.Name)}</div>
+    <div class="pilot-info">
+      <input class="p-name" type="text" placeholder="Pilot name">
+      <div class="p-skills">
+        <span>GU <input class="p-skill" type="number" min="1" max="8" value="4" title="Gunnery Skill"></span>
+        <span>PI <input class="p-skill" type="number" min="1" max="8" value="5" title="Piloting Skill"></span>
+      </div>
+    </div>
+  </div>`).join('');
+  const w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>Owned Units — Alpha Strike Cards</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:Arial,sans-serif; background:#fff; }
+    .header { padding:12px 16px; border-bottom:2px solid #333; margin-bottom:10px; }
+    .header h1 { font-size:16px; }
+    .header p { font-size:11px; color:#555; margin-top:3px; }
+    .card-row { display:flex; flex-wrap:wrap; gap:10px; padding:10px 14px; }
+    .card-wrap { display:flex; flex-direction:column; align-items:center; width:220px; break-inside:avoid; }
+    .card-wrap img { width:220px; height:auto; display:block; }
+    .card-name { font-size:10px; font-weight:700; margin-top:3px; text-align:center; }
+    .pilot-info { width:100%; margin-top:5px; }
+    .p-name { width:100%; border:1px solid #aaa; border-radius:2px; padding:2px 4px; font-size:10px; }
+    .p-skills { display:flex; gap:8px; margin-top:3px; font-size:10px; font-weight:700; align-items:center; }
+    .p-skill { width:32px; border:1px solid #aaa; border-radius:2px; padding:2px; text-align:center; font-size:10px; font-weight:700; }
+    @media print { body { margin:0; } .header { margin-bottom:4px; } }
+  </style></head><body>
+    <div class="header">
+      <h1>Owned Units — Alpha Strike Cards</h1>
+      <p>${selected.length} selected unit${selected.length !== 1 ? 's' : ''} · Total PV: ${totalPV}</p>
+    </div>
+    <div class="card-row">${cardRows}</div>
+  </body></html>`);
+  w.document.close();
+  w.addEventListener('load', () => setTimeout(() => w.print(), 500));
+}
+
+async function lbOwnedOpenSelectedSheets() {
+  const selected = lbOwnedSelectedUnits();
+  if (!selected.length) { alert('Select matched owned units first.'); return; }
+  const totalPV = selected.reduce((s, u) => s + (parseInt(u.BFPointValue, 10) || 0), 0);
+  await lbOpenSheetsCore({
+    lances: [selected],
+    lanceTypes: [''],
+    cmdState: {},
+    unitBonuses: {},
+    fDef: { name: 'Owned Units' },
+    totalPV,
+    isClan: false,
+    getLancePV: () => totalPV,
+    getSkillText: () => 'Regular',
+  });
+}
+
+async function lbOwnedLoadSheetManifest() {
+  if (lbOwnedSheetManifest) return lbOwnedSheetManifest;
+  const sheetsBase = new URL('sheets/', window.location.href).href;
+  try {
+    const res = await fetch(sheetsBase + 'manifest.json');
+    lbOwnedSheetManifest = res.ok ? ((await res.json()).sheets || {}) : {};
+  } catch (_) {
+    lbOwnedSheetManifest = {};
+  }
+  return lbOwnedSheetManifest;
+}
+
+function lbOwnedSheetFileFromManifest(manifest, name) {
+  if (!name) return null;
+  if (manifest[name]) return manifest[name];
+  const stripped = name.replace(/\s*\(.*?\)\s*$/, '').trim();
+  if (manifest[stripped]) return manifest[stripped];
+  const safe = name.replace(/[<>:"/\\|?*]/g, '_').trim();
+  return manifest[safe] || null;
+}
+
+async function lbOwnedOpenSheet(rowId) {
+  const row = lbOwnedRows.find(r => r.id === rowId);
+  const name = row?.unit?.Name || row?.displayName || '';
+  if (!name) return;
+  const manifest = await lbOwnedLoadSheetManifest();
+  const file = lbOwnedSheetFileFromManifest(manifest, name);
+  if (file) {
+    const pdfBase = 'https://battletech-sheets.cjhapril.workers.dev/';
+    window.open(pdfBase + encodeURIComponent(file), '_blank');
+    return;
+  }
+  const MORDEL = 'https://mordel.net/tro.php?a=v&fltr=qf.000.Name~Contains~';
+  window.open(MORDEL + encodeURIComponent(name), '_blank');
+}
+
+function lbOwnedDeleteRow(rowId) {
+  const row = lbOwnedRows.find(r => r.id === rowId);
+  if (!row) return;
+  if (!confirm(`Delete ${row.displayName} from this owned-units list?`)) return;
+  lbOwnedRows = lbOwnedRows.filter(r => r.id !== rowId);
+  lbOwnedBuildPool = lbOwnedBuildPool.filter(u => u._ownedRowId !== rowId);
+  lbOwnedRefreshFactionFilter();
+  lbOwnedRender();
+  lbOwnedRenderBuildPool();
+  const status = document.getElementById('lb-owned-status');
+  if (status) status.textContent = `${row.displayName} deleted from the local owned-units list.`;
+}
+
+function lbOwnedDeleteSelected() {
+  const selected = lbOwnedRows.filter(r => r.selected);
+  if (!selected.length) { alert('Select units to delete first.'); return; }
+  if (!confirm(`Delete ${selected.length} selected unit${selected.length !== 1 ? 's' : ''} from this owned-units list?`)) return;
+  const ids = new Set(selected.map(r => r.id));
+  lbOwnedRows = lbOwnedRows.filter(r => !ids.has(r.id));
+  lbOwnedBuildPool = lbOwnedBuildPool.filter(u => !ids.has(u._ownedRowId));
+  lbOwnedRefreshFactionFilter();
+  lbOwnedRender();
+  lbOwnedRenderBuildPool();
+  const status = document.getElementById('lb-owned-status');
+  if (status) status.textContent = `${selected.length} selected unit${selected.length !== 1 ? 's' : ''} deleted from the local owned-units list.`;
+}
+
+function lbOwnedSendToBuilder() {
+  const selected = lbOwnedRows.filter(r => r.selected && r.unit).map(r => ({
+    ...r.unit,
+    _ownedLabel: r.displayName,
+    _ownedRowId: r.id,
+  }));
+  if (!selected.length) { alert('Select matched owned units first.'); return; }
+  lbPoolUnits = selected.map(u => ({ query: u._ownedLabel || u.Name, unit: u }));
+  lbCurrentLances = [];
+  lbLanceTypes = [];
+  lbFormationDirty = false;
+  lbCmdState = {};
+  lbUnitBonuses = {};
+  lbSwitchMode('csv');
+  lbRenderPool(lbPoolUnits);
+  document.getElementById('lb-build-btn').disabled = false;
+  document.getElementById('lb-formation-out').innerHTML = '';
+  const status = document.getElementById('lb-csv-status');
+  if (status) {
+    status.textContent = `${selected.length} selected owned unit${selected.length !== 1 ? 's' : ''} ready. Choose a formation type and click Build Formation.`;
+    status.className = 'lb-status';
+  }
+  document.getElementById('lb-mode-csv')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function lbOwnedRenderBuildPool() {
+  const el = document.getElementById('lb-owned-unassigned');
+  if (!el) return;
+  if (!lbOwnedBuildPool.length) {
+    el.style.display = 'none';
+    el.innerHTML = '';
+    return;
+  }
+  el.style.display = 'block';
+  el.innerHTML = `<div class="lb-owned-pool-head">
+    <span class="lb-owned-pool-title">Unassigned Owned Pool (${lbOwnedBuildPool.length})</span>
+    <div style="display:flex;gap:6px">
+      <button class="lb-btn-sm" onclick="lbOwnedAddAllToRoster()">Add All That Fit</button>
+      <button class="lb-btn-sm lb-btn-rm" onclick="lbOwnedClearBuildPool()">Clear Pool</button>
+    </div>
+  </div>` + lbOwnedBuildPool.map((u, i) => `<div class="lb-owned-pool-row">
+    <div class="lb-rname">${lbEsc(u._ownedLabel || u.Name)}<small>${lbEsc(u.Name)} · ${lbEsc(u.Role?.Name || 'No role')} · MV ${lbEsc(u.BFMove || '?')}</small></div>
+    <span class="lb-rpv">${lbEsc(u.BFPointValue || '?')} PV</span>
+    <button class="lb-btn-sm" onclick="lbOwnedAddPoolUnit(${i})">Add</button>
+  </div>`).join('');
+}
+
+function lbOwnedAddPoolUnit(idx) {
+  const unit = lbOwnedBuildPool[idx];
+  if (!unit) return;
+  let placed = false;
+  outer: for (let li = 0; li < lbSearchLances.length; li++) {
+    for (let si = 0; si < lbSearchLances[li].length; si++) {
+      if (lbSearchLances[li][si] === null) {
+        lbSearchLances[li][si] = unit;
+        placed = true;
+        break outer;
+      }
+    }
+  }
+  if (!placed) {
+    alert('The current formation is full. Change formation size or remove a unit first.');
+    return;
+  }
+  lbOwnedBuildPool.splice(idx, 1);
+  lbRenderLance();
+  lbOwnedRenderBuildPool();
+}
+
+function lbOwnedAddAllToRoster() {
+  for (let i = 0; i < lbOwnedBuildPool.length;) {
+    const before = lbOwnedBuildPool.length;
+    lbOwnedAddPoolUnit(i);
+    if (lbOwnedBuildPool.length === before) break;
+  }
+}
+
+function lbOwnedClearBuildPool() {
+  lbOwnedBuildPool = [];
+  lbOwnedRenderBuildPool();
 }
 
 function lbLoadCSV(input) {
