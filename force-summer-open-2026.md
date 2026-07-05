@@ -116,3 +116,101 @@ If Ice Ferret = 30 PV and Summoner Sk4 = 39 PV (+4 = 43 at Sk3):
 ## RARITY CHECK
 
 All chassis appear once only. No duplicates. IS Lances contain no Clan units. Clan Star contains no IS units. ✓
+
+---
+
+## IS SOURCE POOL (7-unit collection)
+
+| Unit | Sk4 PV | Sk3 PV | Specials (Cat A active) | Jump |
+|------|--------|--------|-------------------------|------|
+| Atlas AS7-S4 | 55 | 66 | ECM, STL | — |
+| Raven RVN-3L | 26 | 31 | ECM, TAG | — |
+| Devastator DVS-2 | 54 | 65 | — | — |
+| Phoenix Hawk C 2 | 43 | 52 | — | JMPW1 |
+| Charger C (CGR-C) | 83 | 100 | AECM | — |
+| Marauder II MAD-6D | 47 | 56 | — | JMPS1 |
+| Stalker STK-5M | 49 | 59 | — | — |
+| **Total (all 7)** | **357** | **429** | | |
+
+---
+
+## IS LANCE ALTERNATE CONFIGURATIONS — FACTION/ERA ANALYSIS
+
+Data source: scottboehmer/battletech-miniature-availability (derived from MUL).  
+All combos evaluated against **Dark Age era** availability.
+
+### COMBO 1 — Atlas + Raven + Charger C + Phoenix Hawk C 2
+
+| Unit | Sk4 PV | Sk3 PV |
+|------|--------|--------|
+| Atlas AS7-S4 | 55 | 66 |
+| Raven RVN-3L | 26 | 31 |
+| Charger CGR-C | 83 | 100 |
+| Phoenix Hawk C 2 | 43 | 52 |
+| **Total** | **207** | **249** |
+
+**Faction/Era verdict: ❌ NO VALID FACTION**
+
+- Charger CGR-C was built exclusively by Clan Snow Raven (3130) and is **Raven Alliance-only** on MUL.
+- Raven RVN-3L in Dark Age is available **only to Capellan Confederation** (Mercenaries dropped Raven after Late Republic era).
+- No single IS faction or Mercenary list has both Charger CGR-C and Raven RVN-3L in Dark Age.
+- The generic "Charger" availability in Capellan's list covers IS variants (CGR-1A1/3K), not the CGR-C.
+- **This combo cannot be fielded legally under standard matched play faction rules.**
+
+---
+
+### COMBO 2 — Atlas + Devastator + Marauder II + Stalker
+
+| Unit | Sk4 PV | Sk3 PV |
+|------|--------|--------|
+| Atlas AS7-S4 | 55 | 66 |
+| Devastator DVS-2 | 54 | 65 |
+| Marauder II MAD-6D | 47 | 56 |
+| Stalker STK-5M | 49 | 59 |
+| **Total** | **205** | **246** |
+
+**Faction/Era verdict: ✅ LEGAL**
+
+| Faction | Atlas (DA) | Devastator (DA) | Marauder II (DA) | Stalker (DA) | Legal? |
+|---------|:---:|:---:|:---:|:---:|:---:|
+| Federated Suns | ✓ | ✓ | ✓ | ✓ | **YES** |
+| Mercenaries | ✓ | ✓ | ✓ | ✓ | **YES** |
+| Lyran Commonwealth | ✓ | ✓ | ✗ (unconfirmed) | ✓ | Uncertain |
+
+Jump unit: **Marauder II MAD-6D (JMPS1)** — counts as the 1 IS jump slot.  
+At Skill 3 total: **246 PV** (4 PV under cap) — clean fit.
+
+---
+
+### COMBO 3 — Atlas + Devastator + Phoenix Hawk C 2 + Stalker
+
+| Unit | Sk4 PV | Sk3 PV |
+|------|--------|--------|
+| Atlas AS7-S4 | 55 | 66 |
+| Devastator DVS-2 | 54 | 65 |
+| Phoenix Hawk C 2 | 43 | 52 |
+| Stalker STK-5M | 49 | 59 |
+| **Total** | **201** | **242** |
+
+**Faction/Era verdict: ✅ LEGAL**
+
+| Faction | Atlas (DA) | Devastator (DA) | Phoenix Hawk (DA) | Stalker (DA) | Legal? |
+|---------|:---:|:---:|:---:|:---:|:---:|
+| Federated Suns | ✓ | ✓ | ✓ | ✓ | **YES** |
+| Mercenaries | ✓ | ✓ | ✓ | ✓ | **YES** |
+| Lyran Commonwealth | ✓ | ✓ | ✓ | ✓ | **YES** |
+
+Jump unit: **Phoenix Hawk C 2 (JMPW1)** — counts as the 1 IS jump slot.  
+At Skill 3 total: **242 PV** (8 PV under cap).
+
+---
+
+### FACTION VERDICT SUMMARY
+
+| Combo | Units | Sk3 PV | Faction/Era | Status |
+|-------|-------|--------|-------------|--------|
+| 1 | Atlas + Raven + Charger C + PHX C 2 | 249 | None (Charger CGR-C = Raven Alliance only) | ❌ ILLEGAL |
+| 2 | Atlas + Devastator + Marauder II + Stalker | 246 | Federated Suns / Mercenaries, Dark Age | ✅ LEGAL |
+| 3 | Atlas + Devastator + PHX C 2 + Stalker | 242 | Federated Suns / Mercenaries / Lyran, Dark Age | ✅ LEGAL |
+
+**Note:** Charger CGR-C cannot be used in an IS lance under standard matched play faction rules. It is a Clan Snow Raven unit, not available to Inner Sphere factions or Mercenaries in the Dark Age era.
