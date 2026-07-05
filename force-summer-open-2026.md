@@ -151,11 +151,11 @@ All combos evaluated against **Dark Age era** availability.
 
 **Faction/Era verdict: ❌ NO VALID FACTION**
 
-- Charger CGR-C was built exclusively by Clan Snow Raven (3130) and is **Raven Alliance-only** on MUL.
+- Charger CGR-C (MUL #9397) is available to: **Raven Alliance** and **Rasalhague Dominion** in Dark Age.
 - Raven RVN-3L in Dark Age is available **only to Capellan Confederation** (Mercenaries dropped Raven after Late Republic era).
-- No single IS faction or Mercenary list has both Charger CGR-C and Raven RVN-3L in Dark Age.
-- The generic "Charger" availability in Capellan's list covers IS variants (CGR-1A1/3K), not the CGR-C.
-- **This combo cannot be fielded legally under standard matched play faction rules.**
+- Neither Raven Alliance nor Rasalhague Dominion fields the Raven RVN-3L in any era.
+- Capellan Confederation fields the Raven but does NOT have the Charger CGR-C (their "Charger" availability covers IS variants CGR-1A1/3K, not the CGR-C).
+- **No single faction has both CGR-C and RVN-3L in Dark Age — combo remains illegal.**
 
 ---
 
