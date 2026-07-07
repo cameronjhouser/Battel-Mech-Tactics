@@ -787,6 +787,8 @@
   /* ── SKIRMISH BUILDER ────────────────────────────────── */
   .sb-layout { display:grid; grid-template-columns:1fr 320px; gap:16px; margin-top:12px; }
   .sb-browse-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; align-items:center; }
+  .sb-general-hint { font-size:10px; color:var(--text3); cursor:help; white-space:nowrap; border-bottom:1px dotted var(--text3); }
+  .sb-general-hint:hover { color:var(--text2); }
   /* Grouped filter bar */
   .sb-filter-bar { display:flex; flex-wrap:wrap; align-items:flex-end; gap:9px 16px;
     margin-bottom:10px; padding:11px 13px; background:var(--bg2); border:1px solid var(--border); border-radius:6px; }
@@ -2414,7 +2416,8 @@
         <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
       </label>
       <select id="sb-faction" onchange="sbFactionChanged()"></select>
-      <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broader faction group (Inner Sphere General, Clan General, …) — use instead of a specific faction"></select>
+      <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above, it does not narrow or replace it"></select>
+      <span class="sb-general-hint" title="General is additive (OR), not a narrowing filter (AND): it adds units legal for the broader group alongside whatever specific Faction you picked, so totals only ever go up when you set it.">ⓘ General adds units, doesn't narrow</span>
       <select id="sb-era" onchange="sbClearCatalog()">
         <option value="" selected>Select era…</option>
         <option value="16">Dark Age (3131–3150)</option>
@@ -2499,6 +2502,14 @@
           <input type="number" class="sb-fg-dmg" id="sb-filter-dmg-l" placeholder="L" min="0" max="20" oninput="sbRenderBrowse()">
         </div>
       </div>
+      <div class="sb-fgroup" title="Narrow to a faction's exact active years (shown on MUL's own faction page) to match its displayed unit count precisely — the era dropdown alone uses a broader date bucket.">
+        <label class="sb-fg-label">Introduced yr (min–max)</label>
+        <div class="sb-fg-range">
+          <input type="number" id="sb-filter-intro-min" placeholder="min" min="1" max="9999" oninput="sbRenderBrowse()" style="width:56px">
+          <span class="sb-fg-dash">–</span>
+          <input type="number" id="sb-filter-intro-max" placeholder="max" min="1" max="9999" oninput="sbRenderBrowse()" style="width:56px">
+        </div>
+      </div>
       <div class="sb-fgroup">
         <label class="sb-fg-check"><input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only</label>
       </div>
@@ -2529,6 +2540,7 @@
                 <th data-sk="BFArmor" onclick="sbSort('BFArmor')">Armor</th>
                 <th data-sk="BFOverheat" onclick="sbSort('BFOverheat')">OV</th>
                 <th data-sk="BFAbilities" onclick="sbSort('BFAbilities')">Abilities</th>
+                <th data-sk="Intro" onclick="sbSort('Intro')">Intro</th>
                 <th class="sb-col-add"></th>
               </tr>
             </thead>
@@ -4051,9 +4063,16 @@ function sbDmgNum(v) {
   return m ? parseInt(m[0]) : 0;
 }
 
+// Parse the introduction year from DateIntroduced ("3025", "3025-Refit" → 3025)
+function sbIntroYear(unit) {
+  const m = String(unit.DateIntroduced ?? '').match(/\d{3,4}/);
+  return m ? parseInt(m[0]) : 0;
+}
+
 function sbClearFilters() {
   ['sb-filter-name','sb-filter-move-min','sb-filter-move-max',
-   'sb-filter-pv-min','sb-filter-pv-max','sb-filter-dmg-s','sb-filter-dmg-m','sb-filter-dmg-l']
+   'sb-filter-pv-min','sb-filter-pv-max','sb-filter-dmg-s','sb-filter-dmg-m','sb-filter-dmg-l',
+   'sb-filter-intro-min','sb-filter-intro-max']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   ['sb-filter-role','sb-filter-size-min','sb-filter-size-max']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -4312,6 +4331,8 @@ function sbRenderBrowse() {
   const dmgS         = parseInt(document.getElementById('sb-filter-dmg-s')?.value) || 0;
   const dmgM         = parseInt(document.getElementById('sb-filter-dmg-m')?.value) || 0;
   const dmgL         = parseInt(document.getElementById('sb-filter-dmg-l')?.value) || 0;
+  const introMin     = parseInt(document.getElementById('sb-filter-intro-min')?.value) || 0;
+  const introMax     = parseInt(document.getElementById('sb-filter-intro-max')?.value) || 9999;
   const hasCol       = Object.keys(sbCollection).length > 0;
   const inForceIds   = new Set(sbForce.map(f => f.unit.Id));
 
@@ -4334,6 +4355,8 @@ function sbRenderBrowse() {
   if (dmgS > 0)              units = units.filter(u => sbDmgNum(u.BFDamageShort)  >= dmgS);
   if (dmgM > 0)              units = units.filter(u => sbDmgNum(u.BFDamageMedium) >= dmgM);
   if (dmgL > 0)              units = units.filter(u => sbDmgNum(u.BFDamageLong)   >= dmgL);
+  if (introMin > 0)          units = units.filter(u => sbIntroYear(u) >= introMin);
+  if (introMax < 9999)       units = units.filter(u => sbIntroYear(u) <= introMax);
 
   // Build the unit-type tabs from the filtered set, then narrow to the active tab
   sbBuildTypeTabs(units);
@@ -4351,6 +4374,7 @@ function sbRenderBrowse() {
     else if (sbSortKey === 'DmgS')   { av = sbDmgNum(a.BFDamageShort);  bv = sbDmgNum(b.BFDamageShort); }
     else if (sbSortKey === 'DmgM')   { av = sbDmgNum(a.BFDamageMedium); bv = sbDmgNum(b.BFDamageMedium); }
     else if (sbSortKey === 'DmgL')   { av = sbDmgNum(a.BFDamageLong);   bv = sbDmgNum(b.BFDamageLong); }
+    else if (sbSortKey === 'Intro')  { av = sbIntroYear(a); bv = sbIntroYear(b); }
     else { av = a[sbSortKey]||0; bv = b[sbSortKey]||0; }
     return (av - bv) * sbSortDir;
   });
@@ -4375,7 +4399,7 @@ function sbRenderBrowse() {
   sbCatalog.forEach(u => { tbody._umap[u.Id] = u; });
 
   if (!units.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:16px">No units match filters.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:16px">No units match filters.</td></tr>`;
     return;
   }
 
@@ -4389,6 +4413,7 @@ function sbRenderBrowse() {
     const armor   = u.BFArmor ?? '—';
     const ov      = u.BFOverheat || '—';
     const pv      = u.BFPointValue || '?';
+    const intro   = u.DateIntroduced ?? '—';
     return `<tr class="sb-row${inForce?' in-force':''}" data-uid="${u.Id}">
       <td class="sb-col-name">${owned?'<span class="sb-owned-dot" title="Owned"></span>':''}${lbEsc(u.Name)}</td>
       <td class="sb-col-pv">${pv}</td>
@@ -4398,6 +4423,7 @@ function sbRenderBrowse() {
       <td class="sb-col-dmg">${armor}</td>
       <td class="sb-col-dmg">${ov}</td>
       <td class="sb-col-abil" title="${lbEsc(abil)}">${lbEsc(abil)}</td>
+      <td class="sb-col-dmg">${lbEsc(String(intro))}</td>
       <td class="sb-col-add">${inForce
         ? '<span style="color:var(--green);font-size:11px">✓</span>'
         : `<button class="sb-add-btn" onclick="sbAddUnit(${u.Id})">+</button>`
@@ -4423,7 +4449,7 @@ function sbRenderBrowse() {
     const list = groups[t];
     const ownedInGroup = hasCol ? list.filter(u => sbIsOwned(u)).length : 0;
     const ownedTag = ownedInGroup ? `<span class="sb-group-owned">${ownedInGroup} owned</span>` : '';
-    return `<tr class="sb-group-row"><td colspan="9">${lbEsc(sbTypeLabel(t))}`
+    return `<tr class="sb-group-row"><td colspan="10">${lbEsc(sbTypeLabel(t))}`
       + `<span class="sb-group-count">${list.length}</span>${ownedTag}</td></tr>`
       + list.map(unitRow).join('');
   }).join('');
