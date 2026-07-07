@@ -2391,6 +2391,7 @@
       </label>
       <select id="sb-faction" onchange="sbClearCatalog();sbRenderForce()"></select>
       <select id="sb-era" onchange="sbClearCatalog()">
+        <option value="" selected>Select era…</option>
         <option value="16">Dark Age</option>
         <option value="257">ilClan</option>
         <option value="254">Late Republic</option>
@@ -3951,6 +3952,8 @@ function sbInit() {
   sbInited = true;
   const sel = document.getElementById('sb-faction');
   if (!sel) return;
+  // Placeholder so no faction is selected by default
+  sel.appendChild(Object.assign(document.createElement('option'), { value: '', textContent: 'Select faction…', selected: true }));
   let lastGroup = '';
   LB_FACTIONS.filter(f => f.id).forEach(f => {
     if (f.group !== lastGroup) {
@@ -3958,7 +3961,6 @@ function sbInit() {
       lastGroup = f.group;
     }
     const opt = Object.assign(document.createElement('option'), { value: f.id, textContent: f.name });
-    if (f.id === '60') opt.selected = true;
     sel.appendChild(opt);
   });
   sbRenderForce();
@@ -3998,9 +4000,11 @@ function sbClearCatalog() {
 
 async function sbFetchCatalog() {
   const factionId = document.getElementById('sb-faction')?.value || '';
-  const eraId     = document.getElementById('sb-era')?.value || '16';
+  const eraId     = document.getElementById('sb-era')?.value || '';
   const status    = document.getElementById('sb-status');
+  if (!factionId && !eraId) { status.textContent = 'Select a faction and era first.'; return; }
   if (!factionId) { status.textContent = 'Select a faction first.'; return; }
+  if (!eraId)     { status.textContent = 'Select an era first.'; return; }
 
   status.textContent = 'Loading catalog from Master Unit List…';
   sbCatalog = [];
