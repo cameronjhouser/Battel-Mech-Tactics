@@ -885,6 +885,18 @@
   .sb-force-remove:hover { color:#ff6666; }
   .sb-skill-sel { font-size:10px; background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:3px; padding:2px 3px; flex-shrink:0; }
   .sb-empty-hint { font-size:11px; color:var(--text3); text-align:center; padding:18px 0; }
+  /* Lance / Star grouping in the force panel */
+  .sb-lance-group { border:1px solid var(--border); border-radius:5px; padding:6px; margin-bottom:8px; background:var(--bg1); }
+  .sb-lance-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:4px; }
+  .sb-lance-title { font-family:var(--cond); font-weight:700; font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:var(--text); }
+  .sb-lance-title .sb-lance-sub { font-size:9px; color:var(--text3); font-weight:400; margin-left:5px; letter-spacing:0; text-transform:none; }
+  .sb-lance-pv { font-family:var(--mono); font-size:11px; color:var(--accent); }
+  .sb-lance-specs { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:5px; }
+  .sb-spec-badge { font-size:9px; font-family:var(--cond); font-weight:700; letter-spacing:.03em;
+    color:var(--green); background:rgba(70,170,90,.12); border:1px solid var(--green); border-radius:3px; padding:1px 6px; }
+  .sb-spec-none { font-size:9px; color:var(--text3); font-style:italic; }
+  .sb-lance-group .sb-force-unit { margin-bottom:3px; }
+  .sb-lance-group .sb-force-unit:last-child { margin-bottom:0; }
   @media(max-width:900px) { .sb-layout { grid-template-columns:1fr; } .sb-force-panel { position:static; } }
 </style>
 </head>
@@ -2377,7 +2389,7 @@
         <span>📂 Collection CSV</span>
         <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
       </label>
-      <select id="sb-faction" onchange="sbClearCatalog()"></select>
+      <select id="sb-faction" onchange="sbClearCatalog();sbRenderForce()"></select>
       <select id="sb-era" onchange="sbClearCatalog()">
         <option value="16">Dark Age</option>
         <option value="257">ilClan</option>
@@ -4267,11 +4279,7 @@ function sbRenderForce() {
     return;
   }
 
-  const skillOpts = (isJump) => [3,4].map(s =>
-    `<option value="${s}"${''} ${isJump&&s>3?'disabled':''}>Sk${s}</option>`
-  ).join('');
-
-  listEl.innerHTML = sbForce.map((f, idx) => {
+  const unitRow = (f, idx) => {
     const adjPV  = sbAdjPV(f.unit, f.skill);
     const isJump = sbIsJump(f.unit);
     const abil   = (f.unit.BFAbilities || '').trim();
@@ -4287,7 +4295,50 @@ function sbRenderForce() {
       <span class="sb-force-pv">${adjPV}</span>
       <button class="sb-force-remove" onclick="sbRemoveUnit(${idx})" title="Remove">✕</button>
     </div>`;
-  }).join('');
+  };
+
+  // Group the force into lances (IS, 4 units) or stars (Clan, 5 units) and
+  // show the lance specialties each grouping qualifies for.
+  const factionId = document.getElementById('sb-faction')?.value || '';
+  const isClan    = !!LB_FACTIONS.find(x => x.id === factionId)?.isClan;
+  const groupSize = isClan ? 5 : 4;
+  const groupWord = isClan ? 'Star' : 'Lance';
+
+  let html = '';
+  for (let start = 0, g = 1; start < sbForce.length; start += groupSize, g++) {
+    const members  = sbForce.slice(start, start + groupSize);
+    const groupPV  = members.reduce((s, m) => s + sbAdjPV(m.unit, m.skill), 0);
+    const specs    = sbGroupSpecialties(members.map(m => m.unit), factionId);
+    const full     = members.length === groupSize;
+    const subNote  = full ? '' : `<span class="sb-lance-sub">${members.length}/${groupSize}</span>`;
+    const specHtml = specs.length
+      ? specs.map(s => `<span class="sb-spec-badge">${lbEsc(s)}</span>`).join('')
+      : `<span class="sb-spec-none">${full ? 'No lance specialty (mixed roles)' : 'Incomplete — add more units'}</span>`;
+    html += `<div class="sb-lance-group">
+      <div class="sb-lance-head">
+        <span class="sb-lance-title">${groupWord} ${g}${subNote}</span>
+        <span class="sb-lance-pv">${groupPV} PV</span>
+      </div>
+      <div class="sb-lance-specs">${specHtml}</div>
+      ${members.map((f, mi) => unitRow(f, start + mi)).join('')}
+    </div>`;
+  }
+  listEl.innerHTML = html;
+}
+
+// Which lance specialties does this group of units qualify for?
+// Reuses the CSV-builder's lbLanceQualifies + LB_SPECIAL_TYPES definitions.
+function sbGroupSpecialties(unitObjs, factionId) {
+  if (!unitObjs.length) return [];
+  const factionKeys = LB_FACTION_TYPES[String(factionId || '')] || [];
+  const allFactionKeys = new Set(Object.values(LB_FACTION_TYPES).flat());
+  const out = [];
+  Object.keys(LB_SPECIAL_TYPES).forEach(k => {
+    // Skip faction-specific specialties that belong to a different faction
+    if (allFactionKeys.has(k) && !factionKeys.includes(k)) return;
+    if (lbLanceQualifies(unitObjs, k)) out.push(LB_SPECIAL_TYPES[k].name);
+  });
+  return out;
 }
 
 /* ── OWNED UNITS ───────────────────────────────────── */
