@@ -2505,7 +2505,7 @@
           <input type="number" class="sb-fg-dmg" id="sb-filter-dmg-l" placeholder="L" min="0" max="20" oninput="sbRenderBrowse()">
         </div>
       </div>
-      <div class="sb-fgroup" title="Narrow to a faction's exact active years (shown on MUL's own faction page) to match its displayed unit count precisely — the era dropdown alone uses a broader date bucket.">
+      <div class="sb-fgroup" title="Verified: MUL's own faction+era view caps units at the specific faction's dissolution year (shown on MUL's faction page, e.g. Clan Wolverine 2807-2823), not the broader era's end date. Set max to that year to reproduce MUL's exact displayed count.">
         <label class="sb-fg-label">Introduced yr (min–max)</label>
         <div class="sb-fg-range">
           <input type="number" id="sb-filter-intro-min" placeholder="min" min="1" max="9999" oninput="sbRenderBrowse()" style="width:56px">
@@ -2517,8 +2517,8 @@
         <label class="sb-fg-check"><input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only</label>
       </div>
       <div class="sb-fgroup">
-        <label class="sb-fg-check" title="Excludes Introductory-tier simplified stat cards not meant for standard competitive play; uncheck to include them">
-          <input type="checkbox" id="sb-standard-rules-only" checked onchange="sbRenderBrowse()"> Standard rules only</label>
+        <label class="sb-fg-check" title="Verified against MUL's own combined faction+era view: it includes Introductory/Experimental/Advanced units alongside Standard, so this is OFF by default. Check it if your event's rules restrict to Standard only.">
+          <input type="checkbox" id="sb-standard-rules-only" onchange="sbRenderBrowse()"> Standard rules only</label>
       </div>
       <div class="sb-fgroup sb-fgroup-actions">
         <button class="sb-clear-btn" onclick="sbClearFilters()" title="Reset all filters">Clear filters</button>
@@ -4086,7 +4086,7 @@ function sbClearFilters() {
   ['sb-filter-role','sb-filter-size-min','sb-filter-size-max']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const oo = document.getElementById('sb-owned-only'); if (oo) oo.checked = false;
-  const sr = document.getElementById('sb-standard-rules-only'); if (sr) sr.checked = true;
+  const sr = document.getElementById('sb-standard-rules-only'); if (sr) sr.checked = false;
   sbAbilSel.clear();
   sbUpdateAbilBtn();
   sbRenderAbilMenu();
