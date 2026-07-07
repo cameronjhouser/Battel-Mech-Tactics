@@ -3918,6 +3918,8 @@ let sbActiveType = 'all'; // selected unit-type tab ('all' or a Type.Name)
 let sbAbilSel    = new Set(); // selected base ability codes (multi-select)
 let sbAbilMode   = 'all';  // 'all' = unit must have every selected ability; 'any' = at least one
 let sbAbilOpts   = [];     // [{code, n}] distinct base abilities in the catalog
+let sbFactionMeta = {};    // faction id -> { name, isClan } (curated + live-loaded)
+let sbFactionsLive = false;// true once the full list is loaded from MUL
 
 const SB_ERA_LABELS = {
   '16':'Dark Age','257':'ilClan','254':'Late Republic','15':'Early Republic',
@@ -4075,23 +4077,85 @@ function sbInit() {
   sbInited = true;
   const sel = document.getElementById('sb-faction');
   if (!sel) return;
-  // Placeholder so no faction is selected by default
-  sel.appendChild(Object.assign(document.createElement('option'), { value: '', textContent: 'Select faction…', selected: true }));
-  let lastGroup = '';
+  // Seed the curated list immediately (fallback + instant render), then try
+  // to replace it with the complete list loaded live from the MUL.
   LB_FACTIONS.filter(f => f.id).forEach(f => {
-    if (f.group !== lastGroup) {
-      sel.appendChild(Object.assign(document.createElement('optgroup'), { label: f.group }));
-      lastGroup = f.group;
-    }
-    const opt = Object.assign(document.createElement('option'), { value: f.id, textContent: f.name });
-    sel.appendChild(opt);
+    sbFactionMeta[f.id] = { name: f.name, isClan: !!f.isClan };
   });
+  sbPopulateFactions(LB_FACTIONS.filter(f => f.id).map(f => ({ value: f.id, label: f.name, group: f.group })));
+  sbLoadFactions();
   // Close the abilities multi-select when clicking outside it
   document.addEventListener('click', (e) => {
     const grp = document.getElementById('sb-abil-menu')?.parentElement;
     if (grp && !grp.contains(e.target)) sbCloseAbilMenu();
   });
   sbRenderForce();
+}
+
+// Derive the MUL origin from the QuickList URL
+function sbMulBase() {
+  try { return new URL(MUL_API).origin; } catch { return 'https://masterunitlist.azurewebsites.net'; }
+}
+
+// Populate the faction <select>. Entries: {value, label, group?}. Groups the
+// "…General" faction-group entries separately; keeps a "Select faction…" head.
+function sbPopulateFactions(entries) {
+  const sel = document.getElementById('sb-faction');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '';
+  sel.appendChild(Object.assign(document.createElement('option'), { value: '', textContent: 'Select faction…' }));
+
+  const hasCuratedGroups = entries.some(e => e.group);
+  const addGroup = (label, arr) => {
+    if (!arr.length) return;
+    const og = document.createElement('optgroup');
+    og.label = label;
+    arr.forEach(e => og.appendChild(Object.assign(document.createElement('option'), { value: String(e.value), textContent: e.label })));
+    sel.appendChild(og);
+  };
+
+  if (hasCuratedGroups) {
+    // Preserve the curated Inner Sphere / Clans / Periphery ordering
+    let lastGroup = null, og = null;
+    entries.forEach(e => {
+      if (e.group !== lastGroup) { og = document.createElement('optgroup'); og.label = e.group || ''; sel.appendChild(og); lastGroup = e.group; }
+      og.appendChild(Object.assign(document.createElement('option'), { value: String(e.value), textContent: e.label }));
+    });
+  } else {
+    const generals = entries.filter(e => String(e.label).toLowerCase().endsWith('general'));
+    const specific = entries.filter(e => !String(e.label).toLowerCase().endsWith('general'));
+    specific.sort((a, b) => a.label.localeCompare(b.label));
+    generals.sort((a, b) => a.label.localeCompare(b.label));
+    addGroup('Factions', specific);
+    addGroup('General / Faction Groups', generals);
+  }
+  if (prev) sel.value = prev;
+}
+
+// Load the complete faction list from the MUL Autocomplete endpoint.
+// Falls back silently to the curated list already in the dropdown on failure.
+async function sbLoadFactions() {
+  try {
+    const res = await fetch(`${sbMulBase()}/Faction/Autocomplete?term=`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) throw new Error('empty response');
+    const entries = data
+      .filter(f => f && f.label != null && f.value != null)
+      .map(f => ({ value: f.value, label: String(f.label) }));
+    if (!entries.length) throw new Error('no usable entries');
+    // Merge into the meta map (curated isClan flags win; else infer from label)
+    entries.forEach(e => {
+      const id = String(e.value);
+      const curated = sbFactionMeta[id];
+      sbFactionMeta[id] = { name: e.label, isClan: curated?.isClan ?? /\bclan\b/i.test(e.label) };
+    });
+    sbPopulateFactions(entries);
+    sbFactionsLive = true;
+  } catch (e) {
+    console.log('Faction live-load failed, keeping curated list:', e.message);
+  }
 }
 
 function sbLoadCSV(input) {
@@ -4163,7 +4227,7 @@ async function sbFetchCatalog() {
         roles.map(r => `<option value="${lbEsc(r)}"${r===prev?' selected':''}>${lbEsc(r)}</option>`).join('');
     }
 
-    const fName = LB_FACTIONS.find(f => f.id === factionId)?.name || factionId;
+    const fName = sbFactionMeta[factionId]?.name || factionId;
     const eLabel = SB_ERA_LABELS[eraId] || eraId;
     const ownedCount = sbCatalog.filter(u => sbIsOwned(u)).length;
     const ownedInfo = Object.keys(sbCollection).length ? ` · ${ownedCount} owned` : '';
@@ -4437,7 +4501,7 @@ function sbRenderForce() {
   // Group the force into lances (IS, 4 units) or stars (Clan, 5 units) and
   // show the lance specialties each grouping qualifies for.
   const factionId = document.getElementById('sb-faction')?.value || '';
-  const isClan    = !!LB_FACTIONS.find(x => x.id === factionId)?.isClan;
+  const isClan    = !!sbFactionMeta[factionId]?.isClan;
   const groupSize = isClan ? 5 : 4;
   const groupWord = isClan ? 'Star' : 'Lance';
 
