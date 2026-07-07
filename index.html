@@ -787,8 +787,6 @@
   /* ── SKIRMISH BUILDER ────────────────────────────────── */
   .sb-layout { display:grid; grid-template-columns:1fr 320px; gap:16px; margin-top:12px; }
   .sb-browse-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; align-items:center; }
-  .sb-general-hint { font-size:10px; color:var(--text3); cursor:help; white-space:nowrap; border-bottom:1px dotted var(--text3); }
-  .sb-general-hint:hover { color:var(--text2); }
   /* Grouped filter bar */
   .sb-filter-bar { display:flex; flex-wrap:wrap; align-items:flex-end; gap:9px 16px;
     margin-bottom:10px; padding:11px 13px; background:var(--bg2); border:1px solid var(--border); border-radius:6px; }
@@ -2417,7 +2415,6 @@
       </label>
       <select id="sb-faction" onchange="sbFactionChanged()"></select>
       <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above, it does not narrow or replace it"></select>
-      <span class="sb-general-hint" title="General is additive (OR), not a narrowing filter (AND): it adds units legal for the broader group alongside whatever specific Faction you picked, so totals only ever go up when you set it.">ⓘ General adds units, doesn't narrow</span>
       <select id="sb-era" onchange="sbClearCatalog()">
         <option value="" selected>Select era…</option>
         <option value="16">Dark Age (3131–3150)</option>
