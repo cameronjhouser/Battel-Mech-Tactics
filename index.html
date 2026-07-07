@@ -808,6 +808,30 @@
   .sb-fg-range .sb-fg-dmg { width:40px; }
   .sb-fg-check { display:flex; align-items:center; gap:5px; height:28px; font-size:11px;
     color:var(--text2); cursor:pointer; white-space:nowrap; }
+  /* Abilities multi-select */
+  .sb-abil-mode { font-size:8px; color:var(--accent); cursor:pointer; margin-left:5px; letter-spacing:0;
+    text-transform:none; border:1px solid var(--border2); border-radius:3px; padding:0 4px; }
+  .sb-abil-mode:hover { color:var(--text); border-color:var(--accent); }
+  .sb-abil-btn { text-align:left; background:var(--bg3); color:var(--text); border:1px solid var(--border2);
+    border-radius:4px; height:28px; padding:0 8px; font-size:11px; font-family:var(--sans); cursor:pointer;
+    width:100%; box-sizing:border-box; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sb-abil-btn:hover { border-color:var(--accent); }
+  .sb-abil-menu { position:absolute; top:100%; left:0; z-index:20; margin-top:3px; width:230px; max-width:80vw;
+    background:var(--bg2); border:1px solid var(--border2); border-radius:5px; box-shadow:0 6px 18px rgba(0,0,0,.4);
+    padding:6px; }
+  .sb-abil-search { width:100%; box-sizing:border-box; background:var(--bg3); color:var(--text);
+    border:1px solid var(--border); border-radius:4px; height:26px; padding:0 7px; font-size:11px; margin-bottom:5px; }
+  .sb-abil-list { max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:1px; }
+  .sb-abil-opt { display:flex; align-items:center; gap:6px; padding:3px 5px; font-size:11px; color:var(--text);
+    border-radius:3px; cursor:pointer; white-space:nowrap; }
+  .sb-abil-opt:hover { background:var(--bg3); }
+  .sb-abil-opt input { margin:0; cursor:pointer; }
+  .sb-abil-opt .sb-abil-n { margin-left:auto; font-family:var(--mono); font-size:9px; color:var(--text3); }
+  .sb-abil-foot { display:flex; align-items:center; justify-content:space-between; margin-top:5px;
+    padding-top:5px; border-top:1px solid var(--border); font-size:10px; color:var(--text3); }
+  .sb-abil-foot button { background:var(--bg4); color:var(--text2); border:1px solid var(--border2);
+    border-radius:3px; padding:2px 9px; font-size:10px; cursor:pointer; }
+  .sb-abil-foot button:hover { background:var(--red); color:#fff; border-color:var(--red); }
   .sb-fgroup-actions { margin-left:auto; }
   .sb-clear-btn { height:28px; background:var(--bg4); border:1px solid var(--border2); color:var(--text2);
     border-radius:4px; padding:0 13px; font-size:11px; cursor:pointer; white-space:nowrap; }
@@ -2418,9 +2442,17 @@
         <label class="sb-fg-label">Role</label>
         <select id="sb-filter-role" onchange="sbRenderBrowse()"><option value="">All roles</option></select>
       </div>
-      <div class="sb-fgroup sb-fgroup-grow">
-        <label class="sb-fg-label">Abilities</label>
-        <input type="text" id="sb-filter-abil" placeholder="e.g. JMPS ECM (both)" oninput="sbRenderBrowse()">
+      <div class="sb-fgroup sb-fgroup-grow" style="position:relative">
+        <label class="sb-fg-label">Abilities <span id="sb-abil-mode" class="sb-abil-mode" onclick="sbToggleAbilMode(event)" title="Toggle match mode">match ALL</span></label>
+        <button type="button" id="sb-abil-btn" class="sb-abil-btn" onclick="sbToggleAbilMenu(event)">Any ability ▾</button>
+        <div id="sb-abil-menu" class="sb-abil-menu" style="display:none">
+          <input type="text" id="sb-abil-search" class="sb-abil-search" placeholder="Filter abilities…" oninput="sbRenderAbilMenu()">
+          <div id="sb-abil-list" class="sb-abil-list"></div>
+          <div class="sb-abil-foot">
+            <span id="sb-abil-selcount">0 selected</span>
+            <button type="button" onclick="sbClearAbil()">Clear</button>
+          </div>
+        </div>
       </div>
       <div class="sb-fgroup">
         <label class="sb-fg-label">Size (min–max)</label>
@@ -3883,6 +3915,9 @@ let sbInited     = false;
 let sbSortKey    = 'BFPointValue';
 let sbSortDir    = 1;    // 1=asc, -1=desc
 let sbActiveType = 'all'; // selected unit-type tab ('all' or a Type.Name)
+let sbAbilSel    = new Set(); // selected base ability codes (multi-select)
+let sbAbilMode   = 'all';  // 'all' = unit must have every selected ability; 'any' = at least one
+let sbAbilOpts   = [];     // [{code, n}] distinct base abilities in the catalog
 
 const SB_ERA_LABELS = {
   '16':'Dark Age','257':'ilClan','254':'Late Republic','15':'Early Republic',
@@ -3916,6 +3951,91 @@ const SB_TYPE_PLURAL = {
 };
 function sbTypeLabel(t) { return SB_TYPE_PLURAL[t] || t || 'Other'; }
 
+// ── Abilities multi-select ─────────────────────────────────────────
+// Split a BFAbilities string into individual tokens.
+function sbAbilTokens(u) {
+  return String(u.BFAbilities || '').split(',').map(s => s.trim()).filter(Boolean);
+}
+// Reduce a token to its base ability code: "JMPS2"→"JMPS", "IF1"→"IF",
+// "LRM1/2/2"→"LRM", "HT2"→"HT"; C3 family kept intact ("C3", "C3I", "C3BSM").
+function sbAbilBase(tok) {
+  const t = String(tok || '').trim();
+  if (!t) return '';
+  if (/^C3/i.test(t)) return t.replace(/\/.*$/, '').toUpperCase();
+  const m = t.match(/^[A-Za-z]+/);
+  return (m ? m[0] : t).toUpperCase();
+}
+// Set of base ability codes a unit has.
+function sbUnitAbilBases(u) {
+  return new Set(sbAbilTokens(u).map(sbAbilBase).filter(Boolean));
+}
+// Build the distinct base-ability option list (with counts) from the catalog.
+function sbBuildAbilOptions() {
+  const counts = {};
+  sbCatalog.forEach(u => sbUnitAbilBases(u).forEach(c => { counts[c] = (counts[c] || 0) + 1; }));
+  sbAbilOpts = Object.keys(counts).sort().map(code => ({ code, n: counts[code] }));
+  // Drop selections no longer present in this catalog
+  sbAbilSel.forEach(c => { if (!(c in counts)) sbAbilSel.delete(c); });
+}
+function sbToggleAbilMenu(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('sb-abil-menu');
+  if (!menu) return;
+  const open = menu.style.display !== 'none';
+  if (open) { menu.style.display = 'none'; return; }
+  menu.style.display = 'block';
+  const s = document.getElementById('sb-abil-search');
+  if (s) { s.value = ''; }
+  sbRenderAbilMenu();
+  if (s) s.focus();
+}
+function sbCloseAbilMenu() {
+  const menu = document.getElementById('sb-abil-menu');
+  if (menu) menu.style.display = 'none';
+}
+function sbRenderAbilMenu() {
+  const list = document.getElementById('sb-abil-list');
+  if (!list) return;
+  const q = (document.getElementById('sb-abil-search')?.value || '').toUpperCase().trim();
+  const opts = sbAbilOpts.filter(o => !q || o.code.includes(q));
+  list.innerHTML = opts.length
+    ? opts.map(o => `<label class="sb-abil-opt">
+        <input type="checkbox" ${sbAbilSel.has(o.code) ? 'checked' : ''} onchange="sbToggleAbil('${o.code.replace(/'/g,"\\'")}')">
+        <span>${lbEsc(o.code)}</span><span class="sb-abil-n">${o.n}</span>
+      </label>`).join('')
+    : `<div style="font-size:10px;color:var(--text3);padding:6px;text-align:center">No abilities${sbCatalog.length ? ' match' : ' — load a catalog first'}</div>`;
+  const cnt = document.getElementById('sb-abil-selcount');
+  if (cnt) cnt.textContent = `${sbAbilSel.size} selected`;
+}
+function sbToggleAbil(code) {
+  if (sbAbilSel.has(code)) sbAbilSel.delete(code); else sbAbilSel.add(code);
+  sbUpdateAbilBtn();
+  sbRenderBrowse();
+}
+function sbToggleAbilMode(e) {
+  if (e) e.stopPropagation();
+  sbAbilMode = sbAbilMode === 'all' ? 'any' : 'all';
+  const el = document.getElementById('sb-abil-mode');
+  if (el) el.textContent = sbAbilMode === 'all' ? 'match ALL' : 'match ANY';
+  if (sbAbilSel.size) sbRenderBrowse();
+}
+function sbClearAbil() {
+  sbAbilSel.clear();
+  sbUpdateAbilBtn();
+  sbRenderAbilMenu();
+  sbRenderBrowse();
+}
+function sbUpdateAbilBtn() {
+  const btn = document.getElementById('sb-abil-btn');
+  if (!btn) return;
+  const n = sbAbilSel.size;
+  btn.textContent = n === 0 ? 'Any ability ▾'
+    : n <= 3 ? [...sbAbilSel].join(', ') + ' ▾'
+    : `${n} abilities ▾`;
+  const cnt = document.getElementById('sb-abil-selcount');
+  if (cnt) cnt.textContent = `${n} selected`;
+}
+
 // Parse leading integer from a Move value ("8\"", "10j", "6\"/8\"j" → 8/10/6)
 function sbMoveNum(unit) {
   const m = String(unit.BFMove ?? '').match(/\d+/);
@@ -3929,12 +4049,15 @@ function sbDmgNum(v) {
 }
 
 function sbClearFilters() {
-  ['sb-filter-name','sb-filter-abil','sb-filter-move-min','sb-filter-move-max',
+  ['sb-filter-name','sb-filter-move-min','sb-filter-move-max',
    'sb-filter-pv-min','sb-filter-pv-max','sb-filter-dmg-s','sb-filter-dmg-m','sb-filter-dmg-l']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   ['sb-filter-role','sb-filter-size-min','sb-filter-size-max']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const oo = document.getElementById('sb-owned-only'); if (oo) oo.checked = false;
+  sbAbilSel.clear();
+  sbUpdateAbilBtn();
+  sbRenderAbilMenu();
   sbRenderBrowse();
 }
 
@@ -3962,6 +4085,11 @@ function sbInit() {
     }
     const opt = Object.assign(document.createElement('option'), { value: f.id, textContent: f.name });
     sel.appendChild(opt);
+  });
+  // Close the abilities multi-select when clicking outside it
+  document.addEventListener('click', (e) => {
+    const grp = document.getElementById('sb-abil-menu')?.parentElement;
+    if (grp && !grp.contains(e.target)) sbCloseAbilMenu();
   });
   sbRenderForce();
 }
@@ -4022,6 +4150,10 @@ async function sbFetchCatalog() {
     // Default to the first unit type so the catalog opens separated by tab
     sbActiveType = sbOrderedTypes(sbCatalog)[0] || 'all';
 
+    // Build the abilities multi-select from this catalog
+    sbBuildAbilOptions();
+    sbUpdateAbilBtn();
+
     // Populate role dropdown
     const roles = [...new Set(sbCatalog.map(u => u.Role?.Name).filter(Boolean))].sort();
     const roleSel = document.getElementById('sb-filter-role');
@@ -4055,7 +4187,6 @@ function sbRenderBrowse() {
   const ownedOnly    = document.getElementById('sb-owned-only')?.checked;
   const nameFilter   = (document.getElementById('sb-filter-name')?.value || '').toLowerCase().trim();
   const roleFilter   = document.getElementById('sb-filter-role')?.value || '';
-  const abilFilter   = (document.getElementById('sb-filter-abil')?.value || '').toLowerCase().trim();
   const sizeMin      = parseInt(document.getElementById('sb-filter-size-min')?.value) || 0;
   const sizeMax      = parseInt(document.getElementById('sb-filter-size-max')?.value) || 9;
   const moveMin      = parseInt(document.getElementById('sb-filter-move-min')?.value) || 0;
@@ -4068,14 +4199,16 @@ function sbRenderBrowse() {
   const hasCol       = Object.keys(sbCollection).length > 0;
   const inForceIds   = new Set(sbForce.map(f => f.unit.Id));
 
-  // Split abilities on commas/spaces so "JMPS ECM" requires BOTH
-  const abilTerms = abilFilter ? abilFilter.split(/[\s,]+/).filter(Boolean) : [];
+  const abilSel = [...sbAbilSel];
 
   let units = sbCatalog;
   if (ownedOnly && hasCol)  units = units.filter(u => sbIsOwned(u));
   if (nameFilter)            units = units.filter(u => (u.Name||'').toLowerCase().includes(nameFilter));
   if (roleFilter)            units = units.filter(u => (u.Role?.Name||'') === roleFilter);
-  if (abilTerms.length)      units = units.filter(u => { const a=(u.BFAbilities||'').toLowerCase(); return abilTerms.every(t => a.includes(t)); });
+  if (abilSel.length)        units = units.filter(u => {
+    const bases = sbUnitAbilBases(u);
+    return sbAbilMode === 'any' ? abilSel.some(a => bases.has(a)) : abilSel.every(a => bases.has(a));
+  });
   if (sizeMin > 0)           units = units.filter(u => (u.BFSize||0) >= sizeMin);
   if (sizeMax < 9)           units = units.filter(u => (u.BFSize||0) <= sizeMax);
   if (moveMin > 0)           units = units.filter(u => sbMoveNum(u) >= moveMin);
