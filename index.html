@@ -2517,8 +2517,8 @@
         <label class="sb-fg-check"><input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only</label>
       </div>
       <div class="sb-fgroup">
-        <label class="sb-fg-check" title="MUL's IsFeatured flag — tested against real data and found to cut far more aggressively than MUL's own displayed counts, so it's off by default. Available if you want to try it.">
-          <input type="checkbox" id="sb-featured-only" onchange="sbRenderBrowse()"> Featured only</label>
+        <label class="sb-fg-check" title="Within each chassis (Class), if any variant is MUL's IsFeatured pick, hide its sibling reprints/refits (e.g. a later '-b' variant from a different sourcebook). If no variant in a chassis is flagged Featured, all of them stay — this avoids wrongly dropping designs that just never got a Featured flag at all.">
+          <input type="checkbox" id="sb-dedupe-variants" checked onchange="sbRenderBrowse()"> Hide duplicate reprints</label>
       </div>
       <div class="sb-fgroup">
         <label class="sb-fg-check" title="Excludes Introductory-tier simplified stat cards not meant for standard competitive play; uncheck to include them">
@@ -4082,6 +4082,24 @@ function sbIntroYear(unit) {
   return m ? parseInt(m[0]) : 0;
 }
 
+// Per-chassis dedup: if any variant in a Class is MUL's Featured pick, keep
+// only the Featured one(s) and drop its sibling reprints/refits. If NO
+// variant in that Class is flagged Featured, keep all of them — dropping
+// everything just because none happened to be flagged would be worse
+// (verified against real data: a blanket IsFeatured===true filter wrongly
+// zeroed out chassis where every variant was Featured:false, e.g. Hermes).
+function sbDedupeByClass(units) {
+  const groups = {};
+  units.forEach(u => { const c = u.Class || u.Name; (groups[c] = groups[c] || []).push(u); });
+  const out = [];
+  Object.values(groups).forEach(list => {
+    if (list.length === 1) { out.push(list[0]); return; }
+    const featured = list.filter(u => u.IsFeatured === true);
+    out.push(...(featured.length ? featured : list));
+  });
+  return out;
+}
+
 function sbClearFilters() {
   ['sb-filter-name','sb-filter-move-min','sb-filter-move-max',
    'sb-filter-pv-min','sb-filter-pv-max','sb-filter-dmg-s','sb-filter-dmg-m','sb-filter-dmg-l',
@@ -4090,10 +4108,8 @@ function sbClearFilters() {
   ['sb-filter-role','sb-filter-size-min','sb-filter-size-max']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const oo = document.getElementById('sb-owned-only'); if (oo) oo.checked = false;
-  // Standard-rules defaults ON (excludes simplified Introductory cards).
-  // Featured defaults OFF — tested against real counts and found to cut
-  // far more aggressively than MUL's own displayed totals warrant.
-  const fo = document.getElementById('sb-featured-only'); if (fo) fo.checked = false;
+  // Standard-rules and per-chassis dedup both default ON.
+  const dv = document.getElementById('sb-dedupe-variants'); if (dv) dv.checked = true;
   const sr = document.getElementById('sb-standard-rules-only'); if (sr) sr.checked = true;
   sbAbilSel.clear();
   sbUpdateAbilBtn();
@@ -4378,7 +4394,7 @@ function sbRenderBrowse() {
   if (!tbody) return;
 
   const ownedOnly    = document.getElementById('sb-owned-only')?.checked;
-  const featuredOnly = document.getElementById('sb-featured-only')?.checked;
+  const dedupeVariants = document.getElementById('sb-dedupe-variants')?.checked;
   const stdRulesOnly = document.getElementById('sb-standard-rules-only')?.checked;
   const nameFilter   = (document.getElementById('sb-filter-name')?.value || '').toLowerCase().trim();
   const roleFilter   = document.getElementById('sb-filter-role')?.value || '';
@@ -4400,8 +4416,8 @@ function sbRenderBrowse() {
 
   let units = sbCatalog;
   if (ownedOnly && hasCol)  units = units.filter(u => sbIsOwned(u));
-  if (featuredOnly)          units = units.filter(u => u.IsFeatured !== false);
   if (stdRulesOnly)          units = units.filter(u => !u.Rules || u.Rules === 'Standard');
+  if (dedupeVariants)        units = sbDedupeByClass(units);
   if (nameFilter)            units = units.filter(u => (u.Name||'').toLowerCase().includes(nameFilter));
   if (roleFilter)            units = units.filter(u => (u.Role?.Name||'') === roleFilter);
   if (abilSel.length)        units = units.filter(u => {
