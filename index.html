@@ -803,8 +803,13 @@
     letter-spacing:.06em; text-transform:uppercase; color:var(--text2); border-bottom:1px solid var(--border);
     white-space:nowrap; cursor:pointer; user-select:none; }
   .sb-table th:hover { color:var(--text); }
-  .sb-table th.sort-asc::after  { content:' ↑'; color:var(--accent); }
-  .sb-table th.sort-desc::after { content:' ↓'; color:var(--accent); }
+  .sb-table .sort-asc::after  { content:' ↑'; color:var(--accent); }
+  .sb-table .sort-desc::after { content:' ↓'; color:var(--accent); }
+  .sb-table th.sb-th-dmg { cursor:default; }
+  .sb-table th.sb-th-dmg:hover { color:var(--text2); }
+  .sb-table th.sb-th-dmg span[data-sk] { cursor:pointer; color:var(--text2); }
+  .sb-table th.sb-th-dmg span[data-sk]:hover { color:var(--text); }
+  .sb-table th.sb-th-dmg .sb-th-slash { color:var(--text3); }
   .sb-table td { padding:4px 8px; border-bottom:1px solid var(--border); vertical-align:middle; }
   .sb-table tr:last-child td { border-bottom:none; }
   .sb-table tr.sb-row { cursor:pointer; }
@@ -2411,14 +2416,14 @@
           <table class="sb-table">
             <thead>
               <tr>
-                <th onclick="sbSort('Name')">Name</th>
-                <th onclick="sbSort('BFPointValue')">PV</th>
-                <th onclick="sbSort('Role')">Role</th>
-                <th onclick="sbSort('BFMove')">Move</th>
-                <th>Dmg S/M/L</th>
-                <th onclick="sbSort('BFArmor')">Armor</th>
-                <th onclick="sbSort('BFOverheat')">OV</th>
-                <th>Abilities</th>
+                <th data-sk="Name" onclick="sbSort('Name')">Name</th>
+                <th data-sk="BFPointValue" onclick="sbSort('BFPointValue')">PV</th>
+                <th data-sk="Role" onclick="sbSort('Role')">Role</th>
+                <th data-sk="BFMove" onclick="sbSort('BFMove')">Move</th>
+                <th class="sb-th-dmg">Dmg <span data-sk="DmgS" onclick="sbSort('DmgS')">S</span><span class="sb-th-slash">/</span><span data-sk="DmgM" onclick="sbSort('DmgM')">M</span><span class="sb-th-slash">/</span><span data-sk="DmgL" onclick="sbSort('DmgL')">L</span></th>
+                <th data-sk="BFArmor" onclick="sbSort('BFArmor')">Armor</th>
+                <th data-sk="BFOverheat" onclick="sbSort('BFOverheat')">OV</th>
+                <th data-sk="BFAbilities" onclick="sbSort('BFAbilities')">Abilities</th>
                 <th class="sb-col-add"></th>
               </tr>
             </thead>
@@ -3994,10 +3999,14 @@ function sbRenderBrowse() {
 
   // Sort
   units = [...units].sort((a, b) => {
+    if (sbSortKey === 'Name')        return (a.Name||'').localeCompare(b.Name||'') * sbSortDir;
+    if (sbSortKey === 'Role')        return (a.Role?.Name||'').localeCompare(b.Role?.Name||'') * sbSortDir;
+    if (sbSortKey === 'BFAbilities') return (a.BFAbilities||'').localeCompare(b.BFAbilities||'') * sbSortDir;
     let av, bv;
-    if (sbSortKey === 'Name')   { av = a.Name||''; bv = b.Name||''; return av.localeCompare(bv) * sbSortDir; }
-    if (sbSortKey === 'Role')   { av = a.Role?.Name||''; bv = b.Role?.Name||''; return av.localeCompare(bv) * sbSortDir; }
-    if (sbSortKey === 'BFMove') { av = parseInt(a.BFMove)||0; bv = parseInt(b.BFMove)||0; }
+    if (sbSortKey === 'BFMove')      { av = sbMoveNum(a); bv = sbMoveNum(b); }
+    else if (sbSortKey === 'DmgS')   { av = sbDmgNum(a.BFDamageShort);  bv = sbDmgNum(b.BFDamageShort); }
+    else if (sbSortKey === 'DmgM')   { av = sbDmgNum(a.BFDamageMedium); bv = sbDmgNum(b.BFDamageMedium); }
+    else if (sbSortKey === 'DmgL')   { av = sbDmgNum(a.BFDamageLong);   bv = sbDmgNum(b.BFDamageLong); }
     else { av = a[sbSortKey]||0; bv = b[sbSortKey]||0; }
     return (av - bv) * sbSortDir;
   });
@@ -4007,11 +4016,11 @@ function sbRenderBrowse() {
     units.sort((a, b) => (sbIsOwned(a)?0:1) - (sbIsOwned(b)?0:1));
   }
 
-  // Update sort indicators on headers
-  document.querySelectorAll('.sb-table th').forEach(th => {
-    th.classList.remove('sort-asc','sort-desc');
-    if (th.getAttribute('onclick') === `sbSort('${sbSortKey}')`) {
-      th.classList.add(sbSortDir === 1 ? 'sort-asc' : 'sort-desc');
+  // Update sort indicators (works for both <th> and the Dmg sub-labels)
+  document.querySelectorAll('.sb-table [data-sk]').forEach(el => {
+    el.classList.remove('sort-asc','sort-desc');
+    if (el.getAttribute('data-sk') === sbSortKey) {
+      el.classList.add(sbSortDir === 1 ? 'sort-asc' : 'sort-desc');
     }
   });
 
