@@ -2516,6 +2516,14 @@
       <div class="sb-fgroup">
         <label class="sb-fg-check"><input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only</label>
       </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-check" title="MUL flags one canonical entry per design as Featured; unchecking also shows alternate variants/reprints (e.g. refits) that MUL's own browsing view normally hides">
+          <input type="checkbox" id="sb-featured-only" checked onchange="sbRenderBrowse()"> Featured only</label>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-check" title="Excludes Introductory-tier simplified stat cards not meant for standard competitive play; uncheck to include them">
+          <input type="checkbox" id="sb-standard-rules-only" checked onchange="sbRenderBrowse()"> Standard rules only</label>
+      </div>
       <div class="sb-fgroup sb-fgroup-actions">
         <button class="sb-clear-btn" onclick="sbClearFilters()" title="Reset all filters">Clear filters</button>
       </div>
@@ -4082,6 +4090,11 @@ function sbClearFilters() {
   ['sb-filter-role','sb-filter-size-min','sb-filter-size-max']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const oo = document.getElementById('sb-owned-only'); if (oo) oo.checked = false;
+  // Featured / Standard-rules default to ON (MUL's own curated view) rather
+  // than being cleared off, since unchecked means "show everything, including
+  // alternate variants and simplified stat cards".
+  const fo = document.getElementById('sb-featured-only'); if (fo) fo.checked = true;
+  const sr = document.getElementById('sb-standard-rules-only'); if (sr) sr.checked = true;
   sbAbilSel.clear();
   sbUpdateAbilBtn();
   sbRenderAbilMenu();
@@ -4344,6 +4357,8 @@ function sbRenderBrowse() {
   if (!tbody) return;
 
   const ownedOnly    = document.getElementById('sb-owned-only')?.checked;
+  const featuredOnly = document.getElementById('sb-featured-only')?.checked;
+  const stdRulesOnly = document.getElementById('sb-standard-rules-only')?.checked;
   const nameFilter   = (document.getElementById('sb-filter-name')?.value || '').toLowerCase().trim();
   const roleFilter   = document.getElementById('sb-filter-role')?.value || '';
   const sizeMin      = parseInt(document.getElementById('sb-filter-size-min')?.value) || 0;
@@ -4364,6 +4379,8 @@ function sbRenderBrowse() {
 
   let units = sbCatalog;
   if (ownedOnly && hasCol)  units = units.filter(u => sbIsOwned(u));
+  if (featuredOnly)          units = units.filter(u => u.IsFeatured !== false);
+  if (stdRulesOnly)          units = units.filter(u => !u.Rules || u.Rules === 'Standard');
   if (nameFilter)            units = units.filter(u => (u.Name||'').toLowerCase().includes(nameFilter));
   if (roleFilter)            units = units.filter(u => (u.Role?.Name||'') === roleFilter);
   if (abilSel.length)        units = units.filter(u => {
