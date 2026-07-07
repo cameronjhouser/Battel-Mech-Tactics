@@ -785,30 +785,57 @@
   .lb-cmd-abil-label { font-size:9px; color:gold; font-family:var(--mono); }
 
   /* ── SKIRMISH BUILDER ────────────────────────────────── */
-  .sb-layout { display:grid; grid-template-columns:1fr 340px; gap:16px; margin-top:12px; }
-  .sb-browse-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; align-items:center; }
-  .sb-unit-grid { display:flex; flex-direction:column; gap:3px; max-height:62vh; overflow-y:auto; padding-right:2px; }
-  .sb-unit-row { display:flex; align-items:center; gap:8px; padding:5px 10px; background:var(--bg2); border:1px solid var(--border); border-radius:4px; cursor:pointer; transition:border-color .12s; }
-  .sb-unit-row:hover { border-color:var(--accent); }
-  .sb-unit-row.in-force { border-color:var(--green); opacity:.55; cursor:default; }
-  .sb-unit-name { flex:1; min-width:0; font-weight:600; font-size:12px; }
-  .sb-unit-name small { display:block; font-size:10px; color:var(--text2); font-weight:400; margin-top:1px; }
-  .sb-unit-pv { font-family:var(--mono); font-size:12px; color:var(--accent); white-space:nowrap; flex-shrink:0; }
-  .sb-unit-abil { font-family:var(--mono); font-size:9px; color:var(--teal); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px; flex-shrink:0; }
-  .sb-owned-badge { background:var(--green); color:#000; font-size:9px; font-weight:700; padding:1px 5px; border-radius:3px; text-transform:uppercase; letter-spacing:.05em; flex-shrink:0; }
-  .sb-jump-tag { font-size:9px; color:var(--purple); font-family:var(--mono); white-space:nowrap; flex-shrink:0; }
-  .sb-in-force-tag { font-size:9px; color:var(--green); font-family:var(--mono); white-space:nowrap; flex-shrink:0; }
+  .sb-layout { display:grid; grid-template-columns:1fr 320px; gap:16px; margin-top:12px; }
+  .sb-browse-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; align-items:center; }
+  .sb-filter-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; align-items:center; }
+  .sb-filter-row input[type=text], .sb-filter-row input[type=number] {
+    background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:4px;
+    padding:4px 8px; font-size:11px; font-family:var(--sans);
+  }
+  .sb-filter-row input[type=text] { flex:1 1 140px; }
+  .sb-filter-row input[type=number] { width:64px; }
+  .sb-filter-row select { background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:4px 6px; font-size:11px; }
+  .sb-filter-label { font-size:10px; color:var(--text2); white-space:nowrap; }
+  .sb-table-wrap { overflow-x:auto; max-height:64vh; overflow-y:auto; border:1px solid var(--border); border-radius:5px; }
+  .sb-table { width:100%; border-collapse:collapse; font-size:11px; }
+  .sb-table thead { position:sticky; top:0; z-index:2; background:var(--bg3); }
+  .sb-table th { padding:5px 8px; text-align:left; font-family:var(--cond); font-size:10px; font-weight:700;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--text2); border-bottom:1px solid var(--border);
+    white-space:nowrap; cursor:pointer; user-select:none; }
+  .sb-table th:hover { color:var(--text); }
+  .sb-table th.sort-asc::after  { content:' ↑'; color:var(--accent); }
+  .sb-table th.sort-desc::after { content:' ↓'; color:var(--accent); }
+  .sb-table td { padding:4px 8px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  .sb-table tr:last-child td { border-bottom:none; }
+  .sb-table tr.sb-row { cursor:pointer; }
+  .sb-table tr.sb-row:hover td { background:var(--bg3); }
+  .sb-table tr.sb-row.in-force td { opacity:.5; cursor:default; }
+  .sb-table tr.sb-row.in-force:hover td { background:inherit; }
+  .sb-col-name { font-weight:600; color:var(--text); min-width:120px; }
+  .sb-col-name small { display:block; font-size:9px; color:var(--text3); font-weight:400; }
+  .sb-col-pv { font-family:var(--mono); color:var(--accent); text-align:right; white-space:nowrap; }
+  .sb-col-dmg { font-family:var(--mono); color:var(--text2); white-space:nowrap; }
+  .sb-col-abil { font-family:var(--mono); font-size:9px; color:var(--teal); max-width:160px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sb-col-add { text-align:center; width:32px; }
+  .sb-add-btn { background:var(--bg4); border:1px solid var(--border2); color:var(--accent); border-radius:3px;
+    font-size:13px; line-height:1; padding:1px 6px; cursor:pointer; font-weight:700; }
+  .sb-add-btn:hover { background:var(--accent); color:#000; border-color:var(--accent); }
+  .sb-owned-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--green);
+    margin-right:4px; flex-shrink:0; vertical-align:middle; }
   .sb-force-panel { display:flex; flex-direction:column; gap:8px; position:sticky; top:52px; }
   .sb-pv-meter { background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
-  .sb-pv-row { display:flex; justify-content:space-between; align-items:baseline; }
+  .sb-pv-row { display:flex; justify-content:space-between; align-items:center; gap:6px; }
   .sb-pv-label { font-size:11px; color:var(--text2); }
   .sb-pv-value { font-family:var(--mono); font-size:18px; color:var(--accent); }
-  .sb-pv-cap { font-size:11px; color:var(--text2); }
+  .sb-pv-limit-wrap { display:flex; align-items:center; gap:3px; font-size:11px; color:var(--text2); }
+  .sb-pv-limit { width:52px; background:var(--bg3); color:var(--accent); border:1px solid var(--border2);
+    border-radius:3px; font-family:var(--mono); font-size:14px; text-align:center; padding:1px 4px; }
   .sb-pv-bar-track { background:var(--bg3); border-radius:3px; height:7px; margin-top:6px; overflow:hidden; }
   .sb-pv-bar-fill { height:100%; border-radius:3px; transition:width .3s, background .3s; }
   .sb-rules-bar { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
   .sb-rule { font-size:10px; font-family:var(--mono); padding:2px 7px; border-radius:3px; background:var(--bg3); border:1px solid var(--border); }
-  .sb-rule.ok  { border-color:var(--green);  color:var(--green); }
+  .sb-rule.ok   { border-color:var(--green);  color:var(--green); }
   .sb-rule.warn { border-color:var(--orange); color:var(--orange); }
   .sb-rule.bad  { border-color:var(--red);    color:var(--red); }
   .sb-force-list { display:flex; flex-direction:column; gap:3px; max-height:52vh; overflow-y:auto; }
@@ -820,7 +847,7 @@
   .sb-force-remove:hover { color:#ff6666; }
   .sb-skill-sel { font-size:10px; background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:3px; padding:2px 3px; flex-shrink:0; }
   .sb-empty-hint { font-size:11px; color:var(--text3); text-align:center; padding:18px 0; }
-  @media(max-width:800px) { .sb-layout { grid-template-columns:1fr; } .sb-force-panel { position:static; } }
+  @media(max-width:900px) { .sb-layout { grid-template-columns:1fr; } .sb-force-panel { position:static; } }
 </style>
 </head>
 <body>
@@ -2306,6 +2333,7 @@
 
   <!-- ── SKIRMISH FORCE BUILDER ────────────────── -->
   <div id="lb-mode-skirmish" style="display:none">
+    <!-- Top controls -->
     <div class="sb-browse-controls">
       <label class="lb-file-label">
         <span>📂 Collection CSV</span>
@@ -2320,40 +2348,74 @@
         <option value="14">Jihad</option>
         <option value="247">Civil War</option>
         <option value="13">Clan Invasion</option>
-        <option value="256">Late Succession War – Renaissance</option>
-        <option value="255">Late Succession War – LosTech</option>
+        <option value="256">Late SW – Renaissance</option>
+        <option value="255">Late SW – LosTech</option>
         <option value="11">Early Succession War</option>
         <option value="10">Star League</option>
       </select>
-      <label style="font-size:11px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap">
-        <input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only
-      </label>
+      <button class="lb-btn" onclick="sbFetchCatalog()">Load Catalog</button>
+      <button class="lb-btn" onclick="sbClearForce()" style="background:var(--red)">Clear Force</button>
+    </div>
+
+    <!-- Filter row -->
+    <div class="sb-filter-row">
+      <input type="text" id="sb-filter-name" placeholder="Search name…" oninput="sbRenderBrowse()">
+      <span class="sb-filter-label">Role</span>
+      <select id="sb-filter-role" onchange="sbRenderBrowse()"><option value="">All</option></select>
+      <span class="sb-filter-label">Weight</span>
       <select id="sb-weight-filter" onchange="sbRenderBrowse()">
-        <option value="">All weights</option>
+        <option value="">All</option>
         <option value="1">Light</option>
         <option value="2">Medium</option>
         <option value="3">Heavy</option>
         <option value="4">Assault</option>
       </select>
-      <button class="lb-btn" onclick="sbFetchCatalog()">Load Catalog</button>
-      <button class="lb-btn" onclick="sbClearForce()" style="background:var(--red)">Clear Force</button>
+      <span class="sb-filter-label">PV</span>
+      <input type="number" id="sb-filter-pv-min" placeholder="min" min="1" max="999" oninput="sbRenderBrowse()">
+      <span class="sb-filter-label">–</span>
+      <input type="number" id="sb-filter-pv-max" placeholder="max" min="1" max="999" oninput="sbRenderBrowse()">
+      <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;margin-left:4px">
+        <input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only
+      </label>
     </div>
-    <div id="sb-status" class="lb-status">Select faction + era, then click Load Catalog. Upload a collection CSV to highlight owned units.</div>
+
+    <div id="sb-status" class="lb-status">Select faction + era, then click Load Catalog. Upload a collection CSV to mark owned units.</div>
+
     <div class="sb-layout">
+      <!-- Catalog table -->
       <div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <span class="sec-label" style="margin:0">Available Units</span>
           <span id="sb-catalog-count" style="font-size:11px;color:var(--text2)"></span>
         </div>
-        <div id="sb-unit-grid" class="sb-unit-grid"></div>
+        <div class="sb-table-wrap">
+          <table class="sb-table">
+            <thead>
+              <tr>
+                <th onclick="sbSort('Name')">Name</th>
+                <th onclick="sbSort('BFPointValue')">PV</th>
+                <th onclick="sbSort('Role')">Role</th>
+                <th onclick="sbSort('BFMove')">Move</th>
+                <th>Dmg S/M/L</th>
+                <th onclick="sbSort('BFArmor')">Armor</th>
+                <th onclick="sbSort('BFOverheat')">OV</th>
+                <th>Abilities</th>
+                <th class="sb-col-add"></th>
+              </tr>
+            </thead>
+            <tbody id="sb-unit-grid"></tbody>
+          </table>
+        </div>
       </div>
+
+      <!-- Force panel -->
       <div class="sb-force-panel">
         <span class="sec-label">Tournament Force</span>
         <div class="sb-pv-meter">
           <div class="sb-pv-row">
             <span class="sb-pv-label">TOTAL PV</span>
             <span class="sb-pv-value" id="sb-pv-total">0</span>
-            <span class="sb-pv-cap">/ 250</span>
+            <div class="sb-pv-limit-wrap">/ <input type="number" id="sb-pv-limit" class="sb-pv-limit" value="250" min="1" max="9999" oninput="sbRenderForce()"> PV</div>
           </div>
           <div class="sb-pv-bar-track">
             <div class="sb-pv-bar-fill" id="sb-pv-bar" style="width:0%;background:var(--green)"></div>
@@ -2361,7 +2423,7 @@
           <div class="sb-rules-bar" id="sb-rules-bar"></div>
         </div>
         <div id="sb-force-list" class="sb-force-list">
-          <div class="sb-empty-hint">No units selected.<br>Click units from the catalog to add.</div>
+          <div class="sb-empty-hint">No units selected.<br>Click + to add from the catalog.</div>
         </div>
       </div>
     </div>
@@ -3722,6 +3784,8 @@ let sbCollection = {};   // normalized name -> true (from uploaded CSV)
 let sbCatalog    = [];   // all MUL units for current faction/era
 let sbForce      = [];   // array of { unit, skill }
 let sbInited     = false;
+let sbSortKey    = 'BFPointValue';
+let sbSortDir    = 1;    // 1=asc, -1=desc
 
 const SB_ERA_LABELS = {
   '16':'Dark Age','257':'ilClan','254':'Late Republic','15':'Early Republic',
@@ -3822,6 +3886,16 @@ async function sbFetchCatalog() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     sbCatalog = data.Units || data || [];
+
+    // Populate role dropdown
+    const roles = [...new Set(sbCatalog.map(u => u.Role?.Name).filter(Boolean))].sort();
+    const roleSel = document.getElementById('sb-filter-role');
+    if (roleSel) {
+      const prev = roleSel.value;
+      roleSel.innerHTML = '<option value="">All roles</option>' +
+        roles.map(r => `<option value="${lbEsc(r)}"${r===prev?' selected':''}>${lbEsc(r)}</option>`).join('');
+    }
+
     const fName = LB_FACTIONS.find(f => f.id === factionId)?.name || factionId;
     const eLabel = SB_ERA_LABELS[eraId] || eraId;
     const ownedCount = sbCatalog.filter(u => sbIsOwned(u)).length;
@@ -3833,58 +3907,91 @@ async function sbFetchCatalog() {
   }
 }
 
+function sbSort(key) {
+  if (sbSortKey === key) sbSortDir *= -1;
+  else { sbSortKey = key; sbSortDir = 1; }
+  sbRenderBrowse();
+}
+
 function sbRenderBrowse() {
-  const grid = document.getElementById('sb-unit-grid');
-  if (!grid) return;
+  const tbody = document.getElementById('sb-unit-grid');
+  if (!tbody) return;
 
   const ownedOnly    = document.getElementById('sb-owned-only')?.checked;
   const weightFilter = document.getElementById('sb-weight-filter')?.value;
+  const nameFilter   = (document.getElementById('sb-filter-name')?.value || '').toLowerCase().trim();
+  const roleFilter   = document.getElementById('sb-filter-role')?.value || '';
+  const pvMin        = parseInt(document.getElementById('sb-filter-pv-min')?.value) || 0;
+  const pvMax        = parseInt(document.getElementById('sb-filter-pv-max')?.value) || 9999;
   const hasCol       = Object.keys(sbCollection).length > 0;
   const inForceIds   = new Set(sbForce.map(f => f.unit.Id));
 
   let units = sbCatalog;
-  if (ownedOnly && hasCol) units = units.filter(u => sbIsOwned(u));
-  if (weightFilter)         units = units.filter(u => String(u.BFSize || '') === weightFilter);
+  if (ownedOnly && hasCol)  units = units.filter(u => sbIsOwned(u));
+  if (weightFilter)          units = units.filter(u => String(u.BFSize || '') === weightFilter);
+  if (nameFilter)            units = units.filter(u => (u.Name||'').toLowerCase().includes(nameFilter));
+  if (roleFilter)            units = units.filter(u => (u.Role?.Name||'') === roleFilter);
+  if (pvMin > 0)             units = units.filter(u => (u.BFPointValue||0) >= pvMin);
+  if (pvMax < 9999)          units = units.filter(u => (u.BFPointValue||0) <= pvMax);
 
-  // owned first, then alphabetical
-  if (hasCol) {
-    units = [...units].sort((a, b) => {
-      const d = (sbIsOwned(a) ? 0 : 1) - (sbIsOwned(b) ? 0 : 1);
-      return d !== 0 ? d : (a.Name || '').localeCompare(b.Name || '');
-    });
+  // Sort
+  units = [...units].sort((a, b) => {
+    let av, bv;
+    if (sbSortKey === 'Name')   { av = a.Name||''; bv = b.Name||''; return av.localeCompare(bv) * sbSortDir; }
+    if (sbSortKey === 'Role')   { av = a.Role?.Name||''; bv = b.Role?.Name||''; return av.localeCompare(bv) * sbSortDir; }
+    if (sbSortKey === 'BFMove') { av = parseInt(a.BFMove)||0; bv = parseInt(b.BFMove)||0; }
+    else { av = a[sbSortKey]||0; bv = b[sbSortKey]||0; }
+    return (av - bv) * sbSortDir;
+  });
+
+  // If collection loaded, float owned to top within sort
+  if (hasCol && !ownedOnly) {
+    units.sort((a, b) => (sbIsOwned(a)?0:1) - (sbIsOwned(b)?0:1));
   }
+
+  // Update sort indicators on headers
+  document.querySelectorAll('.sb-table th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (th.getAttribute('onclick') === `sbSort('${sbSortKey}')`) {
+      th.classList.add(sbSortDir === 1 ? 'sort-asc' : 'sort-desc');
+    }
+  });
 
   document.getElementById('sb-catalog-count').textContent = `(${units.length} shown)`;
 
+  // Store lookup
+  tbody._umap = {};
+  sbCatalog.forEach(u => { tbody._umap[u.Id] = u; });
+
   if (!units.length) {
-    grid.innerHTML = '<div style="color:var(--text3);font-size:11px;padding:12px">No units match current filters.</div>';
-    grid._umap = {};
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:16px">No units match filters.</td></tr>`;
     return;
   }
 
-  const SZ = ['','Light','Medium','Heavy','Assault'];
-  grid._umap = {};
-  sbCatalog.forEach(u => { grid._umap[u.Id] = u; });
-
-  grid.innerHTML = units.map(u => {
+  tbody.innerHTML = units.map(u => {
     const owned   = hasCol && sbIsOwned(u);
     const inForce = inForceIds.has(u.Id);
-    const isJump  = sbIsJump(u);
+    const dmg     = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
     const abil    = (u.BFAbilities || '').trim();
-    const sz      = SZ[u.BFSize || 0] || '?';
+    const role    = u.Role?.Name || '—';
+    const mv      = u.BFMove || '—';
+    const armor   = u.BFArmor ?? '—';
+    const ov      = u.BFOverheat || '—';
     const pv      = u.BFPointValue || '?';
-    const mv      = u.BFMove || '?';
-    return `<div class="sb-unit-row${inForce?' in-force':''}" onclick="${inForce?'':'`sbAddUnit('+u.Id+')`'}" data-uid="${u.Id}">
-      <div class="sb-unit-name">
-        ${lbEsc(u.Name)}
-        <small>${sz} · ${u.Tonnage||'?'}t · MV${mv}</small>
-      </div>
-      ${abil?`<span class="sb-unit-abil" title="${lbEsc(abil)}">${lbEsc(abil)}</span>`:''}
-      ${isJump?'<span class="sb-jump-tag">JUMP</span>':''}
-      <span class="sb-unit-pv">${pv}</span>
-      ${owned?'<span class="sb-owned-badge">OWNED</span>':''}
-      ${inForce?'<span class="sb-in-force-tag">IN FORCE</span>':''}
-    </div>`;
+    return `<tr class="sb-row${inForce?' in-force':''}" data-uid="${u.Id}">
+      <td class="sb-col-name">${owned?'<span class="sb-owned-dot" title="Owned"></span>':''}${lbEsc(u.Name)}</td>
+      <td class="sb-col-pv">${pv}</td>
+      <td>${lbEsc(role)}</td>
+      <td class="sb-col-dmg">${mv}</td>
+      <td class="sb-col-dmg">${dmg}</td>
+      <td class="sb-col-dmg">${armor}</td>
+      <td class="sb-col-dmg">${ov}</td>
+      <td class="sb-col-abil" title="${lbEsc(abil)}">${lbEsc(abil)}</td>
+      <td class="sb-col-add">${inForce
+        ? '<span style="color:var(--green);font-size:11px">✓</span>'
+        : `<button class="sb-add-btn" onclick="sbAddUnit(${u.Id})">+</button>`
+      }</td>
+    </tr>`;
   }).join('');
 }
 
@@ -3930,16 +4037,19 @@ function sbRenderForce() {
   const jumpCt   = sbForce.filter(f => sbIsJump(f.unit)).length;
   const htTotal  = sbForce.reduce((s, f) => s + sbHtVal(f.unit), 0);
 
+  const pvLimit = parseInt(document.getElementById('sb-pv-limit')?.value) || 250;
+  const pvWarn  = Math.round(pvLimit * 0.97);
+
   if (pvEl) pvEl.textContent = totalPV;
   if (barEl) {
-    const pct = Math.min(100, (totalPV / 250) * 100);
+    const pct = Math.min(100, (totalPV / pvLimit) * 100);
     barEl.style.width = pct + '%';
-    barEl.style.background = totalPV > 250 ? 'var(--red)' : totalPV > 242 ? 'var(--orange)' : 'var(--green)';
+    barEl.style.background = totalPV > pvLimit ? 'var(--red)' : totalPV > pvWarn ? 'var(--orange)' : 'var(--green)';
   }
 
   if (rulesEl) {
     rulesEl.innerHTML = [
-      { t:`${totalPV}/250 PV`, c: totalPV>250?'bad':totalPV>242?'warn':'ok' },
+      { t:`${totalPV}/${pvLimit} PV`, c: totalPV>pvLimit?'bad':totalPV>pvWarn?'warn':'ok' },
       { t:`${unitCt} units`,   c: unitCt<7?'warn':unitCt<=12?'ok':'bad'  },
       { t:`JMPS ${jumpCt}/2`,  c: jumpCt>2?'bad':'ok'                    },
       { t:`HT ${htTotal}/3`,   c: htTotal>3?'bad':htTotal===3?'warn':'ok' },
