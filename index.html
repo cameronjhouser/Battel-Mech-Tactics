@@ -2517,8 +2517,8 @@
         <label class="sb-fg-check"><input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only</label>
       </div>
       <div class="sb-fgroup">
-        <label class="sb-fg-check" title="MUL flags one canonical entry per design as Featured; unchecking also shows alternate variants/reprints (e.g. refits) that MUL's own browsing view normally hides">
-          <input type="checkbox" id="sb-featured-only" checked onchange="sbRenderBrowse()"> Featured only</label>
+        <label class="sb-fg-check" title="MUL's IsFeatured flag — tested against real data and found to cut far more aggressively than MUL's own displayed counts, so it's off by default. Available if you want to try it.">
+          <input type="checkbox" id="sb-featured-only" onchange="sbRenderBrowse()"> Featured only</label>
       </div>
       <div class="sb-fgroup">
         <label class="sb-fg-check" title="Excludes Introductory-tier simplified stat cards not meant for standard competitive play; uncheck to include them">
@@ -4090,10 +4090,10 @@ function sbClearFilters() {
   ['sb-filter-role','sb-filter-size-min','sb-filter-size-max']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const oo = document.getElementById('sb-owned-only'); if (oo) oo.checked = false;
-  // Featured / Standard-rules default to ON (MUL's own curated view) rather
-  // than being cleared off, since unchecked means "show everything, including
-  // alternate variants and simplified stat cards".
-  const fo = document.getElementById('sb-featured-only'); if (fo) fo.checked = true;
+  // Standard-rules defaults ON (excludes simplified Introductory cards).
+  // Featured defaults OFF — tested against real counts and found to cut
+  // far more aggressively than MUL's own displayed totals warrant.
+  const fo = document.getElementById('sb-featured-only'); if (fo) fo.checked = false;
   const sr = document.getElementById('sb-standard-rules-only'); if (sr) sr.checked = true;
   sbAbilSel.clear();
   sbUpdateAbilBtn();
@@ -4273,9 +4273,30 @@ function sbShowDebugSample() {
     out.value = 'No catalog loaded yet — click Load Catalog first.';
     return;
   }
-  const sample = sbCatalog.slice(0, 5);
-  out.value = `// ${sbCatalog.length} total units loaded. First ${sample.length} raw records:\n\n`
-    + JSON.stringify(sample, null, 2);
+
+  // Prefer the currently active type tab so the sample matches what's on
+  // screen (e.g. BattleMechs), rather than always whatever type happened
+  // to merge in first.
+  const typeOf = u => u.Type?.Name || 'Other';
+  const pool = sbActiveType !== 'all' ? sbCatalog.filter(u => typeOf(u) === sbActiveType) : sbCatalog;
+
+  // Group by Class (chassis) to surface duplicate-variant clusters — the
+  // fastest way to see what field actually differs between an included and
+  // an excluded copy of the "same" design.
+  const groups = {};
+  pool.forEach(u => { const c = u.Class || u.Name; (groups[c] = groups[c] || []).push(u); });
+  const dupClasses = Object.keys(groups).filter(c => groups[c].length > 1).slice(0, 3);
+
+  let sample, note;
+  if (dupClasses.length) {
+    sample = dupClasses.flatMap(c => groups[c]);
+    note = `${pool.length} units in "${sbActiveType === 'all' ? 'All' : sbActiveType}". Showing ${dupClasses.length} duplicate-Class cluster(s) (${sample.length} records) to compare what differs between variants:`;
+  } else {
+    sample = pool.slice(0, 5);
+    note = `${pool.length} units in "${sbActiveType === 'all' ? 'All' : sbActiveType}". No duplicate Class found in this pool — showing first ${sample.length}:`;
+  }
+
+  out.value = `// ${note}\n\n` + JSON.stringify(sample, null, 2);
   out.style.display = 'block';
   out.focus();
   out.select();
