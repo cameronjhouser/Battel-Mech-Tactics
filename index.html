@@ -812,6 +812,17 @@
   .sb-clear-btn { height:28px; background:var(--bg4); border:1px solid var(--border2); color:var(--text2);
     border-radius:4px; padding:0 13px; font-size:11px; cursor:pointer; white-space:nowrap; }
   .sb-clear-btn:hover { background:var(--red); color:#fff; border-color:var(--red); }
+  .sb-type-tabs { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
+  .sb-type-tab { background:var(--bg3); color:var(--text2); border:1px solid var(--border); border-radius:5px;
+    padding:5px 11px; font-size:11px; font-family:var(--cond); font-weight:700; letter-spacing:.04em;
+    cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:6px; }
+  .sb-type-tab:hover { color:var(--text); border-color:var(--border2); }
+  .sb-type-tab.on { background:var(--accent); color:#000; border-color:var(--accent); }
+  .sb-type-tab .sb-tt-count { font-family:var(--mono); font-size:9px; font-weight:400; padding:0 5px;
+    border-radius:8px; background:rgba(0,0,0,.22); }
+  .sb-type-tab.on .sb-tt-count { background:rgba(0,0,0,.28); color:#000; }
+  .sb-type-tab .sb-tt-owned { font-size:9px; font-weight:400; color:var(--green); }
+  .sb-type-tab.on .sb-tt-owned { color:#0a3a12; }
   .sb-table-wrap { overflow-x:auto; max-height:64vh; overflow-y:auto; border:1px solid var(--border); border-radius:5px; }
   .sb-table { width:100%; border-collapse:collapse; font-size:11px; }
   .sb-table thead { position:sticky; top:0; z-index:2; background:var(--bg3); }
@@ -2459,6 +2470,7 @@
           <span class="sec-label" style="margin:0">Available Units</span>
           <span id="sb-catalog-count" style="font-size:11px;color:var(--text2)"></span>
         </div>
+        <div id="sb-type-tabs" class="sb-type-tabs"></div>
         <div class="sb-table-wrap">
           <table class="sb-table">
             <thead>
@@ -3857,6 +3869,7 @@ let sbForce      = [];   // array of { unit, skill }
 let sbInited     = false;
 let sbSortKey    = 'BFPointValue';
 let sbSortDir    = 1;    // 1=asc, -1=desc
+let sbActiveType = 'all'; // selected unit-type tab ('all' or a Type.Name)
 
 const SB_ERA_LABELS = {
   '16':'Dark Age','257':'ilClan','254':'Late Republic','15':'Early Republic',
@@ -3979,6 +3992,7 @@ async function sbFetchCatalog() {
 
   status.textContent = 'Loading catalog from Master Unit List…';
   sbCatalog = [];
+  sbActiveType = 'all';
   document.getElementById('sb-unit-grid').innerHTML = '';
   document.getElementById('sb-catalog-count').textContent = '';
 
@@ -3988,6 +4002,9 @@ async function sbFetchCatalog() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     sbCatalog = data.Units || data || [];
+
+    // Default to the first unit type so the catalog opens separated by tab
+    sbActiveType = sbOrderedTypes(sbCatalog)[0] || 'all';
 
     // Populate role dropdown
     const roles = [...new Set(sbCatalog.map(u => u.Role?.Name).filter(Boolean))].sort();
@@ -4053,6 +4070,12 @@ function sbRenderBrowse() {
   if (dmgM > 0)              units = units.filter(u => sbDmgNum(u.BFDamageMedium) >= dmgM);
   if (dmgL > 0)              units = units.filter(u => sbDmgNum(u.BFDamageLong)   >= dmgL);
 
+  // Build the unit-type tabs from the filtered set, then narrow to the active tab
+  sbBuildTypeTabs(units);
+  if (sbActiveType !== 'all') {
+    units = units.filter(u => (u.Type?.Name || 'Other') === sbActiveType);
+  }
+
   // Sort
   units = [...units].sort((a, b) => {
     if (sbSortKey === 'Name')        return (a.Name||'').localeCompare(b.Name||'') * sbSortDir;
@@ -4117,7 +4140,13 @@ function sbRenderBrowse() {
     </tr>`;
   };
 
-  // Group by unit type (BattleMechs, Combat Vehicles, Infantry, …)
+  if (sbActiveType !== 'all') {
+    // Single type selected — flat list (the tab already names the type)
+    tbody.innerHTML = units.map(unitRow).join('');
+    return;
+  }
+
+  // "All" tab — group by unit type with section headers
   const groups = {};
   units.forEach(u => { const t = u.Type?.Name || 'Other'; (groups[t] = groups[t] || []).push(u); });
   const orderedTypes = Object.keys(groups).sort((a, b) => {
@@ -4133,6 +4162,43 @@ function sbRenderBrowse() {
       + `<span class="sb-group-count">${list.length}</span>${ownedTag}</td></tr>`
       + list.map(unitRow).join('');
   }).join('');
+}
+
+function sbOrderedTypes(list) {
+  const set = [...new Set(list.map(u => u.Type?.Name || 'Other'))];
+  return set.sort((a, b) => {
+    const ia = SB_TYPE_ORDER.indexOf(a), ib = SB_TYPE_ORDER.indexOf(b);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b);
+  });
+}
+
+function sbSetType(t) {
+  sbActiveType = t;
+  sbRenderBrowse();
+}
+
+// Build the unit-type tab row. Tabs come from the full catalog (so they don't
+// vanish when other filters exclude a type); counts reflect the filtered set.
+function sbBuildTypeTabs(filtered) {
+  const wrap = document.getElementById('sb-type-tabs');
+  if (!wrap) return;
+  if (!sbCatalog.length) { wrap.innerHTML = ''; return; }
+
+  const types  = sbOrderedTypes(sbCatalog);
+  if (sbActiveType !== 'all' && !types.includes(sbActiveType)) sbActiveType = 'all';
+  const hasCol = Object.keys(sbCollection).length > 0;
+  const typeOf = u => u.Type?.Name || 'Other';
+  const countOf = t => filtered.reduce((n, u) => n + (typeOf(u) === t ? 1 : 0), 0);
+  const ownedOf = t => hasCol ? filtered.reduce((n, u) => n + (typeOf(u) === t && sbIsOwned(u) ? 1 : 0), 0) : 0;
+  const allOwned = hasCol ? filtered.filter(sbIsOwned).length : 0;
+
+  const tab = (key, label, count, owned) =>
+    `<button class="sb-type-tab${sbActiveType === key ? ' on' : ''}" onclick="sbSetType('${String(key).replace(/'/g, "\\'")}')">`
+    + `${lbEsc(label)}<span class="sb-tt-count">${count}</span>`
+    + `${owned ? `<span class="sb-tt-owned">${owned}◆</span>` : ''}</button>`;
+
+  wrap.innerHTML = tab('all', 'All', filtered.length, allOwned)
+    + types.map(t => tab(t, sbTypeLabel(t), countOf(t), ownedOf(t))).join('');
 }
 
 function sbAddUnit(id) {
