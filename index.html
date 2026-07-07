@@ -4150,6 +4150,20 @@ function sbCurrentFactionId() {
   return document.getElementById('sb-faction')?.value || document.getElementById('sb-faction-general')?.value || '';
 }
 
+// Both Faction and General are sent to MUL together as separate Factions=
+// values when both are set (this is how the reference tool combines them —
+// they are complementary filters, not alternatives).
+function sbCurrentFactionIds() {
+  const specific = document.getElementById('sb-faction')?.value || '';
+  const general  = document.getElementById('sb-faction-general')?.value || '';
+  return [...new Set([specific, general].filter(Boolean))];
+}
+
+// MUL's QuickList endpoint silently truncates results when no Types filter
+// is given. The reference tool works around this by querying once per unit
+// type and merging — replicate that so large factions/eras aren't cut off.
+const SB_MUL_TYPE_IDS = [18, 19, 20, 21, 24]; // BattleMech, Combat Vehicle, Industrial Mech, Infantry, Support
+
 // Load the complete faction list from the MUL Autocomplete endpoint.
 // Falls back silently to the curated list already in the dropdown on failure.
 async function sbLoadFactions() {
@@ -4208,12 +4222,12 @@ function sbClearCatalog() {
 }
 
 async function sbFetchCatalog() {
-  const factionId = sbCurrentFactionId();
-  const eraId     = document.getElementById('sb-era')?.value || '';
-  const status    = document.getElementById('sb-status');
-  if (!factionId && !eraId) { status.textContent = 'Select a faction and era first.'; return; }
-  if (!factionId) { status.textContent = 'Select a faction first.'; return; }
-  if (!eraId)     { status.textContent = 'Select an era first.'; return; }
+  const factionIds = sbCurrentFactionIds();
+  const eraId      = document.getElementById('sb-era')?.value || '';
+  const status     = document.getElementById('sb-status');
+  if (!factionIds.length && !eraId) { status.textContent = 'Select a faction and era first.'; return; }
+  if (!factionIds.length)           { status.textContent = 'Select a faction first.'; return; }
+  if (!eraId)                       { status.textContent = 'Select an era first.'; return; }
 
   status.textContent = 'Loading catalog from Master Unit List…';
   sbCatalog = [];
@@ -4221,12 +4235,28 @@ async function sbFetchCatalog() {
   document.getElementById('sb-unit-grid').innerHTML = '';
   document.getElementById('sb-catalog-count').textContent = '';
 
-  try {
-    const params = new URLSearchParams({ Factions: factionId, AvailableEras: eraId, minPV: '1', maxPV: '999' });
+  // Query once per unit type and merge — MUL's QuickList truncates results
+  // when no Types filter is passed, which is why a single combined call was
+  // silently dropping most of a large faction/era's units.
+  const fetchOneType = async (typeId) => {
+    const params = new URLSearchParams({ AvailableEras: eraId, minPV: '1', maxPV: '999', Types: String(typeId) });
+    factionIds.forEach(id => params.append('Factions', id));
     const res = await fetch(`${MUL_API}?${params}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status} (Types=${typeId})`);
     const data = await res.json();
-    sbCatalog = data.Units || data || [];
+    return data.Units || data || [];
+  };
+
+  try {
+    const results = await Promise.allSettled(SB_MUL_TYPE_IDS.map(fetchOneType));
+    const failed = results.filter(r => r.status === 'rejected');
+    const byId = new Map();
+    results.forEach(r => { if (r.status === 'fulfilled') r.value.forEach(u => byId.set(u.Id, u)); });
+    sbCatalog = [...byId.values()];
+
+    if (!sbCatalog.length && failed.length) {
+      throw new Error(failed[0].reason?.message || 'all type queries failed');
+    }
 
     // Default to the first unit type so the catalog opens separated by tab
     sbActiveType = sbOrderedTypes(sbCatalog)[0] || 'all';
@@ -4244,11 +4274,12 @@ async function sbFetchCatalog() {
         roles.map(r => `<option value="${lbEsc(r)}"${r===prev?' selected':''}>${lbEsc(r)}</option>`).join('');
     }
 
-    const fName = sbFactionMeta[factionId]?.name || factionId;
+    const fName = factionIds.map(id => sbFactionMeta[id]?.name || id).join(' + ');
     const eLabel = SB_ERA_LABELS[eraId] || eraId;
     const ownedCount = sbCatalog.filter(u => sbIsOwned(u)).length;
     const ownedInfo = Object.keys(sbCollection).length ? ` · ${ownedCount} owned` : '';
-    status.textContent = `${sbCatalog.length} units — ${fName}, ${eLabel}${ownedInfo}`;
+    const warnInfo = failed.length ? ` · ${failed.length}/${SB_MUL_TYPE_IDS.length} type queries failed` : '';
+    status.textContent = `${sbCatalog.length} units — ${fName}, ${eLabel}${ownedInfo}${warnInfo}`;
     sbRenderBrowse();
   } catch(e) {
     status.textContent = `Error: ${e.message}`;
