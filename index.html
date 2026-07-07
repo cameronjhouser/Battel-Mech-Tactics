@@ -787,15 +787,31 @@
   /* ── SKIRMISH BUILDER ────────────────────────────────── */
   .sb-layout { display:grid; grid-template-columns:1fr 320px; gap:16px; margin-top:12px; }
   .sb-browse-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; align-items:center; }
-  .sb-filter-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; align-items:center; }
-  .sb-filter-row input[type=text], .sb-filter-row input[type=number] {
-    background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:4px;
-    padding:4px 8px; font-size:11px; font-family:var(--sans);
-  }
-  .sb-filter-row input[type=text] { flex:1 1 140px; }
-  .sb-filter-row input[type=number] { width:64px; }
-  .sb-filter-row select { background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:4px 6px; font-size:11px; }
-  .sb-filter-label { font-size:10px; color:var(--text2); white-space:nowrap; }
+  /* Grouped filter bar */
+  .sb-filter-bar { display:flex; flex-wrap:wrap; align-items:flex-end; gap:9px 16px;
+    margin-bottom:10px; padding:11px 13px; background:var(--bg2); border:1px solid var(--border); border-radius:6px; }
+  .sb-fgroup { display:flex; flex-direction:column; gap:4px; }
+  .sb-fgroup-grow { flex:1 1 150px; min-width:120px; }
+  .sb-fg-label { font-size:9px; font-family:var(--cond); font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--text3); white-space:nowrap; }
+  .sb-fg-range { display:flex; align-items:center; gap:4px; }
+  .sb-fg-dash { color:var(--text3); font-size:11px; }
+  .sb-filter-bar input[type=text], .sb-filter-bar input[type=number], .sb-filter-bar select {
+    background:var(--bg3); color:var(--text); border:1px solid var(--border2); border-radius:4px;
+    padding:0 8px; height:28px; font-size:11px; font-family:var(--sans); box-sizing:border-box; }
+  .sb-filter-bar input[type=text] { width:100%; }
+  .sb-filter-bar select { padding-right:4px; min-width:74px; }
+  .sb-filter-bar input[type=number] { width:52px; text-align:center;
+    -moz-appearance:textfield; appearance:textfield; }
+  .sb-filter-bar input[type=number]::-webkit-outer-spin-button,
+  .sb-filter-bar input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+  .sb-fg-range .sb-fg-dmg { width:40px; }
+  .sb-fg-check { display:flex; align-items:center; gap:5px; height:28px; font-size:11px;
+    color:var(--text2); cursor:pointer; white-space:nowrap; }
+  .sb-fgroup-actions { margin-left:auto; }
+  .sb-clear-btn { height:28px; background:var(--bg4); border:1px solid var(--border2); color:var(--text2);
+    border-radius:4px; padding:0 13px; font-size:11px; cursor:pointer; white-space:nowrap; }
+  .sb-clear-btn:hover { background:var(--red); color:#fff; border-color:var(--red); }
   .sb-table-wrap { overflow-x:auto; max-height:64vh; overflow-y:auto; border:1px solid var(--border); border-radius:5px; }
   .sb-table { width:100%; border-collapse:collapse; font-size:11px; }
   .sb-table thead { position:sticky; top:0; z-index:2; background:var(--bg3); }
@@ -812,6 +828,12 @@
   .sb-table th.sb-th-dmg .sb-th-slash { color:var(--text3); }
   .sb-table td { padding:4px 8px; border-bottom:1px solid var(--border); vertical-align:middle; }
   .sb-table tr:last-child td { border-bottom:none; }
+  .sb-group-row td { background:var(--bg4); color:var(--accent); font-family:var(--cond);
+    font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    padding:5px 8px; border-top:1px solid var(--border2); border-bottom:1px solid var(--border2); }
+  .sb-group-count { display:inline-block; margin-left:7px; padding:0 6px; border-radius:8px;
+    background:var(--bg2); color:var(--text2); font-family:var(--mono); font-size:9px; font-weight:400; }
+  .sb-group-owned { margin-left:7px; color:var(--green); font-size:9px; font-weight:400; letter-spacing:.04em; }
   .sb-table tr.sb-row { cursor:pointer; }
   .sb-table tr.sb-row:hover td { background:var(--bg3); }
   .sb-table tr.sb-row.in-force td { opacity:.5; cursor:default; }
@@ -2362,45 +2384,70 @@
       <button class="lb-btn" onclick="sbClearForce()" style="background:var(--red)">Clear Force</button>
     </div>
 
-    <!-- Filter row -->
-    <div class="sb-filter-row">
-      <input type="text" id="sb-filter-name" placeholder="Search name…" oninput="sbRenderBrowse()">
-      <span class="sb-filter-label">Role</span>
-      <select id="sb-filter-role" onchange="sbRenderBrowse()"><option value="">All</option></select>
-      <span class="sb-filter-label">Abilities</span>
-      <input type="text" id="sb-filter-abil" placeholder="e.g. JMPS, ECM" oninput="sbRenderBrowse()" style="flex:1 1 120px">
-      <span class="sb-filter-label">Size</span>
-      <select id="sb-filter-size-min" onchange="sbRenderBrowse()" title="Minimum size">
-        <option value="">Min</option>
-        <option value="1">Light</option>
-        <option value="2">Medium</option>
-        <option value="3">Heavy</option>
-        <option value="4">Assault</option>
-      </select>
-      <span class="sb-filter-label">–</span>
-      <select id="sb-filter-size-max" onchange="sbRenderBrowse()" title="Maximum size">
-        <option value="">Max</option>
-        <option value="1">Light</option>
-        <option value="2">Medium</option>
-        <option value="3">Heavy</option>
-        <option value="4">Assault</option>
-      </select>
-      <span class="sb-filter-label">Move</span>
-      <input type="number" id="sb-filter-move-min" placeholder="min" min="0" max="99" oninput="sbRenderBrowse()">
-      <span class="sb-filter-label">–</span>
-      <input type="number" id="sb-filter-move-max" placeholder="max" min="0" max="99" oninput="sbRenderBrowse()">
-      <span class="sb-filter-label">PV</span>
-      <input type="number" id="sb-filter-pv-min" placeholder="min" min="1" max="999" oninput="sbRenderBrowse()">
-      <span class="sb-filter-label">–</span>
-      <input type="number" id="sb-filter-pv-max" placeholder="max" min="1" max="999" oninput="sbRenderBrowse()">
-      <span class="sb-filter-label">Dmg&nbsp;S/M/L&nbsp;≥</span>
-      <input type="number" id="sb-filter-dmg-s" placeholder="S" min="0" max="20" oninput="sbRenderBrowse()" style="width:44px">
-      <input type="number" id="sb-filter-dmg-m" placeholder="M" min="0" max="20" oninput="sbRenderBrowse()" style="width:44px">
-      <input type="number" id="sb-filter-dmg-l" placeholder="L" min="0" max="20" oninput="sbRenderBrowse()" style="width:44px">
-      <label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;margin-left:4px">
-        <input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only
-      </label>
-      <button class="sb-add-btn" onclick="sbClearFilters()" title="Reset all filters" style="margin-left:auto;font-weight:400;padding:2px 8px;font-size:11px">Clear</button>
+    <!-- Grouped filter bar -->
+    <div class="sb-filter-bar">
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Search name</label>
+        <input type="text" id="sb-filter-name" placeholder="e.g. Fenris, Warhammer…" oninput="sbRenderBrowse()">
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">Role</label>
+        <select id="sb-filter-role" onchange="sbRenderBrowse()"><option value="">All roles</option></select>
+      </div>
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Abilities</label>
+        <input type="text" id="sb-filter-abil" placeholder="e.g. JMPS ECM (both)" oninput="sbRenderBrowse()">
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">Size (min–max)</label>
+        <div class="sb-fg-range">
+          <select id="sb-filter-size-min" onchange="sbRenderBrowse()" title="Minimum size">
+            <option value="">Any</option>
+            <option value="1">Light</option>
+            <option value="2">Medium</option>
+            <option value="3">Heavy</option>
+            <option value="4">Assault</option>
+          </select>
+          <span class="sb-fg-dash">–</span>
+          <select id="sb-filter-size-max" onchange="sbRenderBrowse()" title="Maximum size">
+            <option value="">Any</option>
+            <option value="1">Light</option>
+            <option value="2">Medium</option>
+            <option value="3">Heavy</option>
+            <option value="4">Assault</option>
+          </select>
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">Move (min–max)</label>
+        <div class="sb-fg-range">
+          <input type="number" id="sb-filter-move-min" placeholder="min" min="0" max="99" oninput="sbRenderBrowse()">
+          <span class="sb-fg-dash">–</span>
+          <input type="number" id="sb-filter-move-max" placeholder="max" min="0" max="99" oninput="sbRenderBrowse()">
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">PV (min–max)</label>
+        <div class="sb-fg-range">
+          <input type="number" id="sb-filter-pv-min" placeholder="min" min="1" max="999" oninput="sbRenderBrowse()">
+          <span class="sb-fg-dash">–</span>
+          <input type="number" id="sb-filter-pv-max" placeholder="max" min="1" max="999" oninput="sbRenderBrowse()">
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">Min damage S / M / L</label>
+        <div class="sb-fg-range">
+          <input type="number" class="sb-fg-dmg" id="sb-filter-dmg-s" placeholder="S" min="0" max="20" oninput="sbRenderBrowse()">
+          <input type="number" class="sb-fg-dmg" id="sb-filter-dmg-m" placeholder="M" min="0" max="20" oninput="sbRenderBrowse()">
+          <input type="number" class="sb-fg-dmg" id="sb-filter-dmg-l" placeholder="L" min="0" max="20" oninput="sbRenderBrowse()">
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-check"><input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only</label>
+      </div>
+      <div class="sb-fgroup sb-fgroup-actions">
+        <button class="sb-clear-btn" onclick="sbClearFilters()" title="Reset all filters">Clear filters</button>
+      </div>
     </div>
 
     <div id="sb-status" class="lb-status">Select faction + era, then click Load Catalog. Upload a collection CSV to mark owned units.</div>
@@ -3834,6 +3881,15 @@ function sbIsJump(unit) {
   return /\bJMPS\d*\b|\bJMPW\d*\b/i.test(unit.BFAbilities || '');
 }
 
+// Unit-type grouping for the catalog table
+const SB_TYPE_ORDER = ['BattleMech','ProtoMech','Combat Vehicle','Support Vehicle','Battle Armor','Infantry','Aerospace Fighter','Conventional Fighter'];
+const SB_TYPE_PLURAL = {
+  'BattleMech':'BattleMechs', 'ProtoMech':'ProtoMechs', 'Combat Vehicle':'Combat Vehicles',
+  'Support Vehicle':'Support Vehicles', 'Battle Armor':'Battle Armor', 'Infantry':'Infantry',
+  'Aerospace Fighter':'Aerospace Fighters', 'Conventional Fighter':'Conventional Fighters'
+};
+function sbTypeLabel(t) { return SB_TYPE_PLURAL[t] || t || 'Other'; }
+
 // Parse leading integer from a Move value ("8\"", "10j", "6\"/8\"j" → 8/10/6)
 function sbMoveNum(unit) {
   const m = String(unit.BFMove ?? '').match(/\d+/);
@@ -4035,7 +4091,7 @@ function sbRenderBrowse() {
     return;
   }
 
-  tbody.innerHTML = units.map(u => {
+  const unitRow = (u) => {
     const owned   = hasCol && sbIsOwned(u);
     const inForce = inForceIds.has(u.Id);
     const dmg     = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
@@ -4059,6 +4115,23 @@ function sbRenderBrowse() {
         : `<button class="sb-add-btn" onclick="sbAddUnit(${u.Id})">+</button>`
       }</td>
     </tr>`;
+  };
+
+  // Group by unit type (BattleMechs, Combat Vehicles, Infantry, …)
+  const groups = {};
+  units.forEach(u => { const t = u.Type?.Name || 'Other'; (groups[t] = groups[t] || []).push(u); });
+  const orderedTypes = Object.keys(groups).sort((a, b) => {
+    const ia = SB_TYPE_ORDER.indexOf(a), ib = SB_TYPE_ORDER.indexOf(b);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b);
+  });
+
+  tbody.innerHTML = orderedTypes.map(t => {
+    const list = groups[t];
+    const ownedInGroup = hasCol ? list.filter(u => sbIsOwned(u)).length : 0;
+    const ownedTag = ownedInGroup ? `<span class="sb-group-owned">${ownedInGroup} owned</span>` : '';
+    return `<tr class="sb-group-row"><td colspan="9">${lbEsc(sbTypeLabel(t))}`
+      + `<span class="sb-group-count">${list.length}</span>${ownedTag}</td></tr>`
+      + list.map(unitRow).join('');
   }).join('');
 }
 
