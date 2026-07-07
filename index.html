@@ -4160,9 +4160,13 @@ function sbCurrentFactionIds() {
 }
 
 // MUL's QuickList endpoint silently truncates results when no Types filter
-// is given. The reference tool works around this by querying once per unit
-// type and merging — replicate that so large factions/eras aren't cut off.
-const SB_MUL_TYPE_IDS = [18, 19, 20, 21, 24]; // BattleMech, Combat Vehicle, Industrial Mech, Infantry, Support
+// is given. Work around it by querying once per unit type and merging.
+// Full Types id table (verified against MUL's own per-faction/era tab
+// counts): Mech 18, Combat Vee 19, Aerospace 17, Infantry 21,
+// Industrial Mech 20, ProtoMech 23, Support Vee 24, Adv Aerospace 81,
+// Adv Support 79. (Building 97 / Unknown 76 excluded — not fieldable
+// combat units.)
+const SB_MUL_TYPE_IDS = [17, 18, 19, 20, 21, 23, 24, 79, 81];
 
 // Load the complete faction list from the MUL Autocomplete endpoint.
 // Falls back silently to the curated list already in the dropdown on failure.
