@@ -4137,14 +4137,10 @@ function sbPopulateFactions(entries) {
 
 // Faction and General are mutually exclusive — picking one clears the other.
 function sbFactionChanged() {
-  const sel = document.getElementById('sb-faction');
-  if (sel?.value) { const gen = document.getElementById('sb-faction-general'); if (gen) gen.value = ''; }
   sbClearCatalog();
   sbRenderForce();
 }
 function sbGeneralChanged() {
-  const gen = document.getElementById('sb-faction-general');
-  if (gen?.value) { const sel = document.getElementById('sb-faction'); if (sel) sel.value = ''; }
   sbClearCatalog();
   sbRenderForce();
 }
