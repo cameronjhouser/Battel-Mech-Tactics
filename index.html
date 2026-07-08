@@ -4730,10 +4730,20 @@ function sbCardSVG(u, skill) {
   const armorRows  = Math.max(1, Math.ceil(armor / PIP_ROWS_PER_WRAP));
   const structRows = Math.max(1, Math.ceil(struct_ / PIP_ROWS_PER_WRAP));
 
+  const IMG_H = u.ImageUrl ? 190 : 0;
   let y = 34;
   let svg = `<svg viewBox="0 0 ${W} 1" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" data-h-placeholder="1">`;
   svg += `<rect x="0" y="0" width="${W}" height="9999" fill="#111"/>`;
   svg += `<rect x="4" y="4" width="${W-8}" height="9991" fill="#fff" stroke="#111" stroke-width="1"/>`;
+
+  if (u.ImageUrl) {
+    svg += `<clipPath id="sb-img-clip-${u.Id}"><rect x="4" y="4" width="${W-8}" height="${IMG_H}"/></clipPath>
+      <image href="${lbEsc(u.ImageUrl)}" x="4" y="4" width="${W-8}" height="${IMG_H}"
+        preserveAspectRatio="xMidYMid slice" clip-path="url(#sb-img-clip-${u.Id})"
+        onerror="this.setAttribute('href','');this.style.display='none'"/>
+      <rect x="4" y="4" width="${W-8}" height="${IMG_H}" fill="none" stroke="#111" stroke-width="1"/>`;
+    y += IMG_H + 8;
+  }
 
   svg += `<text x="20" y="${y}" font-family="sans-serif" font-size="24" font-weight="700">${lbEsc(u.Name || '?')}</text>`;
   svg += `<rect x="${W-140}" y="${y-22}" width="120" height="44" fill="none" stroke="#111" stroke-width="2"/>`;
@@ -4814,13 +4824,6 @@ function sbDownloadCards() {
       const u = m.unit;
       cardRows += `<div class="card-wrap">
         ${sbCardSVG(u, m.skill)}
-        <div class="pilot-info">
-          <input class="p-name" type="text" placeholder="Pilot name">
-          <div class="p-skills">
-            <span>GU <input class="p-skill" type="number" min="0" max="8" value="${m.skill}" title="Gunnery Skill"></span>
-            <span>PI <input class="p-skill" type="number" min="0" max="8" value="${m.skill}" title="Piloting Skill"></span>
-          </div>
-        </div>
       </div>`;
     });
     cardRows += `</div>`;
@@ -4842,11 +4845,6 @@ function sbDownloadCards() {
     .card-row  { display:flex; flex-wrap:wrap; gap:12px; padding:10px 14px 6px; }
     .card-wrap { display:flex; flex-direction:column; align-items:center; width:340px; }
     .card-wrap svg { border:1px solid #bbb; border-radius:4px; }
-    .pilot-info { width:340px; margin-top:6px; }
-    .p-name  { width:100%; border:1px solid #aaa; border-radius:2px; padding:3px 5px; font-size:11px; }
-    .p-skills { display:flex; gap:10px; margin-top:3px; font-size:11px; font-weight:700; align-items:center; }
-    .p-skill { width:36px; border:1px solid #aaa; border-radius:2px; padding:2px 3px;
-               text-align:center; font-size:11px; font-weight:700; }
     @media print {
       body { margin:0; }
       .lance-hdr { page-break-before:auto; }
