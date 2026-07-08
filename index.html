@@ -2427,6 +2427,10 @@
         <span>📂 Collection CSV</span>
         <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
       </label>
+      <button class="lb-btn" onclick="sbSaveCollectionPrompt()">Save List</button>
+      <select id="sb-collection-select" style="flex:1 1 160px"><option value="">No saved lists</option></select>
+      <button class="lb-btn" onclick="sbLoadCollectionSelected()">Load</button>
+      <button class="lb-btn" onclick="sbDeleteCollectionSelected()" style="background:var(--red)">Delete</button>
       <select id="sb-faction" onchange="sbFactionChanged()"></select>
       <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above, it does not narrow or replace it"></select>
       <select id="sb-era" onchange="sbClearCatalog()">
@@ -3953,11 +3957,12 @@ function lbSwitchMode(mode) {
   document.getElementById('lb-tab-csv').classList.toggle('on', mode === 'csv');
   document.getElementById('lb-tab-skirmish').classList.toggle('on', mode === 'skirmish');
   if (mode === 'csv') lbCsvRefreshSavedSelect();
-  if (mode === 'skirmish') { sbInit(); sbRefreshSavedSelect(); }
+  if (mode === 'skirmish') { sbInit(); sbRefreshSavedSelect(); sbRefreshCollectionSelect(); }
 }
 
 /* ── SKIRMISH FORCE BUILDER ─────────────────────────── */
 let sbCollection = {};   // normalized name -> true (from uploaded CSV)
+const SB_COLLECTION_STORAGE_KEY = 'bmtSavedCollections.v1';
 let sbCatalog    = [];   // all MUL units for current faction/era
 let sbForce      = [];   // array of { unit, skill }
 let sbInited     = false;
@@ -4337,6 +4342,77 @@ function sbLoadCSV(input) {
     sbRenderBrowse();
   };
   reader.readAsText(file);
+}
+
+// Saved collections persist the already-normalized sbCollection map (no MUL
+// lookups involved for this one), so loading is instant — same
+// save/pick-from-dropdown pattern as the Skirmish saved lances and CSV
+// Formation Builder saved lists.
+function sbStoredCollections() {
+  try {
+    return JSON.parse(localStorage.getItem(SB_COLLECTION_STORAGE_KEY) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function sbSetStoredCollections(collections) {
+  localStorage.setItem(SB_COLLECTION_STORAGE_KEY, JSON.stringify(collections));
+}
+
+function sbSaveCollectionPrompt() {
+  const n = Object.keys(sbCollection).length;
+  if (!n) { alert('Upload a Collection CSV before saving a list.'); return; }
+  const defaultName = localStorage.getItem('bmtSavedCollections.lastName') || '';
+  const name = prompt('Save list as:', defaultName);
+  if (!name) return;
+  const key = name.trim();
+  if (!key) return;
+  const collections = sbStoredCollections();
+  collections[key] = {
+    name: key,
+    updatedAt: new Date().toISOString(),
+    unitCount: n,
+    collection: sbCollection,
+  };
+  sbSetStoredCollections(collections);
+  localStorage.setItem('bmtSavedCollections.lastName', key);
+  sbRefreshCollectionSelect(key);
+  alert(`Saved "${key}" with ${n} unit names.`);
+}
+
+function sbRefreshCollectionSelect(selectName) {
+  const el = document.getElementById('sb-collection-select');
+  if (!el) return;
+  const collections = sbStoredCollections();
+  const names = Object.keys(collections).sort((a, b) => a.localeCompare(b));
+  const want = selectName ?? el.value;
+  el.innerHTML = names.length
+    ? names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${collections[n].unitCount || 0})</option>`).join('')
+    : '<option value="">No saved lists</option>';
+  if (names.includes(want)) el.value = want;
+}
+
+function sbLoadCollectionSelected() {
+  const name = document.getElementById('sb-collection-select')?.value;
+  if (!name) { alert('No saved list selected.'); return; }
+  const saved = sbStoredCollections()[name];
+  if (!saved?.collection || !Object.keys(saved.collection).length) { alert('That saved list has no units.'); return; }
+  sbCollection = saved.collection;
+  document.getElementById('sb-status').textContent =
+    `Collection loaded: ${Object.keys(sbCollection).length} unit names from "${name}". Click Load Catalog to browse.`;
+  sbRenderBrowse();
+  localStorage.setItem('bmtSavedCollections.lastName', name);
+}
+
+function sbDeleteCollectionSelected() {
+  const name = document.getElementById('sb-collection-select')?.value;
+  if (!name) { alert('No saved list selected.'); return; }
+  if (!confirm(`Delete saved list "${name}"?`)) return;
+  const collections = sbStoredCollections();
+  delete collections[name];
+  sbSetStoredCollections(collections);
+  sbRefreshCollectionSelect();
 }
 
 function sbClearCatalog() {
