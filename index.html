@@ -501,10 +501,10 @@
   .lb-mode-btn.on { color:var(--accent); border-bottom-color:var(--accent); }
   .lb-mode-btn:hover:not(.on) { color:var(--text); }
 
-  .lb-csv-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:center; }
+  .lb-csv-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:flex-end; }
   .lb-csv-controls select {
     background:var(--bg3); border:1px solid var(--border2); color:var(--text);
-    font-family:var(--sans); font-size:13px; padding:7px 10px; border-radius:4px; flex:1 1 200px;
+    font-family:var(--sans); font-size:13px; padding:7px 10px; border-radius:4px; width:100%;
   }
   .lb-file-label {
     display:inline-flex; align-items:center; gap:8px; background:var(--bg3);
@@ -791,7 +791,7 @@
 
   /* ── SKIRMISH BUILDER ────────────────────────────────── */
   .sb-layout { display:grid; grid-template-columns:1fr 320px; gap:16px; margin-top:12px; }
-  .sb-browse-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; align-items:center; }
+  .sb-browse-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; align-items:flex-end; }
   /* Grouped filter bar */
   .sb-filter-bar { display:flex; flex-wrap:wrap; align-items:flex-end; gap:9px 16px;
     margin-bottom:10px; padding:11px 13px; background:var(--bg2); border:1px solid var(--border); border-radius:6px; }
@@ -2371,54 +2371,69 @@
           <span>📂 Choose CSV file</span>
           <input type="file" id="lb-csv-input" accept=".csv,.txt" onchange="lbLoadCSV(this)">
         </label>
-        <button class="lb-btn" onclick="lbCsvSaveListPrompt()">Save List</button>
-        <select id="lb-csv-saved-select" style="flex:1 1 180px"><option value="">No saved lists</option></select>
-        <button class="lb-btn" onclick="lbCsvLoadSelected()">Load</button>
-        <button class="lb-btn" onclick="lbCsvDeleteSelected()" style="background:var(--red)">Delete</button>
+        <div class="sb-fgroup sb-fgroup-grow">
+          <label class="sb-fg-label">Saved lists</label>
+          <select id="lb-csv-saved-select"><option value="">No saved lists</option></select>
+        </div>
+        <button class="lb-btn-sm" onclick="lbCsvSaveListPrompt()" style="padding:4px 12px">Save List</button>
+        <button class="lb-btn-sm" onclick="lbCsvLoadSelected()" style="padding:4px 12px">Load</button>
+        <button class="lb-btn-sm" onclick="lbCsvDeleteSelected()" style="padding:4px 12px;background:var(--red);color:#fff">Delete</button>
       </div>
     </div>
     <div class="lb-csv-controls">
-      <select id="lb-formation-type" style="flex:1 1 200px">
-        <option value="lance">Lance (4 units · 1 lance)</option>
-        <option value="aug-lance">Augmented Lance (6 units · 1 lance + support)</option>
-        <option value="demi">Demi-Company (6 units · 1–2 lances)</option>
-        <option value="company" selected>Company (12 units · 3 lances)</option>
-        <option value="aug-company">Augmented Company (12 units · 3 lances)</option>
-        <option value="ctf">Company Task Force (18–24 units · 4–6 lances)</option>
-        <option value="battalion">Battalion (40 units · 10 lances)</option>
-        <option value="air-lance">Air Lance (8 units · 2 lances)</option>
-        <option value="aug-battalion">Augmented Battalion (56 units · 14 lances)</option>
-        <option value="reinf-battalion">Reinforced Battalion (48 units · 12 lances)</option>
-        <option value="sl-battalion">SL Reinforced Battalion (64 units · 16 lances)</option>
-        <option value="regiment">Regiment (108 units · 27 lances)</option>
-        <option value="reinf-regiment">Reinforced Regiment (192 units · 48 lances)</option>
-        <option value="brigade">Brigade (324 units · 81 lances)</option>
-        <option value="reinf-brigade">Reinforced Brigade (432 units · 108 lances)</option>
-        <option value="prov-brigade">Provisional Brigade (216 units · 54 lances)</option>
-      </select>
-      <select id="lb-special-type" style="flex:1 1 180px" title="Optionally group lances by special type">
-        <option value="">Standard (sort by weight)</option>
-        <option value="recon">Recon / Scout Lance</option>
-        <option value="strike">Strike / Striker Lance</option>
-        <option value="fire">Fire Lance</option>
-        <option value="battle">Battle / Line Lance</option>
-        <option value="assault-sp">Assault Lance (Special)</option>
-        <option value="command">Command Lance</option>
-        <option value="pursuit">Pursuit Lance</option>
-      </select>
-      <select id="lb-csv-era" style="flex:1 1 180px" title="Only include units introduced in this era or earlier">
-        <option value="">All Eras</option>
-        <option value="0-2570">Age of War (≤ 2570)</option>
-        <option value="2571-2780">Star League (2571–2780)</option>
-        <option value="2781-3049">Succession Wars (2781–3049)</option>
-        <option value="3050-3061">Clan Invasion (3050–3061)</option>
-        <option value="3062-3067">Civil War (3062–3067)</option>
-        <option value="3068-3080">Jihad (3068–3080)</option>
-        <option value="3081-3130">Republic Era (3081–3130)</option>
-        <option value="3131-3150">Dark Age (3131–3150)</option>
-        <option value="3151-9999">ilClan (3151+)</option>
-      </select>
-      <select id="lb-csv-faction" title="Filter pool by faction availability"></select>
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Formation type</label>
+        <select id="lb-formation-type">
+          <option value="lance">Lance (4 units · 1 lance)</option>
+          <option value="aug-lance">Augmented Lance (6 units · 1 lance + support)</option>
+          <option value="demi">Demi-Company (6 units · 1–2 lances)</option>
+          <option value="company" selected>Company (12 units · 3 lances)</option>
+          <option value="aug-company">Augmented Company (12 units · 3 lances)</option>
+          <option value="ctf">Company Task Force (18–24 units · 4–6 lances)</option>
+          <option value="battalion">Battalion (40 units · 10 lances)</option>
+          <option value="air-lance">Air Lance (8 units · 2 lances)</option>
+          <option value="aug-battalion">Augmented Battalion (56 units · 14 lances)</option>
+          <option value="reinf-battalion">Reinforced Battalion (48 units · 12 lances)</option>
+          <option value="sl-battalion">SL Reinforced Battalion (64 units · 16 lances)</option>
+          <option value="regiment">Regiment (108 units · 27 lances)</option>
+          <option value="reinf-regiment">Reinforced Regiment (192 units · 48 lances)</option>
+          <option value="brigade">Brigade (324 units · 81 lances)</option>
+          <option value="reinf-brigade">Reinforced Brigade (432 units · 108 lances)</option>
+          <option value="prov-brigade">Provisional Brigade (216 units · 54 lances)</option>
+        </select>
+      </div>
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Lance specialty</label>
+        <select id="lb-special-type" title="Optionally group lances by special type">
+          <option value="">Standard (sort by weight)</option>
+          <option value="recon">Recon / Scout Lance</option>
+          <option value="strike">Strike / Striker Lance</option>
+          <option value="fire">Fire Lance</option>
+          <option value="battle">Battle / Line Lance</option>
+          <option value="assault-sp">Assault Lance (Special)</option>
+          <option value="command">Command Lance</option>
+          <option value="pursuit">Pursuit Lance</option>
+        </select>
+      </div>
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Era</label>
+        <select id="lb-csv-era" title="Only include units introduced in this era or earlier">
+          <option value="">All Eras</option>
+          <option value="0-2570">Age of War (≤ 2570)</option>
+          <option value="2571-2780">Star League (2571–2780)</option>
+          <option value="2781-3049">Succession Wars (2781–3049)</option>
+          <option value="3050-3061">Clan Invasion (3050–3061)</option>
+          <option value="3062-3067">Civil War (3062–3067)</option>
+          <option value="3068-3080">Jihad (3068–3080)</option>
+          <option value="3081-3130">Republic Era (3081–3130)</option>
+          <option value="3131-3150">Dark Age (3131–3150)</option>
+          <option value="3151-9999">ilClan (3151+)</option>
+        </select>
+      </div>
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Faction</label>
+        <select id="lb-csv-faction" title="Filter pool by faction availability"></select>
+      </div>
       <button class="lb-btn" id="lb-build-btn" onclick="lbBuildFormation()" disabled>Build Formation</button>
     </div>
     <div id="lb-csv-status" class="lb-status">Upload a CSV with one unit name per row to get started.</div>
@@ -2440,33 +2455,45 @@
             <span>📂 Collection CSV</span>
             <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
           </label>
-          <button class="lb-btn" onclick="sbSaveCollectionPrompt()">Save List</button>
-          <select id="sb-collection-select" style="flex:1 1 160px"><option value="">No saved lists</option></select>
-          <button class="lb-btn" onclick="sbLoadCollectionSelected()">Load</button>
-          <button class="lb-btn" onclick="sbDeleteCollectionSelected()" style="background:var(--red)">Delete</button>
+          <div class="sb-fgroup sb-fgroup-grow">
+            <label class="sb-fg-label">Saved lists</label>
+            <select id="sb-collection-select"><option value="">No saved lists</option></select>
+          </div>
+          <button class="lb-btn-sm" onclick="sbSaveCollectionPrompt()" style="padding:4px 12px">Save List</button>
+          <button class="lb-btn-sm" onclick="sbLoadCollectionSelected()" style="padding:4px 12px">Load</button>
+          <button class="lb-btn-sm" onclick="sbDeleteCollectionSelected()" style="padding:4px 12px;background:var(--red);color:#fff">Delete</button>
         </div>
       </div>
       <div class="card" style="padding:12px 14px;margin-bottom:0">
         <div class="card-title">Catalog</div>
         <div class="sb-browse-controls" style="margin-bottom:0">
-          <select id="sb-faction" onchange="sbFactionChanged()"></select>
-          <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above, it does not narrow or replace it"></select>
-          <select id="sb-era" onchange="sbClearCatalog()">
-            <option value="" selected>Select era…</option>
-            <option value="16">Dark Age (3131–3150)</option>
-            <option value="257">ilClan (3151–present)</option>
-            <option value="254">Late Republic (3101–3130)</option>
-            <option value="15">Early Republic (3081–3100)</option>
-            <option value="14">Jihad (3068–3080)</option>
-            <option value="247">Civil War (3062–3067)</option>
-            <option value="13">Clan Invasion (3050–3061)</option>
-            <option value="256">Late SW – Renaissance (3020–3049)</option>
-            <option value="255">Late SW – LosTech (2901–3019)</option>
-            <option value="11">Early Succession War (2781–2900)</option>
-            <option value="10">Star League (2571–2780)</option>
-          </select>
+          <div class="sb-fgroup" style="flex:1 1 100%">
+            <label class="sb-fg-label">Faction</label>
+            <select id="sb-faction" onchange="sbFactionChanged()"></select>
+          </div>
+          <div class="sb-fgroup" style="flex:1 1 100%">
+            <label class="sb-fg-label">General / Clan group</label>
+            <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above, it does not narrow or replace it"></select>
+          </div>
+          <div class="sb-fgroup" style="flex:1 1 100%">
+            <label class="sb-fg-label">Era</label>
+            <select id="sb-era" onchange="sbClearCatalog()">
+              <option value="" selected>Select era…</option>
+              <option value="16">Dark Age (3131–3150)</option>
+              <option value="257">ilClan (3151–present)</option>
+              <option value="254">Late Republic (3101–3130)</option>
+              <option value="15">Early Republic (3081–3100)</option>
+              <option value="14">Jihad (3068–3080)</option>
+              <option value="247">Civil War (3062–3067)</option>
+              <option value="13">Clan Invasion (3050–3061)</option>
+              <option value="256">Late SW – Renaissance (3020–3049)</option>
+              <option value="255">Late SW – LosTech (2901–3019)</option>
+              <option value="11">Early Succession War (2781–2900)</option>
+              <option value="10">Star League (2571–2780)</option>
+            </select>
+          </div>
           <button class="lb-btn" onclick="sbFetchCatalog()">Load Catalog</button>
-          <button class="lb-btn" onclick="sbClearForce()" style="background:var(--red)">Clear Force</button>
+          <button class="lb-btn-sm" onclick="sbClearForce()" style="padding:4px 12px;background:var(--red);color:#fff">Clear Force</button>
         </div>
       </div>
     </div>
