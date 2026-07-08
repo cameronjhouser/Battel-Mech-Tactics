@@ -2566,7 +2566,10 @@
       <div class="sb-force-panel">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span class="sec-label" style="margin:0">Tournament Force</span>
-          <button class="lb-btn-sm" onclick="sbDownloadCards()" style="padding:2px 10px;margin-left:auto">📇 Cards</button>
+          <button class="lb-btn-sm" onclick="sbSaveForcePrompt()" style="padding:2px 10px;margin-left:auto">💾 Save</button>
+          <button class="lb-btn-sm" onclick="sbLoadForcePrompt()" style="padding:2px 10px">📂 Load</button>
+          <button class="lb-btn-sm" onclick="sbDeleteForcePrompt()" style="padding:2px 10px">🗑️ Delete</button>
+          <button class="lb-btn-sm" onclick="sbDownloadCards()" style="padding:2px 10px">📇 Cards</button>
           <button class="lb-btn-sm" onclick="sbOpenSheets()" style="padding:2px 10px">📋 Sheets</button>
         </div>
         <div class="sb-pv-meter">
@@ -3957,6 +3960,7 @@ let sbAbilMode   = 'all';  // 'all' = unit must have every selected ability; 'an
 let sbAbilOpts   = [];     // [{code, n}] distinct base abilities in the catalog
 let sbFactionMeta = {};    // faction id -> { name, isClan } (curated + live-loaded)
 let sbFactionsLive = false;// true once the full list is loaded from MUL
+const SB_SAVED_STORAGE_KEY = 'bmtSavedLances.v1';
 let sbLastAutoIntro = null; // last auto-filled Introduced Year MAX value, or null
 
 // Verified active-year windows for factions with a well-documented, stable
@@ -4651,6 +4655,73 @@ function sbClearForce() {
   sbRenderBrowse();
 }
 
+// Saved lances persist the full unit data alongside each unit's chosen
+// skill, so a load doesn't depend on the catalog's faction/era still
+// being selected — same approach as the Owned Units saved-roster feature.
+function sbStoredLances() {
+  try {
+    return JSON.parse(localStorage.getItem(SB_SAVED_STORAGE_KEY) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function sbSetStoredLances(lances) {
+  localStorage.setItem(SB_SAVED_STORAGE_KEY, JSON.stringify(lances));
+}
+
+function sbSaveForcePrompt() {
+  if (!sbForce.length) { alert('Add units to your force before saving.'); return; }
+  const defaultName = localStorage.getItem('bmtSavedLances.lastName') || '';
+  const name = prompt('Save force as:', defaultName);
+  if (!name) return;
+  const key = name.trim();
+  if (!key) return;
+  const lances = sbStoredLances();
+  lances[key] = {
+    name: key,
+    updatedAt: new Date().toISOString(),
+    unitCount: sbForce.length,
+    totalPV: sbForce.reduce((s, f) => s + sbAdjPV(f.unit, f.skill), 0),
+    force: sbForce,
+  };
+  sbSetStoredLances(lances);
+  localStorage.setItem('bmtSavedLances.lastName', key);
+  alert(`Saved "${key}" with ${sbForce.length} units.`);
+}
+
+function sbForceChoice(actionLabel) {
+  const lances = sbStoredLances();
+  const names = Object.keys(lances).sort((a, b) => a.localeCompare(b));
+  if (!names.length) { alert('No saved forces found.'); return null; }
+  const list = names.map((n, i) => `${i + 1}. ${n} (${lances[n].unitCount || 0} units, ${lances[n].totalPV || 0} PV)`).join('\n');
+  const pick = prompt(`${actionLabel} force:\n${list}\n\nEnter number or name:`);
+  if (!pick) return null;
+  const idx = parseInt(pick, 10);
+  if (Number.isFinite(idx) && idx >= 1 && idx <= names.length) return names[idx - 1];
+  return names.find(n => n.toLowerCase() === pick.trim().toLowerCase()) || null;
+}
+
+function sbLoadForcePrompt() {
+  const name = sbForceChoice('Load');
+  if (!name) return;
+  const saved = sbStoredLances()[name];
+  if (!saved?.force?.length) { alert('That saved force has no units.'); return; }
+  sbForce = saved.force;
+  sbRenderForce();
+  sbRenderBrowse();
+  localStorage.setItem('bmtSavedLances.lastName', name);
+}
+
+function sbDeleteForcePrompt() {
+  const name = sbForceChoice('Delete');
+  if (!name) return;
+  if (!confirm(`Delete saved force "${name}"?`)) return;
+  const lances = sbStoredLances();
+  delete lances[name];
+  sbSetStoredLances(lances);
+}
+
 // Chunk sbForce into lance (4) / star (5) groups, same rule sbRenderForce
 // uses, for the shared card/sheet print builders below.
 function sbForceGroups() {
@@ -4793,10 +4864,15 @@ function sbCardSVG(u, skill) {
   const extraAbilH = Math.max(0, (abilLines.length - 2) * 25);
   const extraH = extraCritH + extraAbilH;
   const totalH = H + extraH;
+  const footerY = 610 + extraH;
 
   let svg = `<svg viewBox="0 0 ${W} ${totalH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">`;
   svg += `<rect x="0" y="0" width="${W}" height="${totalH}" fill="rgb(0,0,0)"/>`;
-  svg += `<rect x="10" y="10" width="${W-20}" height="${totalH-20}" fill="rgb(255,255,255)"/>`;
+  // Stops 20px above the footer bar (which is 10px narrower on the right,
+  // ending at x=970 vs the card's x=990 edge) so the black card background
+  // shows through there instead of a stray white notch peeking past the
+  // footer's corner.
+  svg += `<rect x="10" y="10" width="${W-20}" height="${footerY-30}" fill="rgb(255,255,255)"/>`;
 
   if (u.ImageUrl) {
     svg += `<image x="440" y="10" href="${lbEsc(u.ImageUrl)}" width="550" height="500"
@@ -4893,7 +4969,6 @@ function sbCardSVG(u, skill) {
   }
 
   // Footer
-  const footerY = 610 + extraH;
   svg += `<rect x="10" y="${footerY}" width="960" height="35" fill="rgb(0,0,0)"/>`;
   svg += `<text x="20" y="${footerY+15}" fill="rgb(253,253,227)" font-family="sans-serif" font-weight="700" font-size="30">ALPHA STRIKE</text>`;
   svg += `<text x="980" y="${footerY+15}" text-anchor="end" fill="rgb(253,253,227)" font-family="sans-serif" font-weight="700" font-size="24">BMT</text>`;
