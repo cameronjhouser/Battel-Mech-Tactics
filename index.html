@@ -4664,11 +4664,141 @@ function sbSkillTextForGroup(members) {
   return skills.length <= 1 ? `Sk${skills[0] ?? 4}` : `Sk${skills[0]}-${skills[skills.length - 1]}`;
 }
 
+// Standard Alpha Strike range-band to-hit modifiers and hex ranges — fixed
+// game constants (same for every unit), not derived from unit data. Sourced
+// from the official to-hit modifier table; if your rulebook shows different
+// hex boundaries, these are label text only and don't affect PV/legality.
+const SB_RANGE_BANDS = [
+  { key: 'short',  label: 'S', mod: '+0', hex: '1–3'   },
+  { key: 'medium', label: 'M', mod: '+2', hex: '4–12'  },
+  { key: 'long',   label: 'L', mod: '+4', hex: '13–21' },
+  { key: 'extreme',label: 'E', mod: '+6', hex: '22–30' },
+];
+
+// Break a string into <tspan> lines that roughly fit maxChars per line,
+// since SVG <text> doesn't auto-wrap.
+function sbSvgWrapLines(str, maxChars) {
+  const words = String(str || '').split(/\s+/).filter(Boolean);
+  const lines = [];
+  let cur = '';
+  words.forEach(w => {
+    const next = cur ? `${cur} ${w}` : w;
+    if (next.length > maxChars && cur) { lines.push(cur); cur = w; }
+    else cur = next;
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+// Row of armor/structure pips (filled circles), wrapping at 16 per row.
+function sbSvgPipRow(x, y, count, color) {
+  const r = 9, gap = 22, perRow = 16;
+  let out = '';
+  for (let i = 0; i < count; i++) {
+    const row = Math.floor(i / perRow), col = i % perRow;
+    const cx = x + col * gap, cy = y + row * (gap - 2);
+    out += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" stroke="#000" stroke-width="1.5"/>`;
+  }
+  return out;
+}
+
+// Self-drawn Alpha Strike stat card (SVG), used in place of embedding MUL's
+// pre-rendered card image — so the PV shown reflects our own skill-adjusted
+// value (MUL's static image can only ever show base PV), and printing
+// doesn't depend on MUL's image endpoint staying reachable. Uses a running
+// Y-cursor rather than fixed coordinates so multi-row pip wraps and long
+// abilities text never overlap the next section.
+function sbCardSVG(u, skill) {
+  const W = 640;
+  const pv      = sbAdjPV(u, skill);
+  const role    = u.Role?.Name || '—';
+  const type    = u.BFType || (u.Type?.Name || '').slice(0, 2).toUpperCase() || '?';
+  const size    = ['—','L','M','H','A'][u.BFSize] || '—';
+  const tmm     = u.BFTMM ?? '—';
+  const move    = u.BFMove || '—';
+  const armor   = u.BFArmor ?? 0;
+  const struct_ = u.BFStructure ?? 0;
+  const thresh  = u.BFThreshold ?? 0;
+  const ov      = u.BFOverheat ?? 0;
+  const dmg     = { short: u.BFDamageShort, medium: u.BFDamageMedium, long: u.BFDamageLong, extreme: u.BFDamageExtreme };
+  const dmgMin  = { short: u.BFDamageShortMin, medium: u.BFDamageMediumMin, long: u.BFDamageLongMin, extreme: u.BFDamageExtemeMin };
+  const bands   = SB_RANGE_BANDS.filter(b => b.key !== 'extreme' || (dmg.extreme || 0) > 0);
+  const colW    = (W - 80) / bands.length;
+  const abilLines = sbSvgWrapLines(u.BFAbilities || '—', 60);
+
+  const PIP_ROW_H = 20, PIP_ROWS_PER_WRAP = 16;
+  const armorRows  = Math.max(1, Math.ceil(armor / PIP_ROWS_PER_WRAP));
+  const structRows = Math.max(1, Math.ceil(struct_ / PIP_ROWS_PER_WRAP));
+
+  let y = 34;
+  let svg = `<svg viewBox="0 0 ${W} 1" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" data-h-placeholder="1">`;
+  svg += `<rect x="0" y="0" width="${W}" height="9999" fill="#111"/>`;
+  svg += `<rect x="4" y="4" width="${W-8}" height="9991" fill="#fff" stroke="#111" stroke-width="1"/>`;
+
+  svg += `<text x="20" y="${y}" font-family="sans-serif" font-size="24" font-weight="700">${lbEsc(u.Name || '?')}</text>`;
+  svg += `<rect x="${W-140}" y="${y-22}" width="120" height="44" fill="none" stroke="#111" stroke-width="2"/>`;
+  svg += `<text x="${W-80}" y="${y-4}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#555">POINT VALUE</text>`;
+  svg += `<text x="${W-80}" y="${y+14}" text-anchor="middle" font-family="sans-serif" font-size="24" font-weight="700">${pv}${skill!==4?` <tspan font-size="11" fill="#555">(Sk${skill})</tspan>`:''}</text>`;
+  y += 30; svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
+
+  y += 18;
+  svg += `<g font-family="sans-serif">${[['TP',type],['SZ',size],['TMM',tmm],['MV',move],['SKILL',skill],['ROLE',role]].map((c,i) => {
+    const cw = (W-40)/6, x = 20 + i*cw + cw/2;
+    return `<text x="${x}" y="${y}" text-anchor="middle" font-size="10" fill="#555">${lbEsc(String(c[0]))}</text>
+            <text x="${x}" y="${y+20}" text-anchor="middle" font-size="18" font-weight="700">${lbEsc(String(c[1]))}</text>`;
+  }).join('')}</g>`;
+  y += 34; svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
+
+  y += 24;
+  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">DAMAGE</text>`;
+  y += 14;
+  svg += bands.map((b, i) => {
+    const x = 40 + i * colW + colW / 2;
+    const val = dmg[b.key];
+    const valTxt = (val ?? '—') + (dmgMin[b.key] ? '*' : '');
+    return `<text x="${x}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#555">${b.label} (${b.mod} | ${b.hex}")</text>
+            <text x="${x}" y="${y+47}" text-anchor="middle" font-family="sans-serif" font-size="40" font-weight="700">${lbEsc(String(valTxt))}</text>`;
+  }).join('');
+  y += 62; svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
+
+  y += 24;
+  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">OV</text>`;
+  svg += `<text x="75" y="${y+3}" font-family="sans-serif" font-size="20" font-weight="700">${ov}</text>`;
+  if (thresh) {
+    svg += `<text x="130" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">THR</text>`;
+    svg += `<text x="165" y="${y+3}" font-family="sans-serif" font-size="20" font-weight="700">${thresh}</text>`;
+  }
+  y += 28;
+
+  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">ARMOR (${armor})</text>`;
+  y += 12;
+  svg += sbSvgPipRow(52, y, armor, '#fff');
+  y += armorRows * PIP_ROW_H + 16;
+
+  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">STRUCTURE (${struct_})</text>`;
+  y += 12;
+  svg += sbSvgPipRow(52, y, struct_, '#999');
+  y += structRows * PIP_ROW_H + 22;
+
+  svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
+  y += 20;
+  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="12" font-weight="700" fill="#555">ABILITIES</text>`;
+  y += 16;
+  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="13">${abilLines.map((l, i) => `<tspan x="40" dy="${i===0?0:16}">${lbEsc(l)}</tspan>`).join('')}</text>`;
+  y += (abilLines.length - 1) * 16 + 20;
+
+  const H = y;
+  svg = svg.replace('viewBox="0 0 640 1"', `viewBox="0 0 ${W} ${H}"`)
+           .replace('height="9999"', `height="${H}"`)
+           .replace('height="9991"', `height="${H-8}"`);
+  svg += `</svg>`;
+  return svg;
+}
+
 function sbDownloadCards() {
   if (!sbForce.length) { alert('Add units to your force first.'); return; }
   const { groups, isClan } = sbForceGroups();
   const totalPV  = sbForce.reduce((s, f) => s + sbAdjPV(f.unit, f.skill), 0);
-  const MUL_CARD = 'https://masterunitlist.azurewebsites.net/Unit/Card/';
 
   let cardRows = '';
   groups.forEach((members, li) => {
@@ -4682,12 +4812,8 @@ function sbDownloadCards() {
 
     members.forEach(m => {
       const u = m.unit;
-      const safeName = (u.Name || '').replace(/'/g, "\\'");
       cardRows += `<div class="card-wrap">
-        <img src="${MUL_CARD}${u.Id}" alt="${lbEsc(u.Name)}"
-          onerror="this.style.outline='2px dashed #c00';this.style.padding='8px';this.alt='Card unavailable: ${safeName}'"
-        >
-        <div class="card-name">${lbEsc(u.Name)} — ${sbAdjPV(u, m.skill)} PV (Sk${m.skill})</div>
+        ${sbCardSVG(u, m.skill)}
         <div class="pilot-info">
           <input class="p-name" type="text" placeholder="Pilot name">
           <div class="p-skills">
@@ -4715,8 +4841,7 @@ function sbDownloadCards() {
     .lhdr-meta  { font-size:10px; color:#555; }
     .card-row  { display:flex; flex-wrap:wrap; gap:12px; padding:10px 14px 6px; }
     .card-wrap { display:flex; flex-direction:column; align-items:center; width:340px; }
-    .card-wrap img { width:340px; height:auto; border:1px solid #bbb; border-radius:4px; display:block; }
-    .card-name { font-size:9px; color:#888; margin-top:3px; text-align:center; }
+    .card-wrap svg { border:1px solid #bbb; border-radius:4px; }
     .pilot-info { width:340px; margin-top:6px; }
     .p-name  { width:100%; border:1px solid #aaa; border-radius:2px; padding:3px 5px; font-size:11px; }
     .p-skills { display:flex; gap:10px; margin-top:3px; font-size:11px; font-weight:700; align-items:center; }
