@@ -2359,15 +2359,20 @@
 
   <!-- ── CSV FORMATION BUILDER MODE ────────── -->
   <div id="lb-mode-csv" style="display:none">
+    <div class="card" style="padding:12px 14px">
+      <div class="card-title">Saved Lists</div>
+      <div class="lb-csv-controls" style="margin-bottom:0">
+        <label class="lb-file-label">
+          <span>📂 Choose CSV file</span>
+          <input type="file" id="lb-csv-input" accept=".csv,.txt" onchange="lbLoadCSV(this)">
+        </label>
+        <button class="lb-btn" onclick="lbCsvSaveListPrompt()">Save List</button>
+        <select id="lb-csv-saved-select" style="flex:1 1 180px"><option value="">No saved lists</option></select>
+        <button class="lb-btn" onclick="lbCsvLoadSelected()">Load</button>
+        <button class="lb-btn" onclick="lbCsvDeleteSelected()" style="background:var(--red)">Delete</button>
+      </div>
+    </div>
     <div class="lb-csv-controls">
-      <label class="lb-file-label">
-        <span>📂 Choose CSV file</span>
-        <input type="file" id="lb-csv-input" accept=".csv,.txt" onchange="lbLoadCSV(this)">
-      </label>
-      <button class="lb-btn" onclick="lbCsvSaveListPrompt()">Save List</button>
-      <select id="lb-csv-saved-select" style="flex:1 1 180px"><option value="">No saved lists</option></select>
-      <button class="lb-btn" onclick="lbCsvLoadSelected()">Load</button>
-      <button class="lb-btn" onclick="lbCsvDeleteSelected()" style="background:var(--red)">Delete</button>
       <select id="lb-formation-type" style="flex:1 1 200px">
         <option value="lance">Lance (4 units · 1 lance)</option>
         <option value="aug-lance">Augmented Lance (6 units · 1 lance + support)</option>
@@ -2422,15 +2427,20 @@
   <!-- ── SKIRMISH FORCE BUILDER ────────────────── -->
   <div id="lb-mode-skirmish" style="display:none">
     <!-- Top controls -->
+    <div class="card" style="padding:12px 14px">
+      <div class="card-title">Saved Unit Lists</div>
+      <div class="sb-browse-controls" style="margin-bottom:0">
+        <label class="lb-file-label">
+          <span>📂 Collection CSV</span>
+          <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
+        </label>
+        <button class="lb-btn" onclick="sbSaveCollectionPrompt()">Save List</button>
+        <select id="sb-collection-select" style="flex:1 1 160px"><option value="">No saved lists</option></select>
+        <button class="lb-btn" onclick="sbLoadCollectionSelected()">Load</button>
+        <button class="lb-btn" onclick="sbDeleteCollectionSelected()" style="background:var(--red)">Delete</button>
+      </div>
+    </div>
     <div class="sb-browse-controls">
-      <label class="lb-file-label">
-        <span>📂 Collection CSV</span>
-        <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
-      </label>
-      <button class="lb-btn" onclick="sbSaveCollectionPrompt()">Save List</button>
-      <select id="sb-collection-select" style="flex:1 1 160px"><option value="">No saved lists</option></select>
-      <button class="lb-btn" onclick="sbLoadCollectionSelected()">Load</button>
-      <button class="lb-btn" onclick="sbDeleteCollectionSelected()" style="background:var(--red)">Delete</button>
       <select id="sb-faction" onchange="sbFactionChanged()"></select>
       <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above, it does not narrow or replace it"></select>
       <select id="sb-era" onchange="sbClearCatalog()">
@@ -2577,11 +2587,14 @@
           <button class="lb-btn-sm" onclick="sbDownloadCards()" style="padding:2px 10px;margin-left:auto">📇 Cards</button>
           <button class="lb-btn-sm" onclick="sbOpenSheets()" style="padding:2px 10px">📋 Sheets</button>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px">
-          <button class="lb-btn-sm" onclick="sbSaveForcePrompt()" style="padding:2px 10px">💾 Save</button>
-          <select id="sb-saved-select" style="flex:1 1 120px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:3px 5px"><option value="">No saved forces</option></select>
-          <button class="lb-btn-sm" onclick="sbLoadSelected()" style="padding:2px 10px">📂 Load</button>
-          <button class="lb-btn-sm" onclick="sbDeleteSelected()" style="padding:2px 10px">🗑️</button>
+        <div class="card" style="padding:8px 10px;margin-bottom:0">
+          <div class="card-title" style="font-size:12px;margin-bottom:6px">Saved Lances</div>
+          <div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap">
+            <button class="lb-btn-sm" onclick="sbSaveForcePrompt()" style="padding:2px 7px;flex-shrink:0" title="Save current force">💾</button>
+            <select id="sb-saved-select" style="flex:1 1 auto;min-width:0;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:3px 4px"><option value="">No saved forces</option></select>
+            <button class="lb-btn-sm" onclick="sbLoadSelected()" style="padding:2px 7px;flex-shrink:0" title="Load selected force">📂</button>
+            <button class="lb-btn-sm" onclick="sbDeleteSelected()" style="padding:2px 7px;flex-shrink:0" title="Delete selected force">🗑️</button>
+          </div>
         </div>
         <div class="sb-pv-meter">
           <div class="sb-pv-row">
