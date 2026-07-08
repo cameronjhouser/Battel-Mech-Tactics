@@ -5390,11 +5390,47 @@ function rsBox(x, y, w, h, title) {
     + `<text x="${x + 8}" y="${y + 16}" fill="#fff" font-family="sans-serif" font-size="13" font-weight="700" letter-spacing="1">${lbEsc(title)}</text>`;
 }
 
+// Vendored biped silhouette paths + per-location armor-circle coordinates
+// (from jdgwf/battletech-tools, transcribed into sheets/rs-silhouettes.json).
+// Lazily populated by lbOpenSheetsCore; when null, rsSheetSVG falls back to
+// the simpler pip-cluster diagrams.
+let rsSilData = null;
+
+// A single silhouette diagram: the fixed black mech-body path with white
+// armor/structure bubbles overlaid at their faithful coordinates, revealing
+// `values[loc]` circles per location. `which` = 'armor' | 'struct'. Rendered
+// as a nested <svg> so it scales as a unit when placed on the sheet.
+function rsSilDiagram(x, y, w, which, values) {
+  const S = rsSilData;
+  const viewW = S.viewW;
+  // Armor view includes the rear-torso circle groups (down to y~1115);
+  // structure has no rear locations, so it can crop tighter.
+  const viewH = which === 'armor' ? 1160 : 985;
+  const scale = w / viewW;
+  const h = viewH * scale;
+  const path = which === 'armor' ? S.armorPath : S.structPath;
+  const locs = which === 'armor'
+    ? ['hd','ct','lt','rt','la','ra','ll','rl','ctr','ltr','rtr']
+    : ['hd','ct','lt','rt','la','ra','ll','rl'];
+  let circles = '';
+  locs.forEach(loc => {
+    const pts = S.coords[loc] || [];
+    const n = Math.min(values[loc] || 0, pts.length);
+    for (let i = 0; i < n; i++) {
+      const [cx, cy, r] = pts[i];
+      circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" stroke="#000" stroke-width="2"/>`;
+    }
+  });
+  return { h, svg: `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 ${viewW} ${viewH}" overflow="visible">`
+    + `<path d="${path}" fill="#000"/>${circles}</svg>` };
+}
+
 // Render a full record sheet SVG for a matched biped mech record (from
 // mech-data.json). pilot = { name, gunnery, piloting } optional.
 function rsSheetSVG(m, pilot) {
   pilot = pilot || {};
-  const W = 1000, H = 1320;
+  const useSil = !!rsSilData;
+  const W = 1000, H = useSil ? 1500 : 1320;
   const a = m.armor || {}, s = m.structure || {};
   const esc = lbEsc;
 
@@ -5461,36 +5497,46 @@ function rsSheetSVG(m, pilot) {
     svg += `<text x="${LX + 360}" y="${ry}" font-family="sans-serif" font-size="12">${esc(e.loc || '—')}</text>`;
   });
 
-  // Three evenly-spaced columns keep multi-row pip clusters (CT can be 30+)
-  // from colliding, instead of a tight anthropomorphic silhouette.
-  const acx  = RX + RW / 2;
-  const colL = RX + 90, colC = acx, colR = RX + RW - 90;
-  const legL = RX + 150, legR = RX + RW - 150;
+  if (useSil) {
+    // ── Faithful silhouette diagrams (armor on the right, structure below
+    //    the left-column boxes) ──
+    svg += rsBox(RX, 70, RW, 900, 'ARMOR');
+    const armorDia = rsSilDiagram(RX + 20, 100, RW - 40, 'armor', a);
+    svg += armorDia.svg;
 
-  // ── Armor diagram ──
-  svg += rsBox(RX, 70, RW, 620, 'ARMOR');
-  svg += rsLocation(colC, 104, 'HEAD', a.hd, '#fff').svg;
-  svg += rsLocation(colL, 180, 'L TORSO', a.lt, '#fff').svg;
-  svg += rsLocation(colC, 180, 'C TORSO', a.ct, '#fff').svg;
-  svg += rsLocation(colR, 180, 'R TORSO', a.rt, '#fff').svg;
-  svg += rsLocation(colL, 300, 'L ARM', a.la, '#fff').svg;
-  svg += rsLocation(colR, 300, 'R ARM', a.ra, '#fff').svg;
-  svg += rsLocation(colL, 420, 'L TORSO (R)', a.ltr, '#eee').svg;
-  svg += rsLocation(colC, 420, 'C TORSO (R)', a.ctr, '#eee').svg;
-  svg += rsLocation(colR, 420, 'R TORSO (R)', a.rtr, '#eee').svg;
-  svg += rsLocation(legL, 540, 'L LEG', a.ll, '#fff').svg;
-  svg += rsLocation(legR, 540, 'R LEG', a.rl, '#fff').svg;
+    const stY = 1000;
+    svg += rsBox(RX, stY, RW, H - stY - 20, 'INTERNAL STRUCTURE');
+    svg += rsSilDiagram(RX + 40, stY + 30, RW - 80, 'struct', s).svg;
+  } else {
+    // ── Fallback: pip-cluster diagrams (used if the silhouette data failed
+    //    to load) ──
+    const acx  = RX + RW / 2;
+    const colL = RX + 90, colC = acx, colR = RX + RW - 90;
+    const legL = RX + 150, legR = RX + RW - 150;
 
-  // ── Internal structure diagram ──
-  svg += rsBox(RX, 700, RW, 600, 'INTERNAL STRUCTURE');
-  svg += rsLocation(colC, 734, 'HEAD', s.hd, '#ccc').svg;
-  svg += rsLocation(colL, 810, 'L TORSO', s.lt, '#ccc').svg;
-  svg += rsLocation(colC, 810, 'C TORSO', s.ct, '#ccc').svg;
-  svg += rsLocation(colR, 810, 'R TORSO', s.rt, '#ccc').svg;
-  svg += rsLocation(colL, 930, 'L ARM', s.la, '#ccc').svg;
-  svg += rsLocation(colR, 930, 'R ARM', s.ra, '#ccc').svg;
-  svg += rsLocation(legL, 1050, 'L LEG', s.ll, '#ccc').svg;
-  svg += rsLocation(legR, 1050, 'R LEG', s.rl, '#ccc').svg;
+    svg += rsBox(RX, 70, RW, 620, 'ARMOR');
+    svg += rsLocation(colC, 104, 'HEAD', a.hd, '#fff').svg;
+    svg += rsLocation(colL, 180, 'L TORSO', a.lt, '#fff').svg;
+    svg += rsLocation(colC, 180, 'C TORSO', a.ct, '#fff').svg;
+    svg += rsLocation(colR, 180, 'R TORSO', a.rt, '#fff').svg;
+    svg += rsLocation(colL, 300, 'L ARM', a.la, '#fff').svg;
+    svg += rsLocation(colR, 300, 'R ARM', a.ra, '#fff').svg;
+    svg += rsLocation(colL, 420, 'L TORSO (R)', a.ltr, '#eee').svg;
+    svg += rsLocation(colC, 420, 'C TORSO (R)', a.ctr, '#eee').svg;
+    svg += rsLocation(colR, 420, 'R TORSO (R)', a.rtr, '#eee').svg;
+    svg += rsLocation(legL, 540, 'L LEG', a.ll, '#fff').svg;
+    svg += rsLocation(legR, 540, 'R LEG', a.rl, '#fff').svg;
+
+    svg += rsBox(RX, 700, RW, 600, 'INTERNAL STRUCTURE');
+    svg += rsLocation(colC, 734, 'HEAD', s.hd, '#ccc').svg;
+    svg += rsLocation(colL, 810, 'L TORSO', s.lt, '#ccc').svg;
+    svg += rsLocation(colC, 810, 'C TORSO', s.ct, '#ccc').svg;
+    svg += rsLocation(colR, 810, 'R TORSO', s.rt, '#ccc').svg;
+    svg += rsLocation(colL, 930, 'L ARM', s.la, '#ccc').svg;
+    svg += rsLocation(colR, 930, 'R ARM', s.ra, '#ccc').svg;
+    svg += rsLocation(legL, 1050, 'L LEG', s.ll, '#ccc').svg;
+    svg += rsLocation(legR, 1050, 'R LEG', s.rl, '#ccc').svg;
+  }
 
   svg += `</svg>`;
   return svg;
@@ -6938,6 +6984,15 @@ async function lbOpenSheetsCore(cfg) {
     const res = await fetch(sheetsBase + 'mech-data.json');
     if (res.ok) mechData = (await res.json()).mechs || {};
   } catch (_) {}
+
+  // Faithful silhouette + circle-coordinate data. Optional — rsSheetSVG falls
+  // back to pip-cluster diagrams if it fails to load.
+  if (!rsSilData) {
+    try {
+      const res = await fetch(sheetsBase + 'rs-silhouettes.json');
+      if (res.ok) rsSilData = await res.json();
+    } catch (_) {}
+  }
 
   function sheetFile(name) {
     if (!name) return null;
