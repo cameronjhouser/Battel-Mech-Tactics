@@ -3539,12 +3539,11 @@ const LB_ABILITY_DESC = {
 
 let lbUnitBonuses = {}; // `${li}-${si}` -> chosen ability string
 
-// Skills 0-4 verified against official Alpha Strike PV skill multiplier
-// table. Skills 5-7 are LINEAR EXTRAPOLATION of the same -0.20/level
-// pattern (5:0.80, 6:0.60, 7:0.40) — NOT independently verified against
-// the official table; every official source was unreachable when these
-// were added. Confirm against your rulebook/Alpha Strike Companion.
-const LB_SKILL_MULT = { 0: 1.82, 1: 1.62, 2: 1.42, 3: 1.20, 4: 1.00, 5: 0.80, 6: 0.60, 7: 0.40 };
+// Flat-multiplier skill table used by the Search / CSV Formation Builder /
+// Owned Units tabs (their own pre-existing convention; only 0-4 selectable
+// there). NOT used by the Skirmish Force Builder — see sbAdjPV/
+// sbSkillIncrement below for the correct per-unit-PV-bracket official table.
+const LB_SKILL_MULT = { 0: 1.82, 1: 1.62, 2: 1.42, 3: 1.20, 4: 1.00 };
 const SB_SKILL_LEVELS = [0, 1, 2, 3, 4, 5, 6, 7];
 
 function lbGetAdjLancePV(li) {
@@ -4124,8 +4123,28 @@ function sbHtVal(unit) {
   return m ? parseInt(m[1]) : 0;
 }
 
+// Official "Improved-Skill PV Increase Table" (Alpha Strike errata) — the
+// per-skill-step PV delta depends on the UNIT'S OWN base PV bracket, not a
+// flat multiplier. Verified exactly against the official table:
+//   Base PV 0-7 -> 1, 8-12 -> 2, 13-17 -> 3, 18-22 -> 4, 23-27 -> 5,
+//   28-32 -> 6, 33-37 -> 7, 38-42 -> 8, 43-47 -> 9, 48-52 -> 10,
+//   +1 more for every 5 base PV over 52 (53-57 -> 11, 58-62 -> 12, ...).
+function sbSkillIncrement(basePV) {
+  if (basePV <= 7) return 1;
+  return 2 + Math.floor((basePV - 8) / 5);
+}
+
+// Skill 4 is baseline (no change). Skills 0-3 (better than baseline) ADD
+// sbSkillIncrement(basePV) per step below 4 — this direction is the
+// verified official table. Skills 5-7 (worse than baseline) SUBTRACT the
+// same per-step amount, applied symmetrically as a working assumption —
+// this direction is NOT independently confirmed; the official table found
+// is titled specifically for skill IMPROVEMENT. Confirm against the
+// Alpha Strike Companion / rulebook if you have the reduction-side table.
 function sbAdjPV(unit, skill) {
-  return Math.round((unit.BFPointValue || 0) * (LB_SKILL_MULT[skill] ?? 1.0));
+  const basePV = unit.BFPointValue || 0;
+  const steps  = 4 - skill;
+  return Math.max(0, Math.round(basePV + steps * sbSkillIncrement(basePV)));
 }
 
 function sbInit() {
