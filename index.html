@@ -2560,7 +2560,11 @@
 
       <!-- Force panel -->
       <div class="sb-force-panel">
-        <span class="sec-label">Tournament Force</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="sec-label" style="margin:0">Tournament Force</span>
+          <button class="lb-btn-sm" onclick="sbDownloadCards()" style="padding:2px 10px;margin-left:auto">📇 Cards</button>
+          <button class="lb-btn-sm" onclick="sbOpenSheets()" style="padding:2px 10px">📋 Sheets</button>
+        </div>
         <div class="sb-pv-meter">
           <div class="sb-pv-row">
             <span class="sb-pv-label">TOTAL PV</span>
@@ -4620,6 +4624,121 @@ function sbClearForce() {
   sbForce = [];
   sbRenderForce();
   sbRenderBrowse();
+}
+
+// Chunk sbForce into lance (4) / star (5) groups, same rule sbRenderForce
+// uses, for the shared card/sheet print builders below.
+function sbForceGroups() {
+  const factionId = sbCurrentFactionId();
+  const isClan    = !!sbFactionMeta[factionId]?.isClan;
+  const groupSize = isClan ? 5 : 4;
+  const groups = [];
+  for (let start = 0; start < sbForce.length; start += groupSize) {
+    groups.push(sbForce.slice(start, start + groupSize));
+  }
+  return { groups, isClan };
+}
+
+// "Sk4" if every member shares a skill, "Sk3-6" if mixed.
+function sbSkillTextForGroup(members) {
+  const skills = [...new Set(members.map(m => m.skill))].sort((a, b) => a - b);
+  return skills.length <= 1 ? `Sk${skills[0] ?? 4}` : `Sk${skills[0]}-${skills[skills.length - 1]}`;
+}
+
+function sbDownloadCards() {
+  if (!sbForce.length) { alert('Add units to your force first.'); return; }
+  const { groups, isClan } = sbForceGroups();
+  const totalPV  = sbForce.reduce((s, f) => s + sbAdjPV(f.unit, f.skill), 0);
+  const MUL_CARD = 'https://masterunitlist.azurewebsites.net/Unit/Card/';
+
+  let cardRows = '';
+  groups.forEach((members, li) => {
+    const groupPV  = members.reduce((s, m) => s + sbAdjPV(m.unit, m.skill), 0);
+    const skillTxt = sbSkillTextForGroup(members);
+
+    cardRows += `<div class="lance-hdr">
+      <span class="lhdr-title">${lbGroupLabel(isClan, li)}</span>
+      <span class="lhdr-meta">${groupPV} PV &nbsp;·&nbsp; ${lbEsc(skillTxt)}</span>
+    </div><div class="card-row">`;
+
+    members.forEach(m => {
+      const u = m.unit;
+      const safeName = (u.Name || '').replace(/'/g, "\\'");
+      cardRows += `<div class="card-wrap">
+        <img src="${MUL_CARD}${u.Id}" alt="${lbEsc(u.Name)}"
+          onerror="this.style.outline='2px dashed #c00';this.style.padding='8px';this.alt='Card unavailable: ${safeName}'"
+        >
+        <div class="card-name">${lbEsc(u.Name)} — ${sbAdjPV(u, m.skill)} PV (Sk${m.skill})</div>
+        <div class="pilot-info">
+          <input class="p-name" type="text" placeholder="Pilot name">
+          <div class="p-skills">
+            <span>GU <input class="p-skill" type="number" min="0" max="8" value="${m.skill}" title="Gunnery Skill"></span>
+            <span>PI <input class="p-skill" type="number" min="0" max="8" value="${m.skill}" title="Piloting Skill"></span>
+          </div>
+        </div>
+      </div>`;
+    });
+    cardRows += `</div>`;
+  });
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>Tournament Force — Alpha Strike Cards</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:Arial,sans-serif; background:#fff; }
+    .header { padding:12px 16px; border-bottom:2px solid #333; margin-bottom:10px; }
+    .header h1 { font-size:16px; }
+    .header p  { font-size:11px; color:#555; margin-top:3px; }
+    .lance-hdr { display:flex; justify-content:space-between; align-items:baseline;
+                 padding:8px 14px 4px; margin-top:14px;
+                 border-top:2px solid #333; background:#f0f0f0; }
+    .lhdr-title { font-size:13px; font-weight:700; }
+    .lhdr-meta  { font-size:10px; color:#555; }
+    .card-row  { display:flex; flex-wrap:wrap; gap:12px; padding:10px 14px 6px; }
+    .card-wrap { display:flex; flex-direction:column; align-items:center; width:340px; }
+    .card-wrap img { width:340px; height:auto; border:1px solid #bbb; border-radius:4px; display:block; }
+    .card-name { font-size:9px; color:#888; margin-top:3px; text-align:center; }
+    .pilot-info { width:340px; margin-top:6px; }
+    .p-name  { width:100%; border:1px solid #aaa; border-radius:2px; padding:3px 5px; font-size:11px; }
+    .p-skills { display:flex; gap:10px; margin-top:3px; font-size:11px; font-weight:700; align-items:center; }
+    .p-skill { width:36px; border:1px solid #aaa; border-radius:2px; padding:2px 3px;
+               text-align:center; font-size:11px; font-weight:700; }
+    @media print {
+      body { margin:0; }
+      .lance-hdr { page-break-before:auto; }
+      .card-wrap { page-break-inside:avoid; }
+    }
+  </style></head><body>
+  <div class="header">
+    <h1>Tournament Force — Alpha Strike Cards</h1>
+    <p>Total PV: ${totalPV} &nbsp;·&nbsp; ${sbForce.length} units &nbsp;·&nbsp; Use <strong>Print → Save as PDF</strong> to download</p>
+  </div>
+  ${cardRows}
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+    w.addEventListener('load', () => setTimeout(() => w.print(), 500));
+  }
+}
+
+async function sbOpenSheets() {
+  if (!sbForce.length) { alert('Add units to your force first.'); return; }
+  const { groups, isClan } = sbForceGroups();
+  const totalPV = sbForce.reduce((s, f) => s + sbAdjPV(f.unit, f.skill), 0);
+  await lbOpenSheetsCore({
+    lances: groups.map(members => members.map(m => m.unit)),
+    lanceTypes: groups.map(() => ''),
+    cmdState: {},
+    unitBonuses: {},
+    fDef: { name: 'Tournament Force' },
+    totalPV,
+    isClan,
+    getLancePV: (li) => groups[li].reduce((s, m) => s + sbAdjPV(m.unit, m.skill), 0),
+    getSkillText: (li) => sbSkillTextForGroup(groups[li]),
+  });
 }
 
 function sbRenderForce() {
