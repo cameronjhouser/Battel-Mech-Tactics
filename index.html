@@ -4757,9 +4757,9 @@ function sbCardSVG(u, skill) {
   const basePV  = u.BFPointValue || 0;
   const role    = u.Role?.Name || '—';
   const type    = u.BFType || (u.Type?.Name || '').slice(0, 2).toUpperCase() || '?';
-  const size    = ['—','L','M','H','A'][u.BFSize] || '—';
+  const size    = u.BFSize || '—';
   const isAero  = /^(AF|CF)$/i.test(type);
-  const tmm     = u.BFTMM ?? '—';
+  const tmm     = lbCalcTMM(u);
   const move    = u.BFMove || '—';
   const armor   = u.BFArmor ?? 0;
   const struct_ = u.BFStructure ?? 0;
