@@ -2365,8 +2365,9 @@
         <input type="file" id="lb-csv-input" accept=".csv,.txt" onchange="lbLoadCSV(this)">
       </label>
       <button class="lb-btn" onclick="lbCsvSaveListPrompt()">Save List</button>
-      <button class="lb-btn" onclick="lbCsvLoadListPrompt()">Load List</button>
-      <button class="lb-btn" onclick="lbCsvDeleteListPrompt()" style="background:var(--red)">Delete List</button>
+      <select id="lb-csv-saved-select" style="flex:1 1 180px"><option value="">No saved lists</option></select>
+      <button class="lb-btn" onclick="lbCsvLoadSelected()">Load</button>
+      <button class="lb-btn" onclick="lbCsvDeleteSelected()" style="background:var(--red)">Delete</button>
       <select id="lb-formation-type" style="flex:1 1 200px">
         <option value="lance">Lance (4 units · 1 lance)</option>
         <option value="aug-lance">Augmented Lance (6 units · 1 lance + support)</option>
@@ -2569,11 +2570,14 @@
       <div class="sb-force-panel">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span class="sec-label" style="margin:0">Tournament Force</span>
-          <button class="lb-btn-sm" onclick="sbSaveForcePrompt()" style="padding:2px 10px;margin-left:auto">💾 Save</button>
-          <button class="lb-btn-sm" onclick="sbLoadForcePrompt()" style="padding:2px 10px">📂 Load</button>
-          <button class="lb-btn-sm" onclick="sbDeleteForcePrompt()" style="padding:2px 10px">🗑️ Delete</button>
-          <button class="lb-btn-sm" onclick="sbDownloadCards()" style="padding:2px 10px">📇 Cards</button>
+          <button class="lb-btn-sm" onclick="sbDownloadCards()" style="padding:2px 10px;margin-left:auto">📇 Cards</button>
           <button class="lb-btn-sm" onclick="sbOpenSheets()" style="padding:2px 10px">📋 Sheets</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <button class="lb-btn-sm" onclick="sbSaveForcePrompt()" style="padding:2px 10px">💾 Save</button>
+          <select id="sb-saved-select" style="flex:1 1 120px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:3px 5px"><option value="">No saved forces</option></select>
+          <button class="lb-btn-sm" onclick="sbLoadSelected()" style="padding:2px 10px">📂 Load</button>
+          <button class="lb-btn-sm" onclick="sbDeleteSelected()" style="padding:2px 10px">🗑️</button>
         </div>
         <div class="sb-pv-meter">
           <div class="sb-pv-row">
@@ -3948,7 +3952,8 @@ function lbSwitchMode(mode) {
   document.getElementById('lb-tab-owned').classList.toggle('on', mode === 'owned');
   document.getElementById('lb-tab-csv').classList.toggle('on', mode === 'csv');
   document.getElementById('lb-tab-skirmish').classList.toggle('on', mode === 'skirmish');
-  if (mode === 'skirmish') sbInit();
+  if (mode === 'csv') lbCsvRefreshSavedSelect();
+  if (mode === 'skirmish') { sbInit(); sbRefreshSavedSelect(); }
 }
 
 /* ── SKIRMISH FORCE BUILDER ─────────────────────────── */
@@ -4691,24 +4696,27 @@ function sbSaveForcePrompt() {
   };
   sbSetStoredLances(lances);
   localStorage.setItem('bmtSavedLances.lastName', key);
+  sbRefreshSavedSelect(key);
   alert(`Saved "${key}" with ${sbForce.length} units.`);
 }
 
-function sbForceChoice(actionLabel) {
+// Populates the saved-force <select> from storage, keeping the given name
+// selected if provided (otherwise keeps whatever was already selected).
+function sbRefreshSavedSelect(selectName) {
+  const el = document.getElementById('sb-saved-select');
+  if (!el) return;
   const lances = sbStoredLances();
   const names = Object.keys(lances).sort((a, b) => a.localeCompare(b));
-  if (!names.length) { alert('No saved forces found.'); return null; }
-  const list = names.map((n, i) => `${i + 1}. ${n} (${lances[n].unitCount || 0} units, ${lances[n].totalPV || 0} PV)`).join('\n');
-  const pick = prompt(`${actionLabel} force:\n${list}\n\nEnter number or name:`);
-  if (!pick) return null;
-  const idx = parseInt(pick, 10);
-  if (Number.isFinite(idx) && idx >= 1 && idx <= names.length) return names[idx - 1];
-  return names.find(n => n.toLowerCase() === pick.trim().toLowerCase()) || null;
+  const want = selectName ?? el.value;
+  el.innerHTML = names.length
+    ? names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${lances[n].unitCount || 0}u, ${lances[n].totalPV || 0}PV)</option>`).join('')
+    : '<option value="">No saved forces</option>';
+  if (names.includes(want)) el.value = want;
 }
 
-function sbLoadForcePrompt() {
-  const name = sbForceChoice('Load');
-  if (!name) return;
+function sbLoadSelected() {
+  const name = document.getElementById('sb-saved-select')?.value;
+  if (!name) { alert('No saved force selected.'); return; }
   const saved = sbStoredLances()[name];
   if (!saved?.force?.length) { alert('That saved force has no units.'); return; }
   sbForce = saved.force;
@@ -4717,13 +4725,14 @@ function sbLoadForcePrompt() {
   localStorage.setItem('bmtSavedLances.lastName', name);
 }
 
-function sbDeleteForcePrompt() {
-  const name = sbForceChoice('Delete');
-  if (!name) return;
+function sbDeleteSelected() {
+  const name = document.getElementById('sb-saved-select')?.value;
+  if (!name) { alert('No saved force selected.'); return; }
   if (!confirm(`Delete saved force "${name}"?`)) return;
   const lances = sbStoredLances();
   delete lances[name];
   sbSetStoredLances(lances);
+  sbRefreshSavedSelect();
 }
 
 // Chunk sbForce into lance (4) / star (5) groups, same rule sbRenderForce
@@ -6236,24 +6245,27 @@ function lbCsvSaveListPrompt() {
   };
   lbCsvSetStoredLists(lists);
   localStorage.setItem('bmtSavedCsvLists.lastName', key);
+  lbCsvRefreshSavedSelect(key);
   alert(`Saved "${key}" with ${lbPoolUnits.length} units.`);
 }
 
-function lbCsvListChoice(actionLabel) {
+// Populates the saved-list <select> from storage, keeping the given name
+// selected if provided (otherwise keeps whatever was already selected).
+function lbCsvRefreshSavedSelect(selectName) {
+  const el = document.getElementById('lb-csv-saved-select');
+  if (!el) return;
   const lists = lbCsvStoredLists();
   const names = Object.keys(lists).sort((a, b) => a.localeCompare(b));
-  if (!names.length) { alert('No saved lists found.'); return null; }
-  const list = names.map((n, i) => `${i + 1}. ${n} (${lists[n].unitCount || 0} units)`).join('\n');
-  const pick = prompt(`${actionLabel} list:\n${list}\n\nEnter number or name:`);
-  if (!pick) return null;
-  const idx = parseInt(pick, 10);
-  if (Number.isFinite(idx) && idx >= 1 && idx <= names.length) return names[idx - 1];
-  return names.find(n => n.toLowerCase() === pick.trim().toLowerCase()) || null;
+  const want = selectName ?? el.value;
+  el.innerHTML = names.length
+    ? names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${lists[n].unitCount || 0} units)</option>`).join('')
+    : '<option value="">No saved lists</option>';
+  if (names.includes(want)) el.value = want;
 }
 
-function lbCsvLoadListPrompt() {
-  const name = lbCsvListChoice('Load');
-  if (!name) return;
+function lbCsvLoadSelected() {
+  const name = document.getElementById('lb-csv-saved-select')?.value;
+  if (!name) { alert('No saved list selected.'); return; }
   const saved = lbCsvStoredLists()[name];
   if (!saved?.pool?.length) { alert('That saved list has no units.'); return; }
   lbPoolUnits = saved.pool;
@@ -6266,13 +6278,14 @@ function lbCsvLoadListPrompt() {
   localStorage.setItem('bmtSavedCsvLists.lastName', name);
 }
 
-function lbCsvDeleteListPrompt() {
-  const name = lbCsvListChoice('Delete');
-  if (!name) return;
+function lbCsvDeleteSelected() {
+  const name = document.getElementById('lb-csv-saved-select')?.value;
+  if (!name) { alert('No saved list selected.'); return; }
   if (!confirm(`Delete saved list "${name}"?`)) return;
   const lists = lbCsvStoredLists();
   delete lists[name];
   lbCsvSetStoredLists(lists);
+  lbCsvRefreshSavedSelect();
 }
 
 function lbAssignToTypes(pool, typeKeys, upl) {
