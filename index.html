@@ -4702,15 +4702,30 @@ function sbSvgPipRow(x, y, count, color) {
   return out;
 }
 
+// Fixed Alpha Strike critical-hit tracks: box count + effect text are the
+// same for every 'Mech/IndustrialMech regardless of unit stats (verified
+// against the reference tool's own source — these are boilerplate rules
+// text, not per-unit data). Vehicles (SV/CV) get 5 MP boxes instead of 4.
+function sbCritTracks(type) {
+  const isVehicle = /^(SV|CV)$/i.test(type || '');
+  return [
+    { label: 'ENGINE',       pips: 2, text: '+1 Heat/Firing Weapons' },
+    { label: 'FIRE CONTROL', pips: 4, text: '+2 To-Hit Each' },
+    { label: 'MP',           pips: isVehicle ? 5 : 4, text: '½ MV & TMM Each' },
+    { label: 'WEAPONS',      pips: 4, text: '-1 Damage Each' },
+  ];
+}
+
 // Self-drawn Alpha Strike stat card (SVG), used in place of embedding MUL's
 // pre-rendered card image — so the PV shown reflects our own skill-adjusted
 // value (MUL's static image can only ever show base PV), and printing
-// doesn't depend on MUL's image endpoint staying reachable. Uses a running
-// Y-cursor rather than fixed coordinates so multi-row pip wraps and long
-// abilities text never overlap the next section.
+// doesn't depend on MUL's image endpoint staying reachable. Layout mirrors
+// the reference tool's card (stats/damage left, artwork right, heat scale,
+// armor/structure + critical-hit tracks, abilities, footer).
 function sbCardSVG(u, skill) {
-  const W = 640;
+  const W = 1000;
   const pv      = sbAdjPV(u, skill);
+  const basePV  = u.BFPointValue || 0;
   const role    = u.Role?.Name || '—';
   const type    = u.BFType || (u.Type?.Name || '').slice(0, 2).toUpperCase() || '?';
   const size    = ['—','L','M','H','A'][u.BFSize] || '—';
@@ -4723,84 +4738,122 @@ function sbCardSVG(u, skill) {
   const dmg     = { short: u.BFDamageShort, medium: u.BFDamageMedium, long: u.BFDamageLong, extreme: u.BFDamageExtreme };
   const dmgMin  = { short: u.BFDamageShortMin, medium: u.BFDamageMediumMin, long: u.BFDamageLongMin, extreme: u.BFDamageExtemeMin };
   const bands   = SB_RANGE_BANDS.filter(b => b.key !== 'extreme' || (dmg.extreme || 0) > 0);
-  const colW    = (W - 80) / bands.length;
-  const abilLines = sbSvgWrapLines(u.BFAbilities || '—', 60);
+  const abilLines = sbSvgWrapLines(u.BFAbilities || '—', 70);
+  const crits   = sbCritTracks(type);
 
-  const PIP_ROW_H = 20, PIP_ROWS_PER_WRAP = 16;
-  const armorRows  = Math.max(1, Math.ceil(armor / PIP_ROWS_PER_WRAP));
-  const structRows = Math.max(1, Math.ceil(struct_ / PIP_ROWS_PER_WRAP));
+  const LEFT_X = 24, LEFT_W = 470, ART_X = 510, ART_W = 466;
+  const PIP_ROW_H = 20, PIP_PER_ROW = 16;
+  const armorRows  = Math.max(1, Math.ceil(armor / PIP_PER_ROW));
+  const structRows = Math.max(1, Math.ceil(struct_ / PIP_PER_ROW));
 
-  const IMG_H = u.ImageUrl ? 190 : 0;
-  let y = 34;
-  let svg = `<svg viewBox="0 0 ${W} 1" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" data-h-placeholder="1">`;
+  let svg = `<svg viewBox="0 0 ${W} 1" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">`;
   svg += `<rect x="0" y="0" width="${W}" height="9999" fill="#111"/>`;
-  svg += `<rect x="4" y="4" width="${W-8}" height="9991" fill="#fff" stroke="#111" stroke-width="1"/>`;
+  svg += `<rect x="6" y="6" width="${W-12}" height="9987" fill="#fff" stroke="#111" stroke-width="1"/>`;
 
+  // Header: name (Class big / Variant small, when available) + PV box
+  let y = 40;
+  if (u.Class && u.Variant) {
+    svg += `<text x="20" y="24" font-family="sans-serif" font-size="15" fill="#555">${lbEsc(u.Variant)}</text>`;
+    svg += `<text x="20" y="${y+12}" font-family="sans-serif" font-size="30" font-weight="700">${lbEsc(u.Class.toUpperCase())}</text>`;
+  } else {
+    svg += `<text x="20" y="${y+12}" font-family="sans-serif" font-size="26" font-weight="700">${lbEsc((u.Name||'?').toUpperCase())}</text>`;
+  }
+  svg += `<rect x="${W-160}" y="10" width="140" height="50" fill="none" stroke="#111" stroke-width="2"/>`;
+  svg += `<text x="${W-90}" y="42" text-anchor="middle" font-family="sans-serif" font-size="24" font-weight="700">PV: ${pv}</text>`;
+  if (skill !== 4) svg += `<text x="${W-90}" y="56" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#555">Base PV: ${basePV} (Sk${skill})</text>`;
+  y = 70; svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
+
+  // Left column: TP/SZ/TMM/MV, Role/Skill, Damage. Right column: artwork.
+  const ART_H = 300;
   if (u.ImageUrl) {
-    svg += `<clipPath id="sb-img-clip-${u.Id}"><rect x="4" y="4" width="${W-8}" height="${IMG_H}"/></clipPath>
-      <image href="${lbEsc(u.ImageUrl)}" x="4" y="4" width="${W-8}" height="${IMG_H}"
+    svg += `<clipPath id="sb-img-clip-${u.Id}"><rect x="${ART_X}" y="${y+10}" width="${ART_W}" height="${ART_H}"/></clipPath>
+      <image href="${lbEsc(u.ImageUrl)}" x="${ART_X}" y="${y+10}" width="${ART_W}" height="${ART_H}"
         preserveAspectRatio="xMidYMid slice" clip-path="url(#sb-img-clip-${u.Id})"
         onerror="this.setAttribute('href','');this.style.display='none'"/>
-      <rect x="4" y="4" width="${W-8}" height="${IMG_H}" fill="none" stroke="#111" stroke-width="1"/>`;
-    y += IMG_H + 8;
+      <rect x="${ART_X}" y="${y+10}" width="${ART_W}" height="${ART_H}" fill="none" stroke="#111" stroke-width="1"/>`;
   }
 
-  svg += `<text x="20" y="${y}" font-family="sans-serif" font-size="24" font-weight="700">${lbEsc(u.Name || '?')}</text>`;
-  svg += `<rect x="${W-140}" y="${y-22}" width="120" height="44" fill="none" stroke="#111" stroke-width="2"/>`;
-  svg += `<text x="${W-80}" y="${y-4}" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#555">POINT VALUE</text>`;
-  svg += `<text x="${W-80}" y="${y+14}" text-anchor="middle" font-family="sans-serif" font-size="24" font-weight="700">${pv}${skill!==4?` <tspan font-size="11" fill="#555">(Sk${skill})</tspan>`:''}</text>`;
-  y += 30; svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
+  y += 26;
+  svg += `<text x="${LEFT_X}" y="${y}" font-family="sans-serif" font-size="17"><tspan font-weight="700">TP:</tspan> ${lbEsc(type)}   <tspan font-weight="700">SZ:</tspan> ${lbEsc(size)}   <tspan font-weight="700">TMM:</tspan> ${lbEsc(String(tmm))}   <tspan font-weight="700">MV:</tspan> ${lbEsc(move)}</text>`;
+  y += 26;
+  svg += `<text x="${LEFT_X}" y="${y}" font-family="sans-serif" font-size="17"><tspan font-weight="700">ROLE:</tspan> ${lbEsc(role)}   <tspan font-weight="700">SKILL:</tspan> ${skill}</text>`;
+  y += 20; svg += `<line x1="${LEFT_X}" y1="${y}" x2="${LEFT_X+LEFT_W}" y2="${y}" stroke="#111"/>`;
 
-  y += 18;
-  svg += `<g font-family="sans-serif">${[['TP',type],['SZ',size],['TMM',tmm],['MV',move],['SKILL',skill],['ROLE',role]].map((c,i) => {
-    const cw = (W-40)/6, x = 20 + i*cw + cw/2;
-    return `<text x="${x}" y="${y}" text-anchor="middle" font-size="10" fill="#555">${lbEsc(String(c[0]))}</text>
-            <text x="${x}" y="${y+20}" text-anchor="middle" font-size="18" font-weight="700">${lbEsc(String(c[1]))}</text>`;
-  }).join('')}</g>`;
-  y += 34; svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
-
-  y += 24;
-  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">DAMAGE</text>`;
-  y += 14;
+  y += 22;
+  svg += `<text x="${LEFT_X}" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">DAMAGE</text>`;
+  y += 16;
+  const colW = LEFT_W / bands.length;
   svg += bands.map((b, i) => {
-    const x = 40 + i * colW + colW / 2;
+    const x = LEFT_X + i * colW + colW / 2;
     const val = dmg[b.key];
     const valTxt = (val ?? '—') + (dmgMin[b.key] ? '*' : '');
-    return `<text x="${x}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#555">${b.label} (${b.mod} | ${b.hex}")</text>
-            <text x="${x}" y="${y+47}" text-anchor="middle" font-family="sans-serif" font-size="40" font-weight="700">${lbEsc(String(valTxt))}</text>`;
+    const toHit = skill + parseInt(b.mod, 10);
+    return `<text x="${x}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#555">${b.label} (${b.mod} | ${toHit}+)</text>
+            <text x="${x}" y="${y+42}" text-anchor="middle" font-family="sans-serif" font-size="36" font-weight="700">${lbEsc(String(valTxt))}</text>
+            <text x="${x}" y="${y+58}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#555">${b.hex}"</text>`;
   }).join('');
-  y += 62; svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
+  y += 66;
 
-  y += 24;
-  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">OV</text>`;
-  svg += `<text x="75" y="${y+3}" font-family="sans-serif" font-size="20" font-weight="700">${ov}</text>`;
-  if (thresh) {
-    svg += `<text x="130" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">THR</text>`;
-    svg += `<text x="165" y="${y+3}" font-family="sans-serif" font-size="20" font-weight="700">${thresh}</text>`;
-  }
-  y += 28;
+  const colBottom = Math.max(y, (y - 66) + 10 + ART_H + 10); // ensure divider clears artwork too
+  y = colBottom + 10;
+  svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
 
-  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">ARMOR (${armor})</text>`;
-  y += 12;
-  svg += sbSvgPipRow(52, y, armor, '#fff');
-  y += armorRows * PIP_ROW_H + 16;
+  // OV + Heat Scale pill (fixed levels 0/1/2/3/S — a static rules reference,
+  // not per-unit "current heat" state, since this is a print card)
+  y += 30;
+  svg += `<text x="${LEFT_X}" y="${y}" font-family="sans-serif" font-size="13" font-weight="700">OV: ${ov}</text>`;
+  const heatCx = LEFT_X + 90, heatW = 260, heatH = 36;
+  svg += `<rect x="${heatCx}" y="${y-26}" width="${heatW}" height="${heatH}" rx="${heatH/2}" fill="#111"/>`;
+  ['0','1','2','3','S'].forEach((lbl, i) => {
+    const cx = heatCx + 22 + i * (heatW - 44) / 4;
+    svg += `<circle cx="${cx}" cy="${y-8}" r="14" fill="#999"/>`;
+    svg += `<text x="${cx}" y="${y-3}" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#fff">${lbl}</text>`;
+  });
+  y += 30;
+  svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
 
-  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">STRUCTURE (${struct_})</text>`;
-  y += 12;
-  svg += sbSvgPipRow(52, y, struct_, '#999');
-  y += structRows * PIP_ROW_H + 22;
+  // Left: Armor/Structure pips. Right: Critical Hits box.
+  const lowerTop = y;
+  let ly = lowerTop + 22;
+  svg += `<text x="${LEFT_X}" y="${ly}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">ARMOR (${armor})${thresh?` &nbsp; THRESHOLD: ${thresh}`:''}</text>`;
+  ly += 12;
+  svg += sbSvgPipRow(LEFT_X+12, ly, armor, '#fff');
+  ly += armorRows * PIP_ROW_H + 16;
+  svg += `<text x="${LEFT_X}" y="${ly}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">STRUCTURE (${struct_})</text>`;
+  ly += 12;
+  svg += sbSvgPipRow(LEFT_X+12, ly, struct_, '#999');
+  ly += structRows * PIP_ROW_H;
+
+  const critX = 520, critW = W - critX - 20;
+  svg += `<rect x="${critX}" y="${lowerTop+10}" width="${critW}" height="${crits.length*32+34}" fill="none" stroke="#111" stroke-width="1.5"/>`;
+  svg += `<text x="${critX+critW/2}" y="${lowerTop+34}" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700">CRITICAL HITS</text>`;
+  let cy = lowerTop + 56;
+  crits.forEach(c => {
+    svg += `<text x="${critX+critW-10}" y="${cy}" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="700">${c.label}</text>`;
+    svg += sbSvgPipRow(critX+12, cy-4, c.pips, '#fff').replace(/r="9"/g, 'r="7"');
+    svg += `<text x="${critX+12}" y="${cy+16}" font-family="sans-serif" font-size="9" fill="#555">${c.text}</text>`;
+    cy += 32;
+  });
+  const critBottom = lowerTop + 10 + crits.length*32 + 34;
+
+  y = Math.max(ly, critBottom) + 18;
+  svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
+  y += 22;
+  svg += `<text x="${LEFT_X}" y="${y}" font-family="sans-serif" font-size="12" font-weight="700" fill="#555">SPECIAL</text>`;
+  y += 18;
+  svg += `<text x="${LEFT_X}" y="${y}" font-family="sans-serif" font-size="14">${abilLines.map((l, i) => `<tspan x="${LEFT_X}" dy="${i===0?0:18}">${lbEsc(l)}</tspan>`).join('')}</text>`;
+  y += (abilLines.length - 1) * 18 + 20;
 
   svg += `<line x1="20" y1="${y}" x2="${W-20}" y2="${y}" stroke="#111"/>`;
-  y += 20;
-  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="12" font-weight="700" fill="#555">ABILITIES</text>`;
-  y += 16;
-  svg += `<text x="40" y="${y}" font-family="sans-serif" font-size="13">${abilLines.map((l, i) => `<tspan x="40" dy="${i===0?0:16}">${lbEsc(l)}</tspan>`).join('')}</text>`;
-  y += (abilLines.length - 1) * 16 + 20;
+  y += 14;
+  svg += `<text x="${LEFT_X}" y="${y+14}" font-family="sans-serif" font-size="16" font-weight="700">ALPHA STRIKE STATS</text>`;
+  svg += `<text x="${W-20}" y="${y+14}" text-anchor="end" font-family="sans-serif" font-size="14" font-weight="700" fill="#555">BMT</text>`;
+  y += 30;
 
   const H = y;
-  svg = svg.replace('viewBox="0 0 640 1"', `viewBox="0 0 ${W} ${H}"`)
+  svg = svg.replace(`viewBox="0 0 ${W} 1"`, `viewBox="0 0 ${W} ${H}"`)
            .replace('height="9999"', `height="${H}"`)
-           .replace('height="9991"', `height="${H-8}"`);
+           .replace('height="9987"', `height="${H-12}"`);
   svg += `</svg>`;
   return svg;
 }
