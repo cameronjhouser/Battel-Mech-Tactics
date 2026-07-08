@@ -3535,7 +3535,13 @@ const LB_ABILITY_DESC = {
 
 let lbUnitBonuses = {}; // `${li}-${si}` -> chosen ability string
 
-const LB_SKILL_MULT = { 0: 1.82, 1: 1.62, 2: 1.42, 3: 1.20, 4: 1.00 };
+// Skills 0-4 verified against official Alpha Strike PV skill multiplier
+// table. Skills 5-7 are LINEAR EXTRAPOLATION of the same -0.20/level
+// pattern (5:0.80, 6:0.60, 7:0.40) — NOT independently verified against
+// the official table; every official source was unreachable when these
+// were added. Confirm against your rulebook/Alpha Strike Companion.
+const LB_SKILL_MULT = { 0: 1.82, 1: 1.62, 2: 1.42, 3: 1.20, 4: 1.00, 5: 0.80, 6: 0.60, 7: 0.40 };
+const SB_SKILL_LEVELS = [0, 1, 2, 3, 4, 5, 6, 7];
 
 function lbGetAdjLancePV(li) {
   const skillEl = document.getElementById(`lb-skill-${li}`);
@@ -4592,7 +4598,7 @@ function sbAddUnit(id) {
   if (!unit) return;
   if (sbForce.length >= 12) { alert('Force is full (12 units max).'); return; }
   if (sbForce.some(f => f.unit.Id === id)) return;
-  sbForce.push({ unit, skill: sbIsJump(unit) ? 3 : 4 });
+  sbForce.push({ unit, skill: 4 });
   sbRenderForce();
   sbRenderBrowse();
 }
@@ -4606,7 +4612,6 @@ function sbRemoveUnit(idx) {
 function sbSetSkill(idx, val) {
   const skill = parseInt(val);
   if (!sbForce[idx]) return;
-  if (sbIsJump(sbForce[idx].unit) && skill > 3) return; // jump units locked at Sk3
   sbForce[idx].skill = skill;
   sbRenderForce();
 }
@@ -4626,8 +4631,6 @@ function sbRenderForce() {
 
   const totalPV  = sbForce.reduce((s, f) => s + sbAdjPV(f.unit, f.skill), 0);
   const unitCt   = sbForce.length;
-  const jumpCt   = sbForce.filter(f => sbIsJump(f.unit)).length;
-  const htTotal  = sbForce.reduce((s, f) => s + sbHtVal(f.unit), 0);
 
   const pvLimit = parseInt(document.getElementById('sb-pv-limit')?.value) || 250;
   const pvWarn  = Math.round(pvLimit * 0.97);
@@ -4643,8 +4646,6 @@ function sbRenderForce() {
     rulesEl.innerHTML = [
       { t:`${totalPV}/${pvLimit} PV`, c: totalPV>pvLimit?'bad':totalPV>pvWarn?'warn':'ok' },
       { t:`${unitCt} units`,   c: unitCt<7?'warn':unitCt<=12?'ok':'bad'  },
-      { t:`JMPS ${jumpCt}/2`,  c: jumpCt>2?'bad':'ok'                    },
-      { t:`HT ${htTotal}/3`,   c: htTotal>3?'bad':htTotal===3?'warn':'ok' },
     ].map(r=>`<span class="sb-rule ${r.c}">${lbEsc(r.t)}</span>`).join('');
   }
 
@@ -4655,10 +4656,9 @@ function sbRenderForce() {
 
   const unitRow = (f, idx) => {
     const adjPV  = sbAdjPV(f.unit, f.skill);
-    const isJump = sbIsJump(f.unit);
     const abil   = (f.unit.BFAbilities || '').trim();
-    const opts   = [3,4].map(s =>
-      `<option value="${s}"${f.skill===s?' selected':''}${isJump&&s>3?' disabled':''}>${s===3?'Sk3':'Sk4'}</option>`
+    const opts   = SB_SKILL_LEVELS.map(s =>
+      `<option value="${s}"${f.skill===s?' selected':''}>Sk${s}</option>`
     ).join('');
     return `<div class="sb-force-unit">
       <div class="sb-force-name">
