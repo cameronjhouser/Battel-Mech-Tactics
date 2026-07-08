@@ -3942,7 +3942,7 @@ let sbAbilMode   = 'all';  // 'all' = unit must have every selected ability; 'an
 let sbAbilOpts   = [];     // [{code, n}] distinct base abilities in the catalog
 let sbFactionMeta = {};    // faction id -> { name, isClan } (curated + live-loaded)
 let sbFactionsLive = false;// true once the full list is loaded from MUL
-let sbLastAutoIntro = null; // {min, max} last auto-filled Introduced Year values, or null
+let sbLastAutoIntro = null; // last auto-filled Introduced Year MAX value, or null
 
 // Verified active-year windows for factions with a well-documented, stable
 // historical end date (mostly extinct/absorbed Homeworld Clans). Keyed by
@@ -4194,24 +4194,21 @@ function sbFactionChanged() {
 // back out (same rule) when switching to a faction with no known window.
 function sbApplyFactionYearPreset() {
   const sel = document.getElementById('sb-faction');
-  const minEl = document.getElementById('sb-filter-intro-min');
   const maxEl = document.getElementById('sb-filter-intro-max');
-  if (!sel || !minEl || !maxEl) return;
+  if (!sel || !maxEl) return;
 
   const name = sbFactionMeta[sel.value]?.name || '';
   const preset = SB_FACTION_ACTIVE_YEARS[name];
   const status = document.getElementById('sb-status');
 
-  const untouched = (el, val) => !el.value || (sbLastAutoIntro && String(val) === el.value);
+  const untouched = (el, val) => !el.value || (sbLastAutoIntro != null && String(val) === el.value);
 
   if (preset) {
-    if (untouched(minEl, sbLastAutoIntro?.min)) minEl.value = preset.start;
-    if (untouched(maxEl, sbLastAutoIntro?.max)) maxEl.value = preset.end;
-    sbLastAutoIntro = { min: preset.start, max: preset.end };
-    if (status) status.textContent = `Auto-filled Introduced Year to ${lbEsc(name)}'s known active dates (${preset.start}–${preset.end}) — edit or clear if needed, then Load Catalog.`;
-  } else if (sbLastAutoIntro) {
-    if (minEl.value === String(sbLastAutoIntro.min)) minEl.value = '';
-    if (maxEl.value === String(sbLastAutoIntro.max)) maxEl.value = '';
+    if (untouched(maxEl, sbLastAutoIntro)) maxEl.value = preset.end;
+    sbLastAutoIntro = preset.end;
+    if (status) status.textContent = `Auto-filled Introduced Year max to ${lbEsc(name)}'s known dissolution year (${preset.end}) — edit or clear if needed, then Load Catalog.`;
+  } else if (sbLastAutoIntro != null) {
+    if (maxEl.value === String(sbLastAutoIntro)) maxEl.value = '';
     sbLastAutoIntro = null;
   }
 }
