@@ -2364,6 +2364,9 @@
         <span>📂 Choose CSV file</span>
         <input type="file" id="lb-csv-input" accept=".csv,.txt" onchange="lbLoadCSV(this)">
       </label>
+      <button class="lb-btn" onclick="lbCsvSaveListPrompt()">Save List</button>
+      <button class="lb-btn" onclick="lbCsvLoadListPrompt()">Load List</button>
+      <button class="lb-btn" onclick="lbCsvDeleteListPrompt()" style="background:var(--red)">Delete List</button>
       <select id="lb-formation-type" style="flex:1 1 200px">
         <option value="lance">Lance (4 units · 1 lance)</option>
         <option value="aug-lance">Augmented Lance (6 units · 1 lance + support)</option>
@@ -3487,6 +3490,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ── CSV FORMATION BUILDER ───────────────────────────── */
+const LB_CSV_STORAGE_KEY = 'bmtSavedCsvLists.v1';
 let lbPoolUnits     = []; // resolved units from CSV
 let lbCurrentLances = []; // [[unit,...], ...] — live formation
 let lbVariantsCache = {}; // chassis -> [unit,...]
@@ -6197,6 +6201,78 @@ function lbRenderPool(resolved) {
     </div>`;
   }).join('');
   document.getElementById('lb-csv-pool').style.display = 'block';
+}
+
+// Saved CSV lists persist the resolved MUL lookups (query + matched unit),
+// same shape lbBatchLookup already builds, so loading skips re-querying the
+// MUL API for names already resolved — same approach as the Owned Units
+// saved-roster and Skirmish Force Builder saved-lance features.
+function lbCsvStoredLists() {
+  try {
+    return JSON.parse(localStorage.getItem(LB_CSV_STORAGE_KEY) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function lbCsvSetStoredLists(lists) {
+  localStorage.setItem(LB_CSV_STORAGE_KEY, JSON.stringify(lists));
+}
+
+function lbCsvSaveListPrompt() {
+  if (!lbPoolUnits.length) { alert('Upload a CSV before saving a list.'); return; }
+  const defaultName = localStorage.getItem('bmtSavedCsvLists.lastName') || '';
+  const name = prompt('Save list as:', defaultName);
+  if (!name) return;
+  const key = name.trim();
+  if (!key) return;
+  const lists = lbCsvStoredLists();
+  lists[key] = {
+    name: key,
+    updatedAt: new Date().toISOString(),
+    unitCount: lbPoolUnits.length,
+    matchedCount: lbPoolUnits.filter(r => r.unit).length,
+    pool: lbPoolUnits,
+  };
+  lbCsvSetStoredLists(lists);
+  localStorage.setItem('bmtSavedCsvLists.lastName', key);
+  alert(`Saved "${key}" with ${lbPoolUnits.length} units.`);
+}
+
+function lbCsvListChoice(actionLabel) {
+  const lists = lbCsvStoredLists();
+  const names = Object.keys(lists).sort((a, b) => a.localeCompare(b));
+  if (!names.length) { alert('No saved lists found.'); return null; }
+  const list = names.map((n, i) => `${i + 1}. ${n} (${lists[n].unitCount || 0} units)`).join('\n');
+  const pick = prompt(`${actionLabel} list:\n${list}\n\nEnter number or name:`);
+  if (!pick) return null;
+  const idx = parseInt(pick, 10);
+  if (Number.isFinite(idx) && idx >= 1 && idx <= names.length) return names[idx - 1];
+  return names.find(n => n.toLowerCase() === pick.trim().toLowerCase()) || null;
+}
+
+function lbCsvLoadListPrompt() {
+  const name = lbCsvListChoice('Load');
+  if (!name) return;
+  const saved = lbCsvStoredLists()[name];
+  if (!saved?.pool?.length) { alert('That saved list has no units.'); return; }
+  lbPoolUnits = saved.pool;
+  const okCount = lbPoolUnits.filter(r => r.unit).length;
+  const status = document.getElementById('lb-csv-status');
+  status.textContent = `Loaded "${name}": ${okCount} of ${lbPoolUnits.length} units matched. Select a formation type and click Build.`;
+  status.className = okCount < lbPoolUnits.length ? 'lb-status err' : 'lb-status';
+  document.getElementById('lb-build-btn').disabled = false;
+  lbRenderPool(lbPoolUnits);
+  localStorage.setItem('bmtSavedCsvLists.lastName', name);
+}
+
+function lbCsvDeleteListPrompt() {
+  const name = lbCsvListChoice('Delete');
+  if (!name) return;
+  if (!confirm(`Delete saved list "${name}"?`)) return;
+  const lists = lbCsvStoredLists();
+  delete lists[name];
+  lbCsvSetStoredLists(lists);
 }
 
 function lbAssignToTypes(pool, typeKeys, upl) {
