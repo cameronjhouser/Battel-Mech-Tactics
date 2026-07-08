@@ -4758,7 +4758,10 @@ function sbSvgPipRow(x, y, count, color) {
 // reference tool's source (a React/SVG BattleTech roster app), including
 // its semi-transparent-white-box-over-artwork layering technique.
 function sbCardSVG(u, skill) {
-  const W = 1000, H = 640;
+  // H leaves a 10px black margin below the footer bar (which sits at
+  // y=610..645), matching the 10px border on the other three sides —
+  // 640 clipped the footer's bottom 5px against the viewBox edge.
+  const W = 1000, H = 655;
   const pv      = sbAdjPV(u, skill);
   const basePV  = u.BFPointValue || 0;
   const role    = u.Role?.Name || '—';
