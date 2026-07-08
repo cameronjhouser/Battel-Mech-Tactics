@@ -5353,48 +5353,30 @@ function sbGroupSpecialties(unitObjs, factionId) {
    database). Phase 1 covers Biped 'Mechs; other motive types / unmatched
    units fall back to the existing embedded-PDF path in lbOpenSheetsCore. */
 
-// Compact block of pips centred on (cx, top), wrapping at perRow. Smaller than
-// the AS card's pips since a record sheet packs many per location (CT can hold
-// 30+ armor). Returns { svg, height } so callers can stack clusters.
-function rsPipCluster(cx, top, count, opts) {
-  const perRow = opts.perRow || 10, r = opts.r || 4.5, gap = opts.gap || 12;
-  const color = opts.color || '#fff';
-  let svg = '';
-  for (let i = 0; i < count; i++) {
-    const row = Math.floor(i / perRow), col = i % perRow;
-    const rowCount = Math.min(perRow, count - row * perRow);
-    const rowW = (rowCount - 1) * gap;
-    const x = cx - rowW / 2 + col * gap;
-    const y = top + row * gap;
-    svg += `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" stroke="#000" stroke-width="1"/>`;
-  }
-  const rows = Math.ceil(count / perRow) || 1;
-  return { svg, height: rows * gap };
-}
-
-// One labelled armor/structure location: title + value + a pip cluster inside
-// a light box. Returns { svg, height }.
-function rsLocation(cx, top, label, count, color) {
-  if (!count) return { svg: '', height: 0 };
-  const cluster = rsPipCluster(cx, top + 26, count, { color });
-  const svg =
-    `<text x="${cx}" y="${top + 12}" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700">${lbEsc(label)} (${count})</text>`
-    + cluster.svg;
-  return { svg, height: 26 + cluster.height + 6 };
-}
-
-// Section header bar used to divide the sheet into labelled boxes.
-function rsBox(x, y, w, h, title) {
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="#000" stroke-width="2"/>`
-    + `<rect x="${x}" y="${y}" width="${w}" height="22" fill="#000"/>`
-    + `<text x="${x + 8}" y="${y + 16}" fill="#fff" font-family="sans-serif" font-size="13" font-weight="700" letter-spacing="1">${lbEsc(title)}</text>`;
-}
-
-// Vendored biped silhouette paths + per-location armor-circle coordinates
-// (from jdgwf/battletech-tools, transcribed into sheets/rs-silhouettes.json).
-// Lazily populated by lbOpenSheetsCore; when null, rsSheetSVG falls back to
-// the simpler pip-cluster diagrams.
+// Vendored biped silhouette paths + per-location armor/structure-circle
+// coordinates (from jdgwf/battletech-tools, transcribed verbatim into
+// sheets/rs-silhouettes.json — see build notes there). Lazily populated by
+// lbOpenSheetsCore; when null, rsSheetSVG falls back to a simpler diagram.
 let rsSilData = null;
+
+// Official heat-effect thresholds (Total Warfare heat scale): these rows get
+// the shaded "effect" background + a footnote asterisk on the real record
+// sheet. Transcribed from HeatTrackSVG's own threshold list.
+const RS_HEAT_EFFECT_ROWS = new Set([5,8,10,13,14,15,17,18,19,20,22,23,24,25,26,28,30]);
+
+// The rounded-corner group box used throughout the reference tool's record
+// sheet (RecordSheetGroupBoxSVG): a black-bordered white box with a black
+// title pill straddling the top edge.
+function rsGroupBox(x, y, w, h, title) {
+  const r = 10;
+  let svg = `<rect rx="${r}" ry="${r}" x="${x}" y="${y + 12}" width="${w}" height="${h}" fill="#000"/>`
+    + `<rect rx="${r}" ry="${r}" x="${x + 2}" y="${y + 14}" width="${w - 4}" height="${h - 4}" fill="#fff"/>`;
+  if (title) {
+    svg += `<rect rx="${r}" ry="${r}" x="${x + 14}" y="${y}" width="${w - 28}" height="24" fill="#000"/>`
+      + `<text x="${x + w / 2}" y="${y + 17}" font-family="sans-serif" fill="#fff" text-anchor="middle" font-size="14" font-weight="700" letter-spacing="1">${lbEsc(title.toUpperCase())}</text>`;
+  }
+  return svg;
+}
 
 // A single silhouette diagram: the fixed black mech-body path with white
 // armor/structure bubbles overlaid at their faithful coordinates, revealing
@@ -5403,26 +5385,52 @@ let rsSilData = null;
 function rsSilDiagram(x, y, w, which, values) {
   const S = rsSilData;
   const viewW = S.viewW;
-  // Armor view includes the rear-torso circle groups (down to y~1115);
-  // structure has no rear locations, so it can crop tighter.
-  const viewH = which === 'armor' ? 1160 : 985;
+  // Crop tightly to where each diagram's circles actually land (measured
+  // from the extracted coordinate data) instead of the full page-sized
+  // canvas, so the silhouette fills the box instead of floating in blank
+  // space. Armor circles span y=140-915 (rear torso is a separate diagram,
+  // see rsRearArmorDiagram); structure circles span y=168-948.
+  const yOff = which === 'armor' ? 100 : 140;
+  const viewH = 850;
   const scale = w / viewW;
   const h = viewH * scale;
   const path = which === 'armor' ? S.armorPath : S.structPath;
-  const locs = which === 'armor'
-    ? ['hd','ct','lt','rt','la','ra','ll','rl','ctr','ltr','rtr']
-    : ['hd','ct','lt','rt','la','ra','ll','rl'];
+  const locs = ['hd','ct','lt','rt','la','ra','ll','rl'];
+  const coordSet = which === 'armor' ? S.coords : S.structCoords;
   let circles = '';
   locs.forEach(loc => {
-    const pts = S.coords[loc] || [];
+    const pts = coordSet[loc] || [];
     const n = Math.min(values[loc] || 0, pts.length);
     for (let i = 0; i < n; i++) {
       const [cx, cy, r] = pts[i];
       circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" stroke="#000" stroke-width="2"/>`;
     }
   });
-  return { h, svg: `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 ${viewW} ${viewH}" overflow="visible">`
+  return { h, svg: `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 ${yOff} ${viewW} ${viewH}" overflow="visible">`
     + `<path d="${path}" fill="#000"/>${circles}</svg>` };
+}
+
+// The rear-torso silhouette (a separate small diagram in the reference tool,
+// not part of the main body path). Its own coordinate frame is offset and
+// scaled differently from the front armor diagram's (it's displayed smaller,
+// inset within the armor box) — rearCoords is pre-converted into the rear
+// path's own local space so it overlays correctly.
+function rsRearArmorDiagram(x, y, w, values) {
+  const S = rsSilData;
+  const viewW = 744.09448819, viewH = 340, yOff = 160;
+  const scale = w / viewW;
+  const h = viewH * scale;
+  let circles = '';
+  ['ctr','ltr','rtr'].forEach(loc => {
+    const pts = S.rearCoords[loc] || [];
+    const n = Math.min(values[loc] || 0, pts.length);
+    for (let i = 0; i < n; i++) {
+      const [cx, cy, r] = pts[i];
+      circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#eee" stroke="#000" stroke-width="2"/>`;
+    }
+  });
+  return { h, svg: `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 ${yOff} ${viewW} ${viewH}" overflow="visible">`
+    + `<g transform="translate(0,${S.rearTransformY})"><path d="${S.rearPath}" fill="#000"/></g>${circles}</svg>` };
 }
 
 // Render a full record sheet SVG for a matched biped mech record (from
@@ -5430,116 +5438,137 @@ function rsSilDiagram(x, y, w, which, values) {
 function rsSheetSVG(m, pilot) {
   pilot = pilot || {};
   const useSil = !!rsSilData;
-  const W = 1000, H = useSil ? 1500 : 1320;
+  const W = 1000;
   const a = m.armor || {}, s = m.structure || {};
   const esc = lbEsc;
 
-  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#fff">`;
-  svg += `<rect x="0" y="0" width="${W}" height="${H}" fill="#fff" stroke="#000" stroke-width="3"/>`;
+  // Body content is assembled first so the page height can be sized to fit
+  // it (silhouette diagrams shrink/grow with RW, and the equipment list
+  // grows with the unit's loadout) instead of guessing a fixed H upfront.
+  let svg = '';
+  let leftBottom = 0, rightBottom = 0;
 
-  // Header
-  svg += `<text x="20" y="34" font-family="sans-serif" font-size="26" font-weight="800">${esc(m.name)}</text>`;
-  svg += `<text x="20" y="54" font-family="sans-serif" font-size="13" fill="#444">BattleMech Record Sheet · ${esc(m.tons)} tons · ${esc(m.techBase || 'Inner Sphere')}</text>`;
+  const LX = 16, LW = 468;   // left column
+  const RX = 500, RW = 484;  // right column (armor + structure diagrams)
 
-  const LX = 20, LW = 460;   // left column
-  const RX = 500, RW = 480;  // right column (armor + structure diagrams)
-
-  // ── Mech Data box ──
-  let y = 70;
-  svg += rsBox(LX, y, LW, 96, 'MECH DATA');
-  const dataRows = [
-    ['Tonnage', `${m.tons}`], ['Tech Base', m.techBase || '—'],
-    ['Year', m.year || '—'], ['Battle Value', m.bv || '—'],
-  ];
-  dataRows.forEach((r, i) => {
-    const ry = y + 40 + (i % 2) * 24, rx = LX + 12 + (i < 2 ? 0 : 230);
-    svg += `<text x="${rx}" y="${ry}" font-family="sans-serif" font-size="12"><tspan font-weight="700">${esc(r[0])}:</tspan> ${esc(r[1])}</text>`;
-  });
-
-  // ── Movement box ──
-  y = 176;
-  svg += rsBox(LX, y, LW, 60, 'MOVEMENT');
+  // ── 'Mech Data box (name, type line + tonnage/tech/era/cost/BV/movement,
+  //    all one box — matches the reference's combined "'Mech Data" box) ──
+  let y = 10;
+  svg += rsGroupBox(LX, y, LW, 190, "'Mech Data");
+  svg += `<text x="${LX + 12}" y="${y + 50}" font-family="sans-serif" font-size="12" font-weight="700">Type:</text>`;
+  svg += `<text x="${LX + 12}" y="${y + 72}" font-family="sans-serif" font-size="18" font-weight="600">${esc(m.name)}</text>`;
   const mv = m.move || {};
-  svg += `<text x="${LX + 12}" y="${y + 46}" font-family="sans-serif" font-size="14">`
-    + `<tspan font-weight="700">Walk:</tspan> ${mv.walk || 0}   `
-    + `<tspan font-weight="700">Run:</tspan> ${mv.run || 0}   `
-    + `<tspan font-weight="700">Jump:</tspan> ${mv.jump || 0}</text>`;
+  svg += `<text x="${LX + 12}" y="${y + 100}" font-family="sans-serif" font-size="12" font-weight="700">Movement Points</text>`;
+  svg += `<text x="${LX + 12}" y="${y + 122}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Walking:</tspan> ${esc(mv.walk||0)}</text>`;
+  svg += `<text x="${LX + 12}" y="${y + 140}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Running:</tspan> ${esc(mv.run||0)}</text>`;
+  svg += `<text x="${LX + 12}" y="${y + 158}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Jumping:</tspan> ${esc(mv.jump||0)}</text>`;
+  svg += `<text x="${LX + 230}" y="${y + 100}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Tonnage:</tspan> ${esc(m.tons)}</text>`;
+  svg += `<text x="${LX + 230}" y="${y + 122}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Tech Base:</tspan> ${esc(m.techBase || '—')}</text>`;
+  svg += `<text x="${LX + 230}" y="${y + 144}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Era:</tspan> ${esc(m.year || '—')}</text>`;
+  svg += `<text x="${LX + 12}" y="${y + 182}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Battle Value:</tspan> ${esc(m.bv || '—')}</text>`;
+  svg += `<text x="${LX + 230}" y="${y + 182}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Heat Sinks:</tspan> ${esc((m.heatSinks||{}).count||0)} ${esc((m.heatSinks||{}).type||'')}</text>`;
 
-  // ── Warrior / Pilot box (with 6-pip hit track) ──
-  y = 246;
-  svg += rsBox(LX, y, LW, 78, 'WARRIOR DATA');
-  svg += `<text x="${LX + 12}" y="${y + 44}" font-family="sans-serif" font-size="13"><tspan font-weight="700">Pilot:</tspan> ${esc(pilot.name || '________________')}</text>`;
-  svg += `<text x="${LX + 12}" y="${y + 66}" font-family="sans-serif" font-size="13"><tspan font-weight="700">Gunnery:</tspan> ${esc(pilot.gunnery ?? 4)}    <tspan font-weight="700">Piloting:</tspan> ${esc(pilot.piloting ?? 5)}</text>`;
-  svg += `<text x="${LX + 300}" y="${y + 40}" font-family="sans-serif" font-size="11" font-weight="700">Hits</text>`;
-  for (let i = 0; i < 6; i++) svg += `<circle cx="${LX + 300 + i * 24}" cy="${y + 58}" r="8" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
-
-  // ── Heat scale box (0..30 ladder) ──
-  y = 334;
-  svg += rsBox(LX, y, LW, 96, 'HEAT SCALE');
-  svg += `<text x="${LX + 12}" y="${y + 44}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Heat Sinks:</tspan> ${esc((m.heatSinks || {}).count || 0)} ${esc((m.heatSinks || {}).type || '')}</text>`;
-  for (let i = 0; i <= 30; i++) {
-    const col = i % 16, row = Math.floor(i / 16);
-    const hx = LX + 14 + col * 27, hy = y + 58 + row * 20;
-    svg += `<rect x="${hx}" y="${hy}" width="20" height="16" fill="#fff" stroke="#000" stroke-width="1"/>`
-      + `<text x="${hx + 10}" y="${hy + 12}" text-anchor="middle" font-family="sans-serif" font-size="9">${i}</text>`;
+  // ── Warrior Data box (pilot name/skills + the real double-boxed hit
+  //    track with consciousness-roll thresholds, like PilotHitTrackSVG) ──
+  y = 212;
+  svg += rsGroupBox(LX, y, LW, 100, 'Warrior Data');
+  svg += `<text x="${LX + 12}" y="${y + 34}" font-family="sans-serif" font-size="13">${esc(pilot.name || '________________')}</text>`;
+  svg += `<text x="${LX + LW - 12}" y="${y + 34}" text-anchor="end" font-family="sans-serif" font-size="13">Piloting: ${esc(pilot.piloting ?? 5)}</text>`;
+  svg += `<text x="${LX + LW - 12}" y="${y + 54}" text-anchor="end" font-family="sans-serif" font-size="13">Gunnery: ${esc(pilot.gunnery ?? 4)}</text>`;
+  const hitLabels = ['3+','5+','7+','10+','11+','Dead'];
+  const hitY = y + 84, hitBoxW = 62;
+  svg += `<text x="${LX + 40}" y="${hitY - 10}" text-anchor="end" font-family="sans-serif" font-size="11">Hits:</text>`;
+  svg += `<text x="${LX + 40}" y="${hitY + 8}" text-anchor="end" font-family="sans-serif" font-size="11">Consc:</text>`;
+  for (let i = 0; i < 6; i++) {
+    const hx = LX + 46 + i * hitBoxW;
+    svg += `<rect x="${hx}" y="${hitY - 20}" width="${hitBoxW-4}" height="16" fill="#000"/>`
+      + `<rect x="${hx+1}" y="${hitY-19}" width="${hitBoxW-6}" height="14" fill="#fff"/>`
+      + `<text x="${hx + (hitBoxW-4)/2}" y="${hitY - 8}" text-anchor="middle" font-family="sans-serif" font-size="11">${i+1}</text>`
+      + `<rect x="${hx}" y="${hitY}" width="${hitBoxW-4}" height="16" fill="#000"/>`
+      + `<rect x="${hx+1}" y="${hitY+1}" width="${hitBoxW-6}" height="14" fill="#fff"/>`
+      + `<text x="${hx + (hitBoxW-4)/2}" y="${hitY + 12}" text-anchor="middle" font-family="sans-serif" font-size="9">${hitLabels[i]}</text>`;
   }
 
-  // ── Weapons & Equipment box (grows) ──
-  y = 440;
-  const eq = (m.equipment || []).filter(e => e.type !== 'ammunition');
-  const eqBoxH = Math.max(120, 40 + eq.length * 20 + 10);
-  svg += rsBox(LX, y, LW, eqBoxH, 'WEAPONS & EQUIPMENT');
-  svg += `<text x="${LX + 12}" y="${y + 36}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">NAME</text>`;
-  svg += `<text x="${LX + 360}" y="${y + 36}" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">LOC</text>`;
-  eq.forEach((e, i) => {
-    const ry = y + 56 + i * 20;
-    svg += `<text x="${LX + 12}" y="${ry}" font-family="sans-serif" font-size="12">${esc(e.name)}</text>`;
-    svg += `<text x="${LX + 360}" y="${ry}" font-family="sans-serif" font-size="12">${esc(e.loc || '—')}</text>`;
+  // ── Heat Scale box (0-30 ladder, official effect rows shaded + starred —
+  //    laid out horizontally to fit our page proportions; the reference
+  //    tool stacks the same 31 boxes vertically down a page margin) ──
+  y = 326;
+  svg += rsGroupBox(LX, y, LW, 78, 'Heat Scale');
+  const perRow = 16;
+  for (let i = 0; i <= 30; i++) {
+    const col = i % perRow, row = Math.floor(i / perRow);
+    const hx = LX + 10 + col * 28, hy = y + 24 + row * 26;
+    const effect = RS_HEAT_EFFECT_ROWS.has(i);
+    svg += `<rect x="${hx}" y="${hy}" width="24" height="22" fill="${effect ? '#c8c8c8' : '#fff'}" stroke="#000" stroke-width="1.5"/>`
+      + `<text x="${hx + 12}" y="${hy + 15}" text-anchor="middle" font-family="sans-serif" font-size="11">${i}${effect ? '*' : ''}</text>`;
+  }
+
+  // ── Weapons & Equipment box (Qty/Type/Loc column layout matching
+  //    RecordSheetEquipmentTable's own header set/striped rows; the
+  //    reference table also has Heat/Dmg/Min/Sht/Med/Lng columns, omitted
+  //    here since that per-weapon stat lookup isn't in our SSW-derived
+  //    data yet — showing those headers with nothing under them would
+  //    look broken rather than faithful) ──
+  y = 414;
+  const rawEq = (m.equipment || []).filter(e => e.type !== 'ammunition');
+  const grouped = [];
+  rawEq.forEach(e => {
+    const prev = grouped.find(g => g.name === e.name && g.loc === e.loc);
+    if (prev) prev.qty++; else grouped.push({ name: e.name, loc: e.loc, qty: 1 });
   });
+  const eqBoxH = Math.max(80, 40 + grouped.length * 20 + 12);
+  svg += rsGroupBox(LX, y, LW, eqBoxH, 'Weapons & Equipment');
+  const cols = { qty: LX+12, type: LX+42, loc: LX+LW-50 };
+  const headY = y + 34;
+  svg += `<text x="${cols.qty}" y="${headY}" font-family="sans-serif" font-size="10" font-weight="700" fill="#555">Qty</text>`;
+  svg += `<text x="${cols.type}" y="${headY}" font-family="sans-serif" font-size="10" font-weight="700" fill="#555">Type</text>`;
+  svg += `<text x="${cols.loc}" y="${headY}" font-family="sans-serif" font-size="10" font-weight="700" fill="#555">Loc</text>`;
+  grouped.forEach((e, i) => {
+    const ry = headY + 20 + i * 20;
+    if (i % 2 === 0) svg += `<rect x="${LX+8}" y="${ry-13}" width="${LW-16}" height="17" fill="#ddd"/>`;
+    svg += `<text x="${cols.qty}" y="${ry}" font-family="sans-serif" font-size="11">${e.qty}</text>`;
+    svg += `<text x="${cols.type}" y="${ry}" font-family="sans-serif" font-size="11">${esc(e.name)}</text>`;
+    svg += `<text x="${cols.loc}" y="${ry}" font-family="sans-serif" font-size="11">${esc(e.loc || '—')}</text>`;
+  });
+  leftBottom = y + eqBoxH + 20;
 
   if (useSil) {
-    // ── Faithful silhouette diagrams (armor on the right, structure below
-    //    the left-column boxes) ──
-    svg += rsBox(RX, 70, RW, 900, 'ARMOR');
-    const armorDia = rsSilDiagram(RX + 20, 100, RW - 40, 'armor', a);
-    svg += armorDia.svg;
+    // ── Faithful silhouette diagrams — armor (front body + separate
+    //    rear-torso silhouette) on the right, internal structure below —
+    //    boxes sized to fit their content rather than a fixed guess, so
+    //    there's no large empty margin below the artwork ──
+    const armorDiaW = RW - 84;
+    const armorDiaH = 850 * (armorDiaW / 744.09448819);
+    const armorH = 46 + armorDiaH + 30;
+    svg += rsGroupBox(RX, 10, RW, armorH, 'Armor Diagram');
+    svg += rsSilDiagram(RX + 42, 46, armorDiaW, 'armor', a).svg;
+    const rearW = 170, rearH = 340 * (rearW / 744.09448819);
+    svg += rsRearArmorDiagram(RX + RW - rearW - 20, 10 + armorH - rearH - 20, rearW, a).svg;
 
-    const stY = 1000;
-    svg += rsBox(RX, stY, RW, H - stY - 20, 'INTERNAL STRUCTURE');
-    svg += rsSilDiagram(RX + 40, stY + 30, RW - 80, 'struct', s).svg;
+    const stY = 10 + armorH + 16;
+    const structDiaW = RW - 120;
+    const structDiaH = 850 * (structDiaW / 744.09448819);
+    const stH = 50 + structDiaH + 24;
+    svg += rsGroupBox(RX, stY, RW, stH, 'Internal Structure');
+    svg += rsSilDiagram(RX + 60, stY + 50, structDiaW, 'struct', s).svg;
+    rightBottom = stY + stH + 20;
   } else {
-    // ── Fallback: pip-cluster diagrams (used if the silhouette data failed
-    //    to load) ──
-    const acx  = RX + RW / 2;
-    const colL = RX + 90, colC = acx, colR = RX + RW - 90;
-    const legL = RX + 150, legR = RX + RW - 150;
-
-    svg += rsBox(RX, 70, RW, 620, 'ARMOR');
-    svg += rsLocation(colC, 104, 'HEAD', a.hd, '#fff').svg;
-    svg += rsLocation(colL, 180, 'L TORSO', a.lt, '#fff').svg;
-    svg += rsLocation(colC, 180, 'C TORSO', a.ct, '#fff').svg;
-    svg += rsLocation(colR, 180, 'R TORSO', a.rt, '#fff').svg;
-    svg += rsLocation(colL, 300, 'L ARM', a.la, '#fff').svg;
-    svg += rsLocation(colR, 300, 'R ARM', a.ra, '#fff').svg;
-    svg += rsLocation(colL, 420, 'L TORSO (R)', a.ltr, '#eee').svg;
-    svg += rsLocation(colC, 420, 'C TORSO (R)', a.ctr, '#eee').svg;
-    svg += rsLocation(colR, 420, 'R TORSO (R)', a.rtr, '#eee').svg;
-    svg += rsLocation(legL, 540, 'L LEG', a.ll, '#fff').svg;
-    svg += rsLocation(legR, 540, 'R LEG', a.rl, '#fff').svg;
-
-    svg += rsBox(RX, 700, RW, 600, 'INTERNAL STRUCTURE');
-    svg += rsLocation(colC, 734, 'HEAD', s.hd, '#ccc').svg;
-    svg += rsLocation(colL, 810, 'L TORSO', s.lt, '#ccc').svg;
-    svg += rsLocation(colC, 810, 'C TORSO', s.ct, '#ccc').svg;
-    svg += rsLocation(colR, 810, 'R TORSO', s.rt, '#ccc').svg;
-    svg += rsLocation(colL, 930, 'L ARM', s.la, '#ccc').svg;
-    svg += rsLocation(colR, 930, 'R ARM', s.ra, '#ccc').svg;
-    svg += rsLocation(legL, 1050, 'L LEG', s.ll, '#ccc').svg;
-    svg += rsLocation(legR, 1050, 'R LEG', s.rl, '#ccc').svg;
+    // ── Fallback: simple per-location bracketed counts (used only if the
+    //    silhouette data failed to load) ──
+    const fLoc = (label, val) => val ? `<tspan font-weight="700">${lbEsc(label)}</tspan> [${val}]  ` : '';
+    svg += rsGroupBox(RX, 10, RW, 300, 'Armor Diagram');
+    svg += `<text x="${RX+12}" y="70" font-family="sans-serif" font-size="13">${fLoc('HD',a.hd)}${fLoc('CT',a.ct)}${fLoc('CT(R)',a.ctr)}</text>`;
+    svg += `<text x="${RX+12}" y="100" font-family="sans-serif" font-size="13">${fLoc('LT',a.lt)}${fLoc('LT(R)',a.ltr)}${fLoc('RT',a.rt)}${fLoc('RT(R)',a.rtr)}</text>`;
+    svg += `<text x="${RX+12}" y="130" font-family="sans-serif" font-size="13">${fLoc('LA',a.la)}${fLoc('RA',a.ra)}${fLoc('LL',a.ll)}${fLoc('RL',a.rl)}</text>`;
+    svg += rsGroupBox(RX, 330, RW, 200, 'Internal Structure');
+    svg += `<text x="${RX+12}" y="390" font-family="sans-serif" font-size="13">${fLoc('HD',s.hd)}${fLoc('CT',s.ct)}${fLoc('LT',s.lt)}${fLoc('RT',s.rt)}</text>`;
+    svg += `<text x="${RX+12}" y="420" font-family="sans-serif" font-size="13">${fLoc('LA',s.la)}${fLoc('RA',s.ra)}${fLoc('LL',s.ll)}${fLoc('RL',s.rl)}</text>`;
+    rightBottom = 330 + 200 + 20;
   }
 
-  svg += `</svg>`;
-  return svg;
+  const H = Math.max(leftBottom, rightBottom, 200);
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#fff">`
+    + `<rect x="0" y="0" width="${W}" height="${H}" fill="#fff"/>${svg}</svg>`;
 }
 
 /* ── OWNED UNITS ───────────────────────────────────── */
