@@ -3942,6 +3942,22 @@ let sbAbilMode   = 'all';  // 'all' = unit must have every selected ability; 'an
 let sbAbilOpts   = [];     // [{code, n}] distinct base abilities in the catalog
 let sbFactionMeta = {};    // faction id -> { name, isClan } (curated + live-loaded)
 let sbFactionsLive = false;// true once the full list is loaded from MUL
+let sbLastAutoIntro = null; // {min, max} last auto-filled Introduced Year values, or null
+
+// Verified active-year windows for factions with a well-documented, stable
+// historical end date (mostly extinct/absorbed Homeworld Clans). Keyed by
+// exact faction name so it works regardless of MUL's numeric id. Deliberately
+// small: major Houses persist across the whole timeline with no single
+// "end year", and most Clans don't have a clean, uncontested end date, so
+// they're intentionally left out rather than guessed. All 20 original Clans
+// were founded in 2807 (Exodus).
+const SB_FACTION_ACTIVE_YEARS = {
+  'Clan Wolverine':    { start: 2807, end: 2823 }, // Annihilated — confirmed against MUL's own faction page
+  'Clan Widowmaker':   { start: 2807, end: 2834 }, // Absorbed by Clan Wolf
+  'Clan Mongoose':     { start: 2807, end: 2868 }, // Absorbed by Clan Smoke Jaguar
+  'Clan Burrock':      { start: 2807, end: 3059 }, // Absorbed by Clan Star Adder (brief 3074 revival not modeled)
+  'Clan Smoke Jaguar': { start: 2807, end: 3060 }, // Trial of Annihilation, Operations Bulldog/Serpent
+};
 
 const SB_ERA_LABELS = {
   '16':'Dark Age','257':'ilClan','254':'Late Republic','15':'Early Republic',
@@ -4166,8 +4182,38 @@ function sbPopulateFactions(entries) {
 
 // Faction and General are mutually exclusive — picking one clears the other.
 function sbFactionChanged() {
+  sbApplyFactionYearPreset();
   sbClearCatalog();
   sbRenderForce();
+}
+
+// Auto-suggests the Introduced Year range for factions with a verified
+// active-year window (SB_FACTION_ACTIVE_YEARS). Never overwrites a value
+// the user typed themselves — only fills empty fields, or fields that
+// still hold whatever this function last auto-filled. Clears the fields
+// back out (same rule) when switching to a faction with no known window.
+function sbApplyFactionYearPreset() {
+  const sel = document.getElementById('sb-faction');
+  const minEl = document.getElementById('sb-filter-intro-min');
+  const maxEl = document.getElementById('sb-filter-intro-max');
+  if (!sel || !minEl || !maxEl) return;
+
+  const name = sbFactionMeta[sel.value]?.name || '';
+  const preset = SB_FACTION_ACTIVE_YEARS[name];
+  const status = document.getElementById('sb-status');
+
+  const untouched = (el, val) => !el.value || (sbLastAutoIntro && String(val) === el.value);
+
+  if (preset) {
+    if (untouched(minEl, sbLastAutoIntro?.min)) minEl.value = preset.start;
+    if (untouched(maxEl, sbLastAutoIntro?.max)) maxEl.value = preset.end;
+    sbLastAutoIntro = { min: preset.start, max: preset.end };
+    if (status) status.textContent = `Auto-filled Introduced Year to ${lbEsc(name)}'s known active dates (${preset.start}–${preset.end}) — edit or clear if needed, then Load Catalog.`;
+  } else if (sbLastAutoIntro) {
+    if (minEl.value === String(sbLastAutoIntro.min)) minEl.value = '';
+    if (maxEl.value === String(sbLastAutoIntro.max)) maxEl.value = '';
+    sbLastAutoIntro = null;
+  }
 }
 function sbGeneralChanged() {
   sbClearCatalog();
