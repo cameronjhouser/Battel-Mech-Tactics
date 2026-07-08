@@ -906,6 +906,10 @@
   .sb-rule.ok   { border-color:var(--green);  color:var(--green); }
   .sb-rule.warn { border-color:var(--orange); color:var(--orange); }
   .sb-rule.bad  { border-color:var(--red);    color:var(--red); }
+  .sb-dmg-totals { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+  .sb-abil-totals { display:flex; flex-wrap:wrap; gap:3px; margin-top:8px; }
+  .sb-abil-pill { font-size:9px; font-family:var(--cond); font-weight:700; letter-spacing:.03em;
+    color:var(--teal); background:rgba(58,184,160,.12); border:1px solid var(--teal); border-radius:3px; padding:1px 6px; }
   .sb-force-list { display:flex; flex-direction:column; gap:3px; max-height:52vh; overflow-y:auto; }
   .sb-force-unit { background:var(--bg2); border:1px solid var(--border); border-radius:4px; padding:5px 8px; display:flex; align-items:center; gap:5px; }
   .sb-force-name { flex:1; min-width:0; font-size:11px; font-weight:600; }
@@ -2575,6 +2579,8 @@
             <div class="sb-pv-bar-fill" id="sb-pv-bar" style="width:0%;background:var(--green)"></div>
           </div>
           <div class="sb-rules-bar" id="sb-rules-bar"></div>
+          <div class="sb-dmg-totals" id="sb-dmg-totals"></div>
+          <div class="sb-abil-totals" id="sb-abil-totals"></div>
         </div>
         <div id="sb-force-list" class="sb-force-list">
           <div class="sb-empty-hint">No units selected.<br>Click + to add from the catalog.</div>
@@ -4976,6 +4982,8 @@ function sbRenderForce() {
   const pvEl    = document.getElementById('sb-pv-total');
   const barEl   = document.getElementById('sb-pv-bar');
   const rulesEl = document.getElementById('sb-rules-bar');
+  const dmgEl   = document.getElementById('sb-dmg-totals');
+  const abilEl  = document.getElementById('sb-abil-totals');
   if (!listEl) return;
 
   const totalPV  = sbForce.reduce((s, f) => s + sbAdjPV(f.unit, f.skill), 0);
@@ -4996,6 +5004,27 @@ function sbRenderForce() {
       { t:`${totalPV}/${pvLimit} PV`, c: totalPV>pvLimit?'bad':totalPV>pvWarn?'warn':'ok' },
       { t:`${unitCt} units`,   c: unitCt<7?'warn':unitCt<=12?'ok':'bad'  },
     ].map(r=>`<span class="sb-rule ${r.c}">${lbEsc(r.t)}</span>`).join('');
+  }
+
+  if (dmgEl) {
+    const dmg = sbForce.reduce((acc, f) => {
+      acc.short  += f.unit.BFDamageShort  || 0;
+      acc.medium += f.unit.BFDamageMedium || 0;
+      acc.long   += f.unit.BFDamageLong   || 0;
+      return acc;
+    }, { short: 0, medium: 0, long: 0 });
+    dmgEl.innerHTML = `
+      <span class="sb-rule">S: ${dmg.short}</span>
+      <span class="sb-rule">M: ${dmg.medium}</span>
+      <span class="sb-rule">L: ${dmg.long}</span>
+    `;
+  }
+
+  if (abilEl) {
+    const counts = sbSpecialCounts(sbForce);
+    abilEl.innerHTML = counts.length
+      ? counts.map(([code, n]) => `<span class="sb-abil-pill">${lbEsc(code)} ×${n}</span>`).join('')
+      : '';
   }
 
   if (!sbForce.length) {
@@ -5047,6 +5076,28 @@ function sbRenderForce() {
     </div>`;
   }
   listEl.innerHTML = html;
+}
+
+// Count how many units in the force carry each Alpha Strike special ability
+// (BFAbilities strings like "FLK1/1/1, HT2/2/0, IF2, MEL"), grouped by the
+// ability code with any numeric rating stripped off. Counted once per unit
+// even if a code somehow appears twice in its list.
+function sbSpecialCounts(force) {
+  const counts = {};
+  force.forEach(f => {
+    const abil = (f.unit.BFAbilities || '').trim();
+    if (!abil || abil === '—') return;
+    const seen = new Set();
+    abil.split(',').forEach(tok => {
+      const m = tok.trim().match(/^[A-Za-z]+/);
+      if (!m) return;
+      const code = m[0].toUpperCase();
+      if (seen.has(code)) return;
+      seen.add(code);
+      counts[code] = (counts[code] || 0) + 1;
+    });
+  });
+  return Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 }
 
 // Which lance specialties does this group of units qualify for?
