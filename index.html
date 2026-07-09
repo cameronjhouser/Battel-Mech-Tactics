@@ -5913,7 +5913,10 @@ function rsSheetSVG(m, pilot) {
   svg += T(isC + 200, isT + 310, 15, 700, 'start', 'RIGHT') + T(isC + 200, isT + 330, 15, 700, 'start', `ARM [${st.ra || 0}]`);
   svg += T(isC - 150, isT + 570, 15, 700, 'end', 'LEFT') + T(isC - 150, isT + 590, 15, 700, 'end', `LEG [${st.ll || 0}]`);
   svg += T(isC + 150, isT + 570, 15, 700, 'start', 'RIGHT') + T(isC + 150, isT + 590, 15, 700, 'start', `LEG [${st.rl || 0}]`);
-  svg += T(isC, isT + 300, 15, 700, 'middle', 'CENTER') + T(isC, isT + 320, 15, 700, 'middle', 'TORSO') + T(isC, isT + 340, 15, 700, 'middle', `[${st.ct || 0}]`);
+  // The CT label sits below the silhouette, between the feet — the CT
+  // bubble strip runs down the middle of the figure, so a mid-figure label
+  // gets buried under the bubbles on high-structure (heavy/assault) mechs.
+  svg += T(isC, isT + 612, 15, 700, 'middle', `CENTER TORSO [${st.ct || 0}]`);
 
   // ── Critical Hit Table (10,1250 1225x1215) ──
   const cbL = 10, cbT = 1250, cbW = 1225;
