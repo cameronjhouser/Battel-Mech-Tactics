@@ -5630,8 +5630,15 @@ function rsCritTable(x, y, slots) {
   slots.forEach((s, idx) => {
     const ty = y + line(idx) * rowH;
     texts += rsT(x - 40, ty, 25, 500, 'start', (idx % 6 + 1) + '.');
-    if (s) texts += rsT(x, ty, 25, 500, 'start', lbEsc(s.t));
-    else texts += rsT(x, ty, 25, 100, 'start', '(roll again)', 'rgb(150,150,150)');
+    if (s) {
+      // Squeeze long labels (e.g. "Ammo (Machine Gun) 200/200") into the
+      // capsule instead of letting them overflow its right edge.
+      const fitW = boxW - 18;
+      const squeeze = s.t.length * 13 > fitW ? ` textLength="${fitW}" lengthAdjust="spacingAndGlyphs"` : '';
+      texts += `<text x="${x}" y="${ty}" font-family="sans-serif" font-size="25" font-weight="500" text-anchor="start"${squeeze}>${lbEsc(s.t)}</text>`;
+    } else {
+      texts += rsT(x, ty, 25, 100, 'start', '(roll again)', 'rgb(150,150,150)');
+    }
   });
   let extra = '';
   if (slots.length > 6) {
@@ -5639,6 +5646,45 @@ function rsCritTable(x, y, slots) {
       + rsT(x - 80, y + 9.75 * rowH, 31, 700, 'middle', '4-6');
   }
   return rects + texts + extra;
+}
+
+// Pick n bubble coordinates centred within a location's hand-placed slots
+// (instead of filling from the first coordinate, which piles low armor
+// values into one end of the limb). Slots are grouped into visual rows by
+// cy, a contiguous row window nearest the vertical centre is chosen, and a
+// partially-used row takes its middle coordinates — so bubbles stay on the
+// limb artwork (the coordinates follow its contours) but sit centred.
+function rsCenteredPick(pts, n) {
+  if (n >= pts.length) return pts.slice();
+  if (n <= 0) return [];
+  const byY = pts.slice().sort((a, b) => a[1] - b[1]);
+  const rows = [];
+  let cur = [byY[0]];
+  for (let k = 1; k < byY.length; k++) {
+    const tol = (byY[k][2] || 10) * 1.2;
+    if (byY[k][1] - cur[cur.length - 1][1] <= tol) cur.push(byY[k]);
+    else { rows.push(cur); cur = [byY[k]]; }
+  }
+  rows.push(cur);
+  // Smallest contiguous row window with capacity >= n, nearest the middle.
+  let best = null;
+  for (let start = 0; start < rows.length; start++) {
+    let sum = 0, end = start;
+    while (end < rows.length && sum < n) { sum += rows[end].length; end++; }
+    if (sum < n) break;
+    const score = Math.abs((start + end - 1) / 2 - (rows.length - 1) / 2) * 100 + (end - start);
+    if (!best || score < best.score) best = { start, end, score };
+  }
+  const out = [];
+  let remaining = n;
+  for (let r = best.start; r < best.end && remaining > 0; r++) {
+    const row = rows[r].slice().sort((a, b) => a[0] - b[0]);
+    const take = Math.min(remaining, row.length);
+    const off = Math.floor((row.length - take) / 2);
+    for (let k = off; k < off + take; k++) out.push(row[k]);
+    remaining -= take;
+  }
+  return out;
 }
 
 // Render a full record sheet SVG for a matched biped mech record (from
@@ -5755,19 +5801,15 @@ function rsSheetSVG(m, pilot) {
     svg += `<svg x="1413" y="875" width="400" height="${Math.round(400 / S.viewW * S.viewH)}" viewBox="0 0 ${S.viewW} ${S.viewH}"><g transform="translate(0,${S.rearTransformY})"><path d="${S.rearPath}" fill="#000"/></g></svg>`;
     ['hd', 'ct', 'lt', 'rt', 'la', 'ra', 'll', 'rl'].forEach(loc => {
       const pts = S.coords[loc] || [];
-      const n = Math.min(a[loc] || 0, pts.length);
-      for (let k = 0; k < n; k++) {
-        const [cx, cy, cr] = pts[k];
+      rsCenteredPick(pts, Math.min(a[loc] || 0, pts.length)).forEach(([cx, cy, cr]) => {
         svg += `<circle cx="${abL + cx}" cy="${abT + cy}" r="${cr - 3}" fill="#fff" stroke="#000" stroke-width="2"/>`;
-      }
+      });
     });
     ['ctr', 'ltr', 'rtr'].forEach(loc => {
       const pts = S.rearCoords[loc] || [];
-      const n = Math.min(a[loc] || 0, pts.length);
-      for (let k = 0; k < n; k++) {
-        const [cx, cy, cr] = pts[k];
+      rsCenteredPick(pts, Math.min(a[loc] || 0, pts.length)).forEach(([cx, cy, cr]) => {
         svg += `<circle cx="${1413 + cx * rSc}" cy="${875 + cy * rSc}" r="${cr * rSc - 3}" fill="#fff" stroke="#000" stroke-width="2"/>`;
-      }
+      });
     });
   }
   // Armor labels (exact reference positions/sizes)
@@ -5792,11 +5834,9 @@ function rsSheetSVG(m, pilot) {
     svg += `<svg x="1350" y="1275" width="420" height="${Math.round(420 / S.viewW * S.viewH)}" viewBox="0 0 ${S.viewW} ${S.viewH}"><path d="${S.structPath}" fill="#000"/></svg>`;
     ['hd', 'ct', 'lt', 'rt', 'la', 'ra', 'll', 'rl'].forEach(loc => {
       const pts = S.structCoords[loc] || [];
-      const n = Math.min(st[loc] || 0, pts.length);
-      for (let k = 0; k < n; k++) {
-        const [cx, cy, cr] = pts[k];
+      rsCenteredPick(pts, Math.min(st[loc] || 0, pts.length)).forEach(([cx, cy, cr]) => {
         svg += `<circle cx="${1350 + cx * K}" cy="${1275 + cy * K}" r="${cr * K - 3}" fill="#fff" stroke="#000" stroke-width="2"/>`;
-      }
+      });
     });
   }
   svg += T(isC, isT + 55, 15, 700, 'middle', `HEAD [${st.hd || 0}]`);
