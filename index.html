@@ -5758,7 +5758,7 @@ function rsSheetSVG(m, pilot) {
       const n = Math.min(a[loc] || 0, pts.length);
       for (let k = 0; k < n; k++) {
         const [cx, cy, cr] = pts[k];
-        svg += `<circle cx="${abL + cx}" cy="${abT + cy}" r="${cr}" fill="#fff" stroke="#000" stroke-width="2"/>`;
+        svg += `<circle cx="${abL + cx}" cy="${abT + cy}" r="${cr - 3}" fill="#fff" stroke="#000" stroke-width="2"/>`;
       }
     });
     ['ctr', 'ltr', 'rtr'].forEach(loc => {
@@ -5766,7 +5766,7 @@ function rsSheetSVG(m, pilot) {
       const n = Math.min(a[loc] || 0, pts.length);
       for (let k = 0; k < n; k++) {
         const [cx, cy, cr] = pts[k];
-        svg += `<circle cx="${1413 + cx * rSc}" cy="${875 + cy * rSc}" r="${cr * rSc}" fill="#fff" stroke="#000" stroke-width="2"/>`;
+        svg += `<circle cx="${1413 + cx * rSc}" cy="${875 + cy * rSc}" r="${cr * rSc - 3}" fill="#fff" stroke="#000" stroke-width="2"/>`;
       }
     });
   }
@@ -5795,7 +5795,7 @@ function rsSheetSVG(m, pilot) {
       const n = Math.min(st[loc] || 0, pts.length);
       for (let k = 0; k < n; k++) {
         const [cx, cy, cr] = pts[k];
-        svg += `<circle cx="${1350 + cx * K}" cy="${1275 + cy * K}" r="${cr * K}" fill="#fff" stroke="#000" stroke-width="2"/>`;
+        svg += `<circle cx="${1350 + cx * K}" cy="${1275 + cy * K}" r="${cr * K - 3}" fill="#fff" stroke="#000" stroke-width="2"/>`;
       }
     });
   }
@@ -5862,7 +5862,7 @@ function rsSheetSVG(m, pilot) {
   for (let s = 0; s < Math.min(hsCount, 40); s++) {
     const col = Math.floor(s / 10), row = s % 10;
     const cy = skY + 185 + 30 * row + (row >= 5 ? 30 : 0);
-    svg += `<circle cx="${skX + 137.5 + colDx[col]}" cy="${cy}" r="13" fill="#fff" stroke="#000" stroke-width="2"/>`;
+    svg += `<circle cx="${skX + 137.5 + colDx[col]}" cy="${cy}" r="12" fill="#fff" stroke="#000" stroke-width="2"/>`;
   }
 
   // ── Heat Scale strip (right page edge, 1920,1260) ──
