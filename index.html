@@ -5433,6 +5433,51 @@ const RS_AMMO_SHOTS = {
   'Anti-Missile System':24,'Narc Missile Beacon':6,'iNarc Launcher':4,
 };
 
+// Official Cluster Hits Table (Total Warfare): missiles hit per 2d6 roll
+// (rows are rolls 2..12), keyed by launcher size.
+const RS_CLUSTER = {
+  2:  [1,1,1,1,1,1,2,2,2,2,2],
+  3:  [1,1,1,2,2,2,2,2,3,3,3],
+  4:  [1,2,2,2,2,3,3,3,3,4,4],
+  5:  [1,2,2,3,3,3,3,4,4,5,5],
+  6:  [2,2,3,3,4,4,4,5,5,6,6],
+  7:  [2,2,3,4,4,4,4,6,6,7,7],
+  8:  [3,3,4,4,5,5,5,6,6,8,8],
+  9:  [3,3,4,5,5,5,5,7,7,9,9],
+  10: [3,3,4,6,6,6,6,8,8,10,10],
+  12: [4,4,5,8,8,8,8,10,10,12,12],
+  15: [5,5,6,9,9,9,9,12,12,15,15],
+  20: [6,6,9,12,12,12,12,16,16,20,20],
+  30: [10,10,12,18,18,18,18,24,24,30,30],
+  40: [12,12,18,24,24,24,24,32,32,40,40],
+};
+
+// Weapons/equipment that change the attacker's to-hit number (Total
+// Warfare): [modifier, reason, conditional?]. The Targeting Computer is
+// handled separately (it applies -1 to every direct-fire weapon rather
+// than to itself). Conditional entries ('*') aren't folded into the Mod
+// column automatically — the To-Hit Modifiers panel explains when they
+// apply.
+const RS_TOHIT_MODS = {
+  'Small Pulse Laser': [-2, 'Pulse laser'], 'Medium Pulse Laser': [-2, 'Pulse laser'], 'Large Pulse Laser': [-2, 'Pulse laser'],
+  'Small X-Pulse Laser': [-2, 'Pulse laser'], 'Medium X-Pulse Laser': [-2, 'Pulse laser'], 'Large X-Pulse Laser': [-2, 'Pulse laser'],
+  'ER Small Pulse Laser': [-2, 'Pulse laser'], 'ER Medium Pulse Laser': [-2, 'Pulse laser'], 'ER Large Pulse Laser': [-2, 'Pulse laser'],
+  'MRM-10': [1, 'MRM launcher'], 'MRM-20': [1, 'MRM launcher'], 'MRM-30': [1, 'MRM launcher'], 'MRM-40': [1, 'MRM launcher'],
+  'Rocket Launcher 10': [1, 'Rocket launcher (one-shot)'], 'Rocket Launcher 15': [1, 'Rocket launcher (one-shot)'], 'Rocket Launcher 20': [1, 'Rocket launcher (one-shot)'],
+  'LB 2-X AC': [-1, 'Firing cluster ammunition', true], 'LB 5-X AC': [-1, 'Firing cluster ammunition', true],
+  'LB 10-X AC': [-1, 'Firing cluster ammunition', true], 'LB 20-X AC': [-1, 'Firing cluster ammunition', true],
+};
+
+// Launcher size for the Cluster Hits Table. Streaks are excluded — on a
+// successful attack all of a Streak's missiles hit, no cluster roll.
+function rsClusterSize(base) {
+  if (/^Streak/i.test(base)) return null;
+  const mm = base.match(/^(?:LRM|SRM|MRM|MML)-(\d+)$/i) || base.match(/^Rocket Launcher (\d+)$/i);
+  if (!mm) return null;
+  const size = parseInt(mm[1], 10);
+  return RS_CLUSTER[size] ? size : null;
+}
+
 // SSW equipment names look like "(IS) Large Laser", "(IS) @ LRM-15" (ammo),
 // "(R) (IS) Medium Laser" (rear-mounted) — strip the tech-base/ammo/rear
 // tags to get the plain weapon name used to key RS_WEAPON_STATS.
@@ -5693,7 +5738,8 @@ function rsSheetSVG(m, pilot) {
   pilot = pilot || {};
   const S = rsSilData;
   const esc = lbEsc;
-  const W = 2000, H = 2600;
+  const W = 2000;
+  let H = 2600; // grows if the cluster / to-hit band below the crit table is needed
   const a = m.armor || {}, st = m.structure || {};
   const mv = m.move || {};
   const T = rsT;
@@ -5738,9 +5784,10 @@ function rsSheetSVG(m, pilot) {
   // with a Qty count so heavy loadouts still fit the fixed-height box.
   const eqX = 10, eqY = 440;
   svg += rsGroupBox(eqX, eqY, 1215, 645, 'Weapons and Equipment');
-  const wc = [15, 90, 470, 550, 650, 770, 880, 990, 1100].map(o => eqX + o);
-  const heads = ['Qty', 'Type', 'Loc', 'Heat', 'Dmg', 'Min', 'Sht', 'Med', 'Lng'];
-  heads.forEach((hh, k) => { svg += T(wc[k], eqY + 80, 35, 700, 'start', hh); });
+  const hasTC = (m.equipment || []).some(eq => /Targeting Computer/i.test(eq.name));
+  const wc = [15, 90, 435, 505, 575, 655, 735, 810, 885, 965].map(o => eqX + o);
+  const heads = ['Qty', 'Type', 'Loc', 'Mod', 'Heat', 'Dmg', 'Min', 'Sht', 'Med', 'Lng'];
+  heads.forEach((hh, k) => { svg += T(wc[k], eqY + 80, 32, 700, 'start', hh); });
   const ammoRows = [], weaponGroups = [];
   (m.equipment || []).forEach(eq => {
     if (eq.type === 'jumpjet') return; // structural — crit table only
@@ -5748,31 +5795,51 @@ function rsSheetSVG(m, pilot) {
     if (eq.type === 'ammunition') {
       const ab = rsAmmoBaseName(base);
       const shots = RS_AMMO_SHOTS[ab];
-      ammoRows.push({ label: shots ? `Ammo (${ab}) ${shots}/${shots}` : `Ammo (${ab})`, loc: eq.loc, qty: 1, stats: null });
+      ammoRows.push({ label: shots ? `Ammo (${ab}) ${shots}/${shots}` : `Ammo (${ab})`, loc: eq.loc, qty: 1, stats: null, mod: null });
       return;
     }
     let label = base + (rear ? ' [R]' : '');
     const key = label + '|' + eq.loc;
     const prev = weaponGroups.find(g => g.key === key);
-    if (prev) prev.qty++;
-    else weaponGroups.push({ key, label, loc: eq.loc, qty: 1, stats: RS_WEAPON_STATS[base] || null });
+    if (prev) { prev.qty++; return; }
+    // Net to-hit modifier: the weapon's own (unconditional) modifier plus
+    // the Targeting Computer's -1 on direct-fire (energy/ballistic) weapons.
+    let mod = null;
+    if (eq.type === 'energy' || eq.type === 'ballistic' || eq.type === 'missile' || eq.type === 'physical' || eq.type === 'mgarray') {
+      let v = 0;
+      const wm = RS_TOHIT_MODS[base];
+      if (wm && !wm[2]) v += wm[0];
+      if (hasTC && (eq.type === 'energy' || eq.type === 'ballistic')) v -= 1;
+      mod = v;
+      if (wm && wm[2]) mod = { v, star: true }; // conditional — see panel
+    }
+    weaponGroups.push({ key, label, loc: eq.loc, qty: 1, stats: RS_WEAPON_STATS[base] || null, mod, base, etype: eq.type });
   });
+  const fmtMod = (v) => v > 0 ? '+' + v : v < 0 ? String(v) : '—';
   const eqRows = ammoRows.concat(weaponGroups);
   eqRows.forEach((e, k) => {
     const ry = eqY + 120 + 33 * k;
     if (ry > eqY + 645 - 10) return; // clip to the box like the reference
     if (k % 2 === 0) svg += `<rect x="${wc[0] - 5}" y="${eqY + 93 + 33 * k}" width="1180" height="37" fill="rgb(200,200,200)"/>`;
     svg += T(wc[0] + 30, ry, 30, 100, 'middle', e.qty);
-    svg += T(wc[1], ry, 30, 100, 'start', esc(e.label));
+    // Squeeze long names (mostly ammo rows) so they don't run into Loc.
+    const typeW = wc[2] - wc[1] - 12;
+    const tSqueeze = e.label.length * 14.5 > typeW ? ` textLength="${typeW}" lengthAdjust="spacingAndGlyphs"` : '';
+    svg += `<text x="${wc[1]}" y="${ry}" font-family="sans-serif" font-size="30" font-weight="100" text-anchor="start"${tSqueeze}>${esc(e.label)}</text>`;
     svg += T(wc[2] + 30, ry, 30, 100, 'middle', esc((e.loc || '—').toUpperCase()));
+    if (e.mod !== null && e.mod !== undefined) {
+      const isObj = typeof e.mod === 'object';
+      const v = isObj ? e.mod.v : e.mod;
+      svg += T(wc[3] + 30, ry, 30, v !== 0 ? 700 : 100, 'middle', fmtMod(v) + (isObj ? '*' : ''));
+    }
     if (e.stats) {
       const [, heat, dmg, min, sht, med, lng] = e.stats;
-      svg += T(wc[3] + 30, ry, 30, 100, 'middle', esc(heat));
-      svg += T(wc[4] + 30, ry, 30, 100, 'middle', esc(dmg));
-      svg += T(wc[5] + 30, ry, 30, 100, 'middle', esc(min === 0 ? '-' : min));
-      svg += T(wc[6] + 30, ry, 30, 100, 'middle', esc(sht));
-      svg += T(wc[7] + 30, ry, 30, 100, 'middle', esc(med));
-      svg += T(wc[8] + 30, ry, 30, 100, 'middle', esc(lng));
+      svg += T(wc[4] + 30, ry, 30, 100, 'middle', esc(heat));
+      svg += T(wc[5] + 30, ry, 30, 100, 'middle', esc(dmg));
+      svg += T(wc[6] + 30, ry, 30, 100, 'middle', esc(min === 0 ? '-' : min));
+      svg += T(wc[7] + 30, ry, 30, 100, 'middle', esc(sht));
+      svg += T(wc[8] + 30, ry, 30, 100, 'middle', esc(med));
+      svg += T(wc[9] + 30, ry, 30, 100, 'middle', esc(lng));
     }
   });
 
@@ -5916,6 +5983,68 @@ function rsSheetSVG(m, pilot) {
       + `<rect x="${htX + 2}" y="${by + 2}" width="56" height="33" fill="${effect ? 'rgb(200,200,200)' : '#fff'}"/>`
       + T(htX + 27, htY + 89 + 37 * k, 27, 100, 'middle', k);
     if (effect) svg += T(htX + 43, htY + 83 + 37 * k, 22, 100, 'start', '*');
+  }
+
+  // ── Cluster Hits / To-Hit Modifiers band (below the crit table; only
+  //    drawn when the unit actually needs it, so simple mechs keep the
+  //    reference's original page height) ──
+  const clSizes = [];
+  weaponGroups.forEach(g => {
+    const size = g.base ? rsClusterSize(g.base) : null;
+    if (size && clSizes.indexOf(size) === -1) clSizes.push(size);
+  });
+  clSizes.sort((x, y) => x - y);
+  const modRows = [];
+  weaponGroups.forEach(g => {
+    if (!g.base) return;
+    if (modRows.some(r => r.name === g.label)) return;
+    const wm = RS_TOHIT_MODS[g.base];
+    if (wm) modRows.push({ name: g.label, mod: fmtMod(wm[0]) + (wm[2] ? '*' : ''), reason: wm[1] });
+    if (/^Streak/i.test(g.base)) modRows.push({ name: g.label, mod: '—', reason: 'No cluster roll — all missiles hit on a successful attack' });
+  });
+  if (hasTC) modRows.push({ name: 'Targeting Computer', mod: '-1', reason: 'All direct-fire (energy/ballistic) weapon attacks' });
+
+  if (clSizes.length || modRows.length) {
+    const bandY = 2505;
+    const rollRowH = 26;
+    let bandH = 0;
+    let nextX = 10;
+    if (clSizes.length) {
+      const colW = 90, labelW = 130;
+      // Min width keeps the "CLUSTER HITS TABLE" title pill (fs35) from
+      // clipping its own text on narrow tables.
+      const clW = Math.max(520, labelW + clSizes.length * colW + 40);
+      const clH = 70 + 12 * rollRowH + 20;
+      svg += rsGroupBox(nextX, bandY, clW, clH, 'Cluster Hits Table');
+      const gx = nextX + 25;
+      svg += T(gx, bandY + 85, 22, 700, 'start', '2D6 Roll');
+      clSizes.forEach((sz, c) => { svg += T(gx + labelW + c * colW + colW / 2, bandY + 85, 22, 700, 'middle', sz); });
+      svg += T(gx + labelW + clSizes.length * colW / 2, bandY + 60, 18, 500, 'middle', 'Launcher Size — Missiles Hit');
+      for (let roll = 2; roll <= 12; roll++) {
+        const ryy = bandY + 85 + (roll - 1) * rollRowH;
+        if (roll % 2 === 0) svg += `<rect x="${gx - 8}" y="${ryy - 19}" width="${labelW + clSizes.length * colW + 16}" height="${rollRowH}" fill="rgb(225,225,225)"/>`;
+        svg += T(gx, ryy, 22, 700, 'start', roll);
+        clSizes.forEach((sz, c) => {
+          svg += T(gx + labelW + c * colW + colW / 2, ryy, 22, 500, 'middle', RS_CLUSTER[sz][roll - 2]);
+        });
+      }
+      bandH = Math.max(bandH, clH);
+      nextX += clW + 30;
+    }
+    if (modRows.length) {
+      const thW = 1990 - nextX;
+      const thH = clSizes.length ? bandH || 70 + 12 * rollRowH + 20 : Math.max(200, 90 + modRows.length * 34 + 60);
+      svg += rsGroupBox(nextX, bandY, thW, thH, 'To-Hit Modifiers');
+      modRows.forEach((r, k) => {
+        const ryy = bandY + 90 + k * 34;
+        svg += T(nextX + 25, ryy, 24, 500, 'start', esc(r.name));
+        svg += T(nextX + 360, ryy, 24, 700, 'middle', esc(r.mod));
+        svg += T(nextX + 420, ryy, 22, 100, 'start', esc(r.reason));
+      });
+      svg += T(nextX + 25, bandY + thH - 6, 18, 100, 'start', 'Unconditional modifiers are already included in the Mod column above; * applies only in the listed case.');
+      bandH = Math.max(bandH, thH);
+    }
+    H = bandY + bandH + 140;
   }
 
   // ── Footer bar (trademark + attribution, like the reference prints) ──
