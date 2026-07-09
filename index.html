@@ -5353,6 +5353,7 @@ function sbGroupSpecialties(unitObjs, factionId) {
    database). Phase 1 covers Biped 'Mechs; other motive types / unmatched
    units fall back to the existing embedded-PDF path in lbOpenSheetsCore. */
 
+
 // Vendored biped silhouette paths + per-location armor/structure-circle
 // coordinates (from jdgwf/battletech-tools, transcribed verbatim into
 // sheets/rs-silhouettes.json — see build notes there). Lazily populated by
@@ -5363,6 +5364,99 @@ let rsSilData = null;
 // the shaded "effect" background + a footnote asterisk on the real record
 // sheet. Transcribed from HeatTrackSVG's own threshold list.
 const RS_HEAT_EFFECT_ROWS = new Set([5,8,10,13,14,15,17,18,19,20,22,23,24,25,26,28,30]);
+
+// Fixed Total Warfare heat-effects text (HEAT LEVEL -> EFFECT), transcribed
+// from BattleMechHeatEffectsBoxSVG — same on every record sheet regardless
+// of unit, since it's the universal heat scale rule, not per-mech data.
+const RS_HEAT_EFFECTS = [
+  [30,'Shutdown'], [28,'Ammo Exp. Avoid on 8+'], [26,'Shutdown Avoid on 10+'],
+  [25,'-5 Movement Points'], [24,'+4 Modifier to Fire'], [23,'Ammo Exp. Avoid on 6+'],
+  [22,'Shutdown Avoid on 8+'], [20,'-4 Movement Points'], [19,'Ammo Exp. Avoid on 4+'],
+  [18,'Shutdown Avoid on 6+'], [17,'+3 Modifier to Fire'], [15,'-3 Movement Points'],
+  [14,'Shutdown Avoid on 4+'], [13,'+2 Modifier to Fire'], [10,'-2 Movement Points'],
+  [8,'+1 Modifier to Fire'], [5,'-1 Movement Points'],
+];
+
+// TechManual weapon/equipment stats: [crits, heat, dmg, min, sht, med, lng].
+// Not present in the SSW XML (which only gives name/location/crit-index),
+// so this is transcribed from the published rules — same footing as the
+// Internal Structure Table already used in build_sheet_data.py. Covers the
+// weapons that actually appear in the SSW roster (checked by frequency);
+// anything not listed falls back gracefully (1 crit slot, blank stat cols)
+// rather than breaking the table.
+const RS_WEAPON_STATS = {
+  'Small Laser': [1,1,3,0,1,2,3], 'Medium Laser': [1,3,5,0,3,6,9], 'Large Laser': [2,8,8,0,5,10,15],
+  'ER Small Laser': [1,2,3,0,2,4,5], 'ER Medium Laser': [1,5,5,0,4,8,12], 'ER Large Laser': [2,12,8,0,7,14,19],
+  'Small Pulse Laser': [1,2,3,0,1,2,3], 'Medium Pulse Laser': [1,4,6,0,2,4,6], 'Large Pulse Laser': [2,10,9,0,3,7,10],
+  'Small X-Pulse Laser': [1,3,3,0,1,2,3], 'Medium X-Pulse Laser': [2,6,6,0,2,4,5],
+  'ER Small Pulse Laser': [1,3,3,0,2,4,5], 'ER Medium Pulse Laser': [2,6,6,0,4,8,12], 'ER Large Pulse Laser': [3,13,9,0,7,14,19],
+  'Flamer': [1,3,2,0,1,2,3],
+  'PPC': [3,10,10,3,6,12,18], 'ER PPC': [3,15,10,0,7,14,23], 'Light PPC': [2,5,5,3,6,12,18],
+  'Heavy PPC': [3,15,15,3,6,12,18], 'Snub-Nose PPC': [2,10,10,0,9,13,15],
+  'Machine Gun': [1,0,2,0,1,2,3], 'Light Machine Gun': [1,0,1,0,2,4,6], 'Heavy Machine Gun': [1,0,3,0,1,2,3],
+  'Autocannon/2': [1,1,2,4,8,16,24], 'Autocannon/5': [4,1,5,3,6,12,18], 'Autocannon/10': [7,3,10,0,5,10,15], 'Autocannon/20': [10,7,20,0,3,6,9],
+  'AC/2': [1,1,2,4,8,16,24], 'AC/5': [4,1,5,3,6,12,18], 'AC/10': [7,3,10,0,5,10,15], 'AC/20': [10,7,20,0,3,6,9],
+  'Light AC/2': [1,1,2,0,4,8,12], 'Light AC/5': [2,1,5,0,5,10,15],
+  'Ultra AC/2': [3,1,2,2,7,14,21], 'Ultra AC/5': [5,1,5,2,6,13,20], 'Ultra AC/10': [7,3,10,0,6,13,20], 'Ultra AC/20': [10,7,20,0,3,7,10],
+  'Rotary AC/2': [6,1,2,0,4,8,12], 'Rotary AC/5': [6,1,5,2,6,13,20],
+  'LB 2-X AC': [3,1,2,4,8,17,25], 'LB 5-X AC': [6,1,5,3,6,12,18], 'LB 10-X AC': [6,2,10,0,6,12,18], 'LB 20-X AC': [11,6,20,0,3,6,9],
+  'Gauss Rifle': [7,1,15,2,7,15,22], 'Light Gauss Rifle': [5,1,8,3,8,17,25], 'Heavy Gauss Rifle': [11,2,25,4,6,13,20],
+  'Hatchet': [1,0,'Melee','–','–','–','–'], 'Sword': [1,0,'Melee','–','–','–','–'], 'Small Vibroblade': [1,1,'Melee','–','–','–','–'],
+  'LRM-5': [1,2,'1/hit',6,7,14,21], 'LRM-10': [2,4,'1/hit',6,7,14,21], 'LRM-15': [3,5,'1/hit',6,7,14,21], 'LRM-20': [5,6,'1/hit',6,7,14,21],
+  'SRM-2': [1,2,'2/hit',0,3,6,9], 'SRM-4': [1,3,'2/hit',0,3,6,9], 'SRM-6': [2,4,'2/hit',0,3,6,9],
+  'Streak SRM-2': [1,2,'2/hit',0,3,6,9], 'Streak SRM-4': [2,3,'2/hit',0,3,6,9], 'Streak SRM-6': [2,4,'2/hit',0,3,6,9],
+  'MRM-10': [1,2,'1/hit',0,3,8,15], 'MRM-20': [2,4,'1/hit',0,3,8,15], 'MRM-30': [3,6,'1/hit',0,3,8,15], 'MRM-40': [4,8,'1/hit',0,3,8,15],
+  'MML-5': [2,3,'1-2/hit',0,3,6,9], 'MML-7': [3,4,'1-2/hit',0,3,6,9], 'MML-9': [3,5,'1-2/hit',0,3,6,9],
+  'Rocket Launcher 10': [1,3,'1/hit',0,6,12,18], 'Rocket Launcher 15': [1,4,'1/hit',0,6,12,18], 'Rocket Launcher 20': [1,5,'1/hit',0,6,12,18],
+  'Narc Missile Beacon': [2,0,'–',0,3,6,9], 'iNarc Launcher': [3,0,'–',0,3,6,9],
+  'Anti-Missile System': [1,1,'–',0,1,2,3], 'TAG': [1,0,'–',0,5,9,15],
+  'CASE': [1,0,'–','–','–','–','–'], 'CASE II': [1,0,'–','–','–','–','–'],
+  'Guardian ECM Suite': [2,0,'–','–','–','–','–'], 'Beagle Active Probe': [2,0,'–','–','–','–','–'],
+  'Electronic Warfare Equipment': [2,0,'–','–','–','–','–'], 'Communications Equipment': [1,0,'–','–','–','–','–'],
+  'C3 Computer (Slave)': [1,0,'–','–','–','–','–'], 'C3 Computer (Master)': [5,0,'–','–','–','–','–'],
+  'Improved C3 Computer': [2,0,'–','–','–','–','–'], 'Targeting Computer': [1,0,'–','–','–','–','–'],
+};
+
+// Ammo shots-per-ton (TechManual): used to render "Ammo (X) n/n" like the
+// reference. Anything unlisted just shows the ammo name with no count.
+const RS_AMMO_SHOTS = {
+  'AC/2':45,'Autocannon/2':45,'Light AC/2':45,'Ultra AC/2':45,'Rotary AC/2':45,'LB 2-X AC':45,
+  'AC/5':20,'Autocannon/5':20,'Light AC/5':20,'Ultra AC/5':20,'Rotary AC/5':20,'LB 5-X AC':20,
+  'AC/10':10,'Autocannon/10':10,'Ultra AC/10':10,'LB 10-X AC':10,
+  'AC/20':5,'Autocannon/20':5,'Ultra AC/20':5,'LB 20-X AC':5,
+  'LRM-5':24,'LRM-10':12,'LRM-15':8,'LRM-20':6,
+  'SRM-2':50,'SRM-4':25,'SRM-6':15,
+  'Streak SRM-2':50,'Streak SRM-4':25,'Streak SRM-6':15,
+  'MRM-10':24,'MRM-20':12,'MRM-30':8,'MRM-40':6,
+  'Machine Gun':200,'Light Machine Gun':200,'Heavy Machine Gun':100,
+  'Gauss Rifle':8,'Light Gauss Rifle':8,'Heavy Gauss Rifle':4,
+  'Anti-Missile System':24,'Narc Missile Beacon':6,'iNarc Launcher':4,
+};
+
+// SSW equipment names look like "(IS) Large Laser", "(IS) @ LRM-15" (ammo),
+// "(R) (IS) Medium Laser" (rear-mounted) — strip the tech-base/ammo/rear
+// tags to get the plain weapon name used to key RS_WEAPON_STATS.
+function rsCleanEquipName(raw) {
+  let s = String(raw || '').trim();
+  let rear = false;
+  for (let i = 0; i < 4; i++) {
+    let m;
+    if ((m = s.match(/^\(R\)\s*/))) { rear = true; s = s.slice(m[0].length); continue; }
+    if ((m = s.match(/^\((IS|CL)\)\s*/))) { s = s.slice(m[0].length); continue; }
+    if ((m = s.match(/^@\s*/))) { s = s.slice(m[0].length); continue; }
+    break;
+  }
+  return { base: s.trim(), rear };
+}
+function rsAmmoBaseName(base) {
+  return base.replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
+function rsWeaponCrits(eq) {
+  if (eq.type === 'ammunition') return 1;
+  const { base } = rsCleanEquipName(eq.name);
+  const stats = RS_WEAPON_STATS[base];
+  return stats ? stats[0] : 1;
+}
 
 // The rounded-corner group box used throughout the reference tool's record
 // sheet (RecordSheetGroupBoxSVG): a black-bordered white box with a black
@@ -5379,17 +5473,16 @@ function rsGroupBox(x, y, w, h, title) {
 }
 
 // A single silhouette diagram: the fixed black mech-body path with white
-// armor/structure bubbles overlaid at their faithful coordinates, revealing
-// `values[loc]` circles per location. `which` = 'armor' | 'struct'. Rendered
-// as a nested <svg> so it scales as a unit when placed on the sheet.
+// armor/structure bubbles overlaid at their faithful native-frame
+// coordinates. Rendered as a nested <svg> at the exact xLoc/yLoc/width the
+// reference tool itself uses (relative to our own Armor/Internal Structure
+// box origins), so it scales and lands exactly like the source.
 function rsSilDiagram(x, y, w, which, values) {
   const S = rsSilData;
   const viewW = S.viewW;
-  // Crop tightly to where each diagram's circles actually land (measured
-  // from the extracted coordinate data) instead of the full page-sized
-  // canvas, so the silhouette fills the box instead of floating in blank
-  // space. Armor circles span y=140-915 (rear torso is a separate diagram,
-  // see rsRearArmorDiagram); structure circles span y=168-948.
+  // Cropped to where each diagram's circles actually land (empirically
+  // verified in the earlier silhouette-fidelity pass) instead of the full
+  // page-sized canvas, so the silhouette fills its box tightly.
   const yOff = which === 'armor' ? 100 : 140;
   const viewH = 850;
   const scale = w / viewW;
@@ -5406,17 +5499,18 @@ function rsSilDiagram(x, y, w, which, values) {
       circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" stroke="#000" stroke-width="2"/>`;
     }
   });
-  return { h, svg: `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 ${yOff} ${viewW} ${viewH}" overflow="visible">`
-    + `<path d="${path}" fill="#000"/>${circles}</svg>` };
+  return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 ${yOff} ${viewW} ${viewH}" overflow="visible">`
+    + `<path d="${path}" fill="#000"/>${circles}</svg>`;
 }
 
 // The rear-torso silhouette (a separate small diagram in the reference tool,
-// not part of the main body path). Its own coordinate frame is offset and
-// scaled differently from the front armor diagram's (it's displayed smaller,
-// inset within the armor box) — rearCoords is pre-converted into the rear
-// path's own local space so it overlays correctly.
+// not part of the main body path). rearCoords is pre-converted into this
+// diagram's own local coordinate space so it overlays correctly.
 function rsRearArmorDiagram(x, y, w, values) {
   const S = rsSilData;
+  // Cropped to where the rear torso silhouette actually sits post-transform
+  // (empirically verified in the earlier silhouette-fidelity pass — the
+  // full 1052-tall frame is mostly blank canvas above/below this shape).
   const viewW = 744.09448819, viewH = 340, yOff = 160;
   const scale = w / viewW;
   const h = viewH * scale;
@@ -5429,8 +5523,150 @@ function rsRearArmorDiagram(x, y, w, values) {
       circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#eee" stroke="#000" stroke-width="2"/>`;
     }
   });
-  return { h, svg: `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 ${yOff} ${viewW} ${viewH}" overflow="visible">`
-    + `<g transform="translate(0,${S.rearTransformY})"><path d="${S.rearPath}" fill="#000"/></g>${circles}</svg>` };
+  return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 ${yOff} ${viewW} ${viewH}" overflow="visible">`
+    + `<g transform="translate(0,${S.rearTransformY})"><path d="${S.rearPath}" fill="#000"/></g>${circles}</svg>`;
+}
+
+// ── Critical Hit Table construction ──────────────────────────────────────
+// The SSW XML gives us each equipment item's location + a 0-based crit-slot
+// INDEX within that location (confirmed against the Archer ARC-2K's real,
+// published record sheet: Large Laser at RA index=4 lands on slot 5, right
+// after the 4 fixed arm actuator slots — exactly matching the official
+// sheet). Combined with the fixed, deterministic placement rules for head/
+// actuators/engine/gyro, that's enough to build a faithful crit table
+// without needing the reference tool's own internal construction-rules
+// engine (which is a large, separate, interactive mech-builder class not
+// published as reusable data).
+function rsEngineCTSlots(name) { return /compact/i.test(name || '') ? 3 : 6; }
+function rsEngineSideSlots(name) {
+  const n = name || '';
+  if (/xl/i.test(n)) return 3;
+  if (/light/i.test(n)) return 2;
+  return 0;
+}
+function rsGyroSlots(name) {
+  const n = name || '';
+  if (/compact/i.test(n)) return 2;
+  if (/heavy|xl/i.test(n)) return 6;
+  return 4;
+}
+
+function rsBuildCrits(m) {
+  const engineName = (m.engine && m.engine.name) || 'Fusion Engine';
+  const gyroName = m.gyro || 'Standard Gyro';
+  const act = m.actuators || { lla: true, rla: true, lh: true, rh: true };
+  const mk = (n) => new Array(n).fill(null);
+  const crits = { hd: mk(6), ct: mk(12), lt: mk(12), rt: mk(12), la: mk(12), ra: mk(12), ll: mk(6), rl: mk(6) };
+
+  crits.hd[0] = 'Life Support'; crits.hd[1] = 'Sensors'; crits.hd[2] = 'Cockpit';
+  crits.hd[4] = 'Sensors'; crits.hd[5] = 'Life Support';
+
+  ['ll', 'rl'].forEach(loc => {
+    crits[loc][0] = 'Hip'; crits[loc][1] = 'Upper Leg Actuator';
+    crits[loc][2] = 'Lower Leg Actuator'; crits[loc][3] = 'Foot';
+  });
+
+  let i = 0;
+  crits.la[i++] = 'Shoulder'; crits.la[i++] = 'Upper Arm Actuator';
+  if (act.lla) crits.la[i++] = 'Lower Arm Actuator';
+  if (act.lh) crits.la[i++] = 'Hand Actuator';
+  i = 0;
+  crits.ra[i++] = 'Shoulder'; crits.ra[i++] = 'Upper Arm Actuator';
+  if (act.rla) crits.ra[i++] = 'Lower Arm Actuator';
+  if (act.rh) crits.ra[i++] = 'Hand Actuator';
+
+  const engCT = rsEngineCTSlots(engineName);
+  const engSide = rsEngineSideSlots(engineName);
+  const gyroN = rsGyroSlots(gyroName);
+  let ci = 0;
+  const firstEng = Math.min(3, engCT);
+  for (let k = 0; k < firstEng; k++) crits.ct[ci++] = engineName;
+  for (let k = 0; k < gyroN && ci < 12; k++) crits.ct[ci++] = gyroName;
+  for (let k = 0; k < (engCT - firstEng) && ci < 12; k++) crits.ct[ci++] = engineName;
+  for (let k = 0; k < engSide; k++) { crits.lt[k] = engineName; crits.rt[k] = engineName; }
+
+  (m.equipment || []).forEach(eq => {
+    const loc = (eq.loc || '').toLowerCase();
+    if (!crits[loc]) return;
+    const idx = parseInt(eq.crit, 10);
+    if (isNaN(idx) || idx < 0) return;
+    const { base, rear } = rsCleanEquipName(eq.name);
+    const n = rsWeaponCrits(eq);
+    let label = eq.type === 'ammunition' ? `Ammo (${rsAmmoBaseName(base)})` : base;
+    if (rear) label += ' [R]';
+    for (let s = 0; s < n; s++) {
+      const pos = idx + s;
+      if (pos < crits[loc].length && crits[loc][pos] === null) crits[loc][pos] = label;
+    }
+  });
+
+  return crits;
+}
+
+// Renders one location's crit rows, with a light gray "grouping" box behind
+// runs of consecutive identical slots (mirrors CritAllocationTableSVG's own
+// grouping rects) and "(roll again)" for genuinely empty slots.
+function rsCritRows(x, y, rows, rowH, colW) {
+  let svg = '';
+  let i = 0;
+  while (i < rows.length) {
+    if (rows[i] !== null) {
+      let j = i;
+      while (j + 1 < rows.length && rows[j + 1] === rows[i]) j++;
+      if (j > i) {
+        const ry = y + i * rowH - rowH * 0.75;
+        const rh = (j - i + 1) * rowH;
+        svg += `<rect x="${x - 4}" y="${ry}" width="${colW}" height="${rh}" rx="5" ry="5" fill="#ddd"/>`;
+      }
+      i = j + 1;
+    } else i++;
+  }
+  rows.forEach((name, idx) => {
+    const ry = y + idx * rowH;
+    svg += `<text x="${x - 16}" y="${ry}" font-family="sans-serif" font-size="9" font-weight="700">${idx + 1}.</text>`;
+    if (name === null) {
+      svg += `<text x="${x}" y="${ry}" font-family="sans-serif" font-size="9" fill="#888" font-style="italic">(roll again)</text>`;
+    } else {
+      svg += `<text x="${x}" y="${ry}" font-family="sans-serif" font-size="9">${lbEsc(name)}</text>`;
+    }
+  });
+  return svg;
+}
+
+// One location block: a title + either a single 6-row list (Head/Legs) or
+// two stacked 6-row lists with "1-3"/"4-6" die-roll brackets (Arms/Torsos —
+// the official rule for resolving *which* of the 12 slots is hit uses two
+// separate d6 sub-rolls, visually split this way on the real sheet).
+function rsCritLocation(x, y, colW, title, slots) {
+  const rowH = 13;
+  let svg = `<text x="${x}" y="${y}" font-family="sans-serif" font-size="11" font-weight="700">${lbEsc(title.toUpperCase())}</text>`;
+  if (slots.length <= 6) {
+    svg += rsCritRows(x + 18, y + 18, slots, rowH, colW - 18);
+    return { svg, h: 18 + 6 * rowH + 6 };
+  }
+  svg += rsCritRows(x + 18, y + 18, slots.slice(0, 6), rowH, colW - 18);
+  const secondY = y + 18 + 6 * rowH + 12;
+  svg += rsCritRows(x + 18, secondY, slots.slice(6, 12), rowH, colW - 18);
+  svg += `<text x="${x - 8}" y="${y + 18 + 3 * rowH - 3}" text-anchor="end" font-family="sans-serif" font-size="9" font-weight="700">1-3</text>`;
+  svg += `<text x="${x - 8}" y="${secondY + 3 * rowH - 3}" text-anchor="end" font-family="sans-serif" font-size="9" font-weight="700">4-6</text>`;
+  return { svg, h: secondY + 6 * rowH - y + 6 };
+}
+
+// Engine/Gyro/Sensor/Life Support hit trackers (ComponentDamageSVG) — shown
+// unfilled since we don't track in-play damage state, just like the blank
+// pilot hit track above.
+function rsComponentDamage(x, y, w) {
+  let svg = '';
+  const rows = [['Engine Hits', 3], ['Gyro Hits', 2], ['Sensor Hits', 2], ['Life Support', 1]];
+  let yy = y;
+  rows.forEach(([label, n]) => {
+    svg += `<text x="${x + w - 60}" y="${yy + 5}" text-anchor="end" font-family="sans-serif" font-size="11">${label}</text>`;
+    for (let i = 0; i < n; i++) {
+      svg += `<circle cx="${x + w - 40 + i * 22}" cy="${yy}" r="8" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    }
+    yy += 26;
+  });
+  return { svg, h: yy - y };
 }
 
 // Render a full record sheet SVG for a matched biped mech record (from
@@ -5442,17 +5678,14 @@ function rsSheetSVG(m, pilot) {
   const a = m.armor || {}, s = m.structure || {};
   const esc = lbEsc;
 
-  // Body content is assembled first so the page height can be sized to fit
-  // it (silhouette diagrams shrink/grow with RW, and the equipment list
-  // grows with the unit's loadout) instead of guessing a fixed H upfront.
   let svg = '';
   let leftBottom = 0, rightBottom = 0;
 
   const LX = 16, LW = 468;   // left column
   const RX = 500, RW = 484;  // right column (armor + structure diagrams)
+  const FX = 16, FW = 968;   // full-width sections below both columns
 
-  // ── 'Mech Data box (name, type line + tonnage/tech/era/cost/BV/movement,
-  //    all one box — matches the reference's combined "'Mech Data" box) ──
+  // ── 'Mech Data box ──
   let y = 10;
   svg += rsGroupBox(LX, y, LW, 190, "'Mech Data");
   svg += `<text x="${LX + 12}" y="${y + 50}" font-family="sans-serif" font-size="12" font-weight="700">Type:</text>`;
@@ -5465,8 +5698,9 @@ function rsSheetSVG(m, pilot) {
   svg += `<text x="${LX + 230}" y="${y + 100}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Tonnage:</tspan> ${esc(m.tons)}</text>`;
   svg += `<text x="${LX + 230}" y="${y + 122}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Tech Base:</tspan> ${esc(m.techBase || '—')}</text>`;
   svg += `<text x="${LX + 230}" y="${y + 144}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Era:</tspan> ${esc(m.year || '—')}</text>`;
-  svg += `<text x="${LX + 12}" y="${y + 182}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Battle Value:</tspan> ${esc(m.bv || '—')}</text>`;
-  svg += `<text x="${LX + 230}" y="${y + 182}" font-family="sans-serif" font-size="12"><tspan font-weight="700">Heat Sinks:</tspan> ${esc((m.heatSinks||{}).count||0)} ${esc((m.heatSinks||{}).type||'')}</text>`;
+  const cost = m.cost ? Math.round(parseFloat(m.cost)).toLocaleString() : '—';
+  svg += `<text x="${LX + 12}" y="${y + 182}" font-family="sans-serif" font-size="11"><tspan font-weight="700">Cost (C-Bills):</tspan> ${esc(cost)}</text>`;
+  svg += `<text x="${LX + 230}" y="${y + 182}" font-family="sans-serif" font-size="11"><tspan font-weight="700">BV / Heat Sinks:</tspan> ${esc(m.bv || '—')} / ${esc((m.heatSinks||{}).count||0)} ${esc((m.heatSinks||{}).type||'')}</text>`;
 
   // ── Warrior Data box (pilot name/skills + the real double-boxed hit
   //    track with consciousness-roll thresholds, like PilotHitTrackSVG) ──
@@ -5502,59 +5736,26 @@ function rsSheetSVG(m, pilot) {
     svg += `<rect x="${hx}" y="${hy}" width="24" height="22" fill="${effect ? '#c8c8c8' : '#fff'}" stroke="#000" stroke-width="1.5"/>`
       + `<text x="${hx + 12}" y="${hy + 15}" text-anchor="middle" font-family="sans-serif" font-size="11">${i}${effect ? '*' : ''}</text>`;
   }
+  leftBottom = y + 78 + 20;
 
-  // ── Weapons & Equipment box (Qty/Type/Loc column layout matching
-  //    RecordSheetEquipmentTable's own header set/striped rows; the
-  //    reference table also has Heat/Dmg/Min/Sht/Med/Lng columns, omitted
-  //    here since that per-weapon stat lookup isn't in our SSW-derived
-  //    data yet — showing those headers with nothing under them would
-  //    look broken rather than faithful) ──
-  y = 414;
-  const rawEq = (m.equipment || []).filter(e => e.type !== 'ammunition');
-  const grouped = [];
-  rawEq.forEach(e => {
-    const prev = grouped.find(g => g.name === e.name && g.loc === e.loc);
-    if (prev) prev.qty++; else grouped.push({ name: e.name, loc: e.loc, qty: 1 });
-  });
-  const eqBoxH = Math.max(80, 40 + grouped.length * 20 + 12);
-  svg += rsGroupBox(LX, y, LW, eqBoxH, 'Weapons & Equipment');
-  const cols = { qty: LX+12, type: LX+42, loc: LX+LW-50 };
-  const headY = y + 34;
-  svg += `<text x="${cols.qty}" y="${headY}" font-family="sans-serif" font-size="10" font-weight="700" fill="#555">Qty</text>`;
-  svg += `<text x="${cols.type}" y="${headY}" font-family="sans-serif" font-size="10" font-weight="700" fill="#555">Type</text>`;
-  svg += `<text x="${cols.loc}" y="${headY}" font-family="sans-serif" font-size="10" font-weight="700" fill="#555">Loc</text>`;
-  grouped.forEach((e, i) => {
-    const ry = headY + 20 + i * 20;
-    if (i % 2 === 0) svg += `<rect x="${LX+8}" y="${ry-13}" width="${LW-16}" height="17" fill="#ddd"/>`;
-    svg += `<text x="${cols.qty}" y="${ry}" font-family="sans-serif" font-size="11">${e.qty}</text>`;
-    svg += `<text x="${cols.type}" y="${ry}" font-family="sans-serif" font-size="11">${esc(e.name)}</text>`;
-    svg += `<text x="${cols.loc}" y="${ry}" font-family="sans-serif" font-size="11">${esc(e.loc || '—')}</text>`;
-  });
-  leftBottom = y + eqBoxH + 20;
-
+  // ── Armor / Internal Structure diagrams (right column) ──
   if (useSil) {
-    // ── Faithful silhouette diagrams — armor (front body + separate
-    //    rear-torso silhouette) on the right, internal structure below —
-    //    boxes sized to fit their content rather than a fixed guess, so
-    //    there's no large empty margin below the artwork ──
     const armorDiaW = RW - 84;
-    const armorDiaH = 850 * (armorDiaW / 744.09448819);
+    const armorDiaH = 850 * (armorDiaW / rsSilData.viewW);
     const armorH = 46 + armorDiaH + 30;
     svg += rsGroupBox(RX, 10, RW, armorH, 'Armor Diagram');
-    svg += rsSilDiagram(RX + 42, 46, armorDiaW, 'armor', a).svg;
+    svg += rsSilDiagram(RX + 42, 46, armorDiaW, 'armor', a);
     const rearW = 170, rearH = 340 * (rearW / 744.09448819);
-    svg += rsRearArmorDiagram(RX + RW - rearW - 20, 10 + armorH - rearH - 20, rearW, a).svg;
+    svg += rsRearArmorDiagram(RX + RW - rearW - 20, 10 + armorH - rearH - 20, rearW, a);
 
     const stY = 10 + armorH + 16;
     const structDiaW = RW - 120;
-    const structDiaH = 850 * (structDiaW / 744.09448819);
+    const structDiaH = 850 * (structDiaW / rsSilData.viewW);
     const stH = 50 + structDiaH + 24;
     svg += rsGroupBox(RX, stY, RW, stH, 'Internal Structure');
-    svg += rsSilDiagram(RX + 60, stY + 50, structDiaW, 'struct', s).svg;
+    svg += rsSilDiagram(RX + 60, stY + 50, structDiaW, 'struct', s);
     rightBottom = stY + stH + 20;
   } else {
-    // ── Fallback: simple per-location bracketed counts (used only if the
-    //    silhouette data failed to load) ──
     const fLoc = (label, val) => val ? `<tspan font-weight="700">${lbEsc(label)}</tspan> [${val}]  ` : '';
     svg += rsGroupBox(RX, 10, RW, 300, 'Armor Diagram');
     svg += `<text x="${RX+12}" y="70" font-family="sans-serif" font-size="13">${fLoc('HD',a.hd)}${fLoc('CT',a.ct)}${fLoc('CT(R)',a.ctr)}</text>`;
@@ -5566,7 +5767,117 @@ function rsSheetSVG(m, pilot) {
     rightBottom = 330 + 200 + 20;
   }
 
-  const H = Math.max(leftBottom, rightBottom, 200);
+  y = Math.max(leftBottom, rightBottom);
+
+  // ── Weapons & Equipment box (full 9-column layout: Qty/Type/Loc/Heat/
+  //    Dmg/Min/Sht/Med/Lng, matching RecordSheetEquipmentTable — ammo rows
+  //    are listed individually per ton, like the reference, with shot
+  //    counts from the TechManual ammo-per-ton table where known) ──
+  const ammoRows = [], weaponGroups = [];
+  (m.equipment || []).forEach(eq => {
+    const { base, rear } = rsCleanEquipName(eq.name);
+    if (eq.type === 'ammunition') {
+      const ammoBase = rsAmmoBaseName(base);
+      const shots = RS_AMMO_SHOTS[ammoBase];
+      ammoRows.push({ label: shots ? `Ammo (${ammoBase}) ${shots}/${shots}` : `Ammo (${ammoBase})`, loc: eq.loc, qty: 1, stats: null });
+      return;
+    }
+    let label = base;
+    if (rear) label += ' [R]';
+    const key = label + '|' + eq.loc;
+    const prev = weaponGroups.find(g => g.key === key);
+    if (prev) prev.qty++;
+    else weaponGroups.push({ key, label, loc: eq.loc, qty: 1, stats: RS_WEAPON_STATS[base] || null });
+  });
+  const rows = ammoRows.concat(weaponGroups);
+  const eqBoxH = Math.max(90, 40 + rows.length * 18 + 12);
+  svg += rsGroupBox(FX, y, FW, eqBoxH, 'Weapons & Equipment');
+  const cols = { qty: FX+12, type: FX+45, loc: FX+265, heat: FX+320, dmg: FX+380, min: FX+455, sht: FX+520, med: FX+585, lng: FX+650 };
+  const headY = y + 34;
+  Object.entries({qty:'Qty',type:'Type',loc:'Loc',heat:'Heat',dmg:'Dmg',min:'Min',sht:'Sht',med:'Med',lng:'Lng'}).forEach(([k,label]) => {
+    svg += `<text x="${cols[k]}" y="${headY}" font-family="sans-serif" font-size="10" font-weight="700" fill="#555">${label}</text>`;
+  });
+  rows.forEach((e, i) => {
+    const ry = headY + 18 + i * 18;
+    if (i % 2 === 0) svg += `<rect x="${FX+8}" y="${ry-13}" width="${FW-16}" height="17" fill="#eee"/>`;
+    svg += `<text x="${cols.qty}" y="${ry}" font-family="sans-serif" font-size="11">${e.qty}</text>`;
+    svg += `<text x="${cols.type}" y="${ry}" font-family="sans-serif" font-size="11">${esc(e.label)}</text>`;
+    svg += `<text x="${cols.loc}" y="${ry}" font-family="sans-serif" font-size="11">${esc(e.loc || '—')}</text>`;
+    if (e.stats) {
+      const [,heat,dmg,min,sht,med,lng] = e.stats;
+      svg += `<text x="${cols.heat}" y="${ry}" font-family="sans-serif" font-size="11">${esc(heat)}</text>`;
+      svg += `<text x="${cols.dmg}" y="${ry}" font-family="sans-serif" font-size="11">${esc(dmg)}</text>`;
+      svg += `<text x="${cols.min}" y="${ry}" font-family="sans-serif" font-size="11">${esc(min === 0 ? '–' : min)}</text>`;
+      svg += `<text x="${cols.sht}" y="${ry}" font-family="sans-serif" font-size="11">${esc(sht)}</text>`;
+      svg += `<text x="${cols.med}" y="${ry}" font-family="sans-serif" font-size="11">${esc(med)}</text>`;
+      svg += `<text x="${cols.lng}" y="${ry}" font-family="sans-serif" font-size="11">${esc(lng)}</text>`;
+    }
+  });
+  y += eqBoxH + 16;
+
+  // ── GATOR Calculations band (Gunnery/Attacker/Target/Other/Range —
+  //    RecordSheetGATORTable: gunnery is filled in, the rest are blank
+  //    fill-in-the-blank lines for use during actual play) ──
+  svg += rsGroupBox(FX, y, FW, 56, 'GATOR Calculations');
+  const gLabels = ['G','A','T','O','R'];
+  const gW = (FW - 40) / 5;
+  gLabels.forEach((label, i) => {
+    const gx = FX + 20 + i * gW;
+    svg += `<text x="${gx}" y="${y+36}" font-family="sans-serif" font-size="20" font-weight="700">${label}</text>`;
+    if (label === 'G') {
+      svg += `<text x="${gx+26}" y="${y+36}" font-family="sans-serif" font-size="20">${esc(pilot.gunnery ?? 4)}</text>`;
+    } else {
+      svg += `<line x1="${gx+22}" y1="${y+40}" x2="${gx+gW-10}" y2="${y+40}" stroke="#000" stroke-width="1"/>`;
+    }
+  });
+  y += 56 + 16;
+
+  // ── Critical Hit Table (3 columns: LA/HD/RA, LT/CT/RT, LL/[component
+  //    damage]/RL — mirrors the reference's own 3-column arrangement) ──
+  const crits = rsBuildCrits(m);
+  // Columns start with extra left padding (24px, not 10px) so the "1-3"/
+  // "4-6" die-roll bracket labels — drawn to the left of each column's row
+  // numbers — have room and don't get clipped by the box border.
+  const critColW = (FW - 24 - 10 - 20) / 3;
+  const col1 = FX + 24, col2 = col1 + critColW + 10, col3 = col2 + critColW + 10;
+  let ty = y + 30;
+  let critContent = '';
+  const laB = rsCritLocation(col1, ty, critColW, 'Left Arm', crits.la);
+  const hdB = rsCritLocation(col2, ty, critColW, 'Head', crits.hd);
+  const raB = rsCritLocation(col3, ty, critColW, 'Right Arm', crits.ra);
+  critContent += laB.svg + hdB.svg + raB.svg;
+  ty += Math.max(laB.h, hdB.h, raB.h) + 14;
+  const ltB = rsCritLocation(col1, ty, critColW, 'Left Torso', crits.lt);
+  const ctB = rsCritLocation(col2, ty, critColW, 'Center Torso', crits.ct);
+  const rtB = rsCritLocation(col3, ty, critColW, 'Right Torso', crits.rt);
+  critContent += ltB.svg + ctB.svg + rtB.svg;
+  ty += Math.max(ltB.h, ctB.h, rtB.h) + 14;
+  const llB = rsCritLocation(col1, ty, critColW, 'Left Leg', crits.ll);
+  const rlB = rsCritLocation(col3, ty, critColW, 'Right Leg', crits.rl);
+  const cd = rsComponentDamage(col2, ty + 6, critColW);
+  critContent += llB.svg + rlB.svg + cd.svg;
+  ty += Math.max(llB.h, rlB.h, cd.h) + 10;
+  const critBoxH = ty - y + 10;
+  svg += rsGroupBox(FX, y, FW, critBoxH, 'Critical Hit Table') + critContent;
+  y += critBoxH + 20;
+
+  // ── Heat Effects box (fixed Total Warfare heat-scale rules text) ──
+  const heB = FX, heW = FW;
+  svg += rsGroupBox(heB, y, heW, 210, 'Heat Effects');
+  svg += `<text x="${heB+heW/2-100}" y="${y+30}" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="700">HEAT LEVEL</text>`;
+  svg += `<text x="${heB+heW/2-80}" y="${y+30}" font-family="sans-serif" font-size="10" font-weight="700">EFFECTS</text>`;
+  const heCols = 2, heRowH = 16;
+  const perCol = Math.ceil(RS_HEAT_EFFECTS.length / heCols);
+  RS_HEAT_EFFECTS.forEach(([lvl, eff], i) => {
+    const col = Math.floor(i / perCol), row = i % perCol;
+    const hx = heB + 20 + col * (heW/2);
+    const hy = y + 50 + row * heRowH;
+    svg += `<text x="${hx}" y="${hy}" text-anchor="end" font-family="sans-serif" font-size="10">${lvl}</text>`;
+    svg += `<text x="${hx+10}" y="${hy}" font-family="sans-serif" font-size="10">${esc(eff)}</text>`;
+  });
+  y += 210 + 20;
+
+  const H = y;
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#fff">`
     + `<rect x="0" y="0" width="${W}" height="${H}" fill="#fff"/>${svg}</svg>`;
 }
