@@ -6008,6 +6008,7 @@ function rsSheetSVG(m, pilot) {
     const hy = heY + 75 + 27 * (k + 2);
     svg += T(heX + 90, hy, 24, 500, 'end', lvl) + T(heX + 110, hy, 24, 500, 'start', esc(eff));
   });
+  svg += T(heX + 20, heY + 587, 16, 100, 'start', '* on the Heat Scale marks these effect levels.');
 
   // ── Sinks (1690,1885 205x575) ──
   const skX = 1690, skY = 1885;
@@ -6017,11 +6018,21 @@ function rsSheetSVG(m, pilot) {
   svg += T(skX + 102.5, skY + 75, 21, 700, 'middle', 'HEAT SINKS');
   svg += T(skX + 102.5, skY + 129, 54, 700, 'middle', hsCount);
   svg += T(skX + 102.5, skY + 156, 21, 500, 'middle', esc(hsType));
-  const colDx = [-18.75, 18.75, -60, 60]; // fill order matches HeatSinksSVG
-  for (let s = 0; s < Math.min(hsCount, 40); s++) {
-    const col = Math.floor(s / 10), row = s % 10;
-    const cy = skY + 185 + 30 * row + (row >= 5 ? 30 : 0);
-    svg += `<circle cx="${skX + 137.5 + colDx[col]}" cy="${cy}" r="12" fill="#fff" stroke="#000" stroke-width="2"/>`;
+  // Dots in balanced columns, centred in the box both ways (the reference's
+  // own threshold-column layout sat off-centre for anything under 20 sinks).
+  const hsN = Math.min(hsCount, 40);
+  if (hsN > 0) {
+    const hsCols = Math.ceil(hsN / 10);
+    const perCol = Math.floor(hsN / hsCols), hsExtra = hsN % hsCols;
+    const hsTop = skY + 180, hsAvail = 390;
+    for (let c = 0; c < hsCols; c++) {
+      const size = perCol + (c < hsExtra ? 1 : 0);
+      const cx = skX + 102.5 + (c - (hsCols - 1) / 2) * 37.5;
+      const y0 = hsTop + (hsAvail - size * 30) / 2 + 15;
+      for (let r = 0; r < size; r++) {
+        svg += `<circle cx="${cx}" cy="${y0 + r * 30}" r="12" fill="#fff" stroke="#000" stroke-width="2"/>`;
+      }
+    }
   }
 
   // ── Heat Scale strip (right page edge, 1920,1260) ──
@@ -7564,10 +7575,12 @@ async function lbOpenSheetsCore(cfg) {
           ${metaBar}
           <div class="drawn-note">✍️ Self-drawn record sheet (from SSW data)${file ? ' · scanned PDF also available below' : ''}</div>
           <div class="drawn-sheet">${(() => { const g = getUnitSkill(li, si); return rsSheetSVG(mechRec, { gunnery: g, piloting: g + 1 }); })()}</div>
-          ${file ? `<div class="sheet-actions">
+          <div class="sheet-actions">
+            <button class="btn-print-one" onclick="printDrawnSheet(this)">🖨 Print / Save PDF (this sheet)</button>
+            ${file ? `
             <a href="${pdfBase + encodeURIComponent(file)}" download="${file}" class="btn-dl">⬇ Download scanned PDF</a>
-            <a href="${pdfBase + encodeURIComponent(file)}" target="_blank" class="btn-open">↗ Open scanned PDF</a>
-          </div>` : ''}
+            <a href="${pdfBase + encodeURIComponent(file)}" target="_blank" class="btn-open">↗ Open scanned PDF</a>` : ''}
+          </div>
         </div>`;
       } else if (file) {
         embeddedCount++;
@@ -7663,12 +7676,15 @@ async function lbOpenSheetsCore(cfg) {
                    padding:5px 10px; border-radius:4px; white-space:nowrap; }
     @media print {
       .page-header, .status-bar, .sheet-actions, .lance-hdr, .print-bar,
-      .drawn-note { display:none; }
+      .drawn-note, .unit-meta-bar, .missing, .pilot-bar { display:none; }
       .sheet-block { page-break-after:always; }
       .sheet-embed { height:100vh; }
       .drawn-sheet { padding:0; }
+      .drawn-sheet svg { max-width:100%; }
       body { background:#fff; }
     }
+    .btn-print-one { background:#2e7d32; color:#fff; border:none; padding:5px 12px; border-radius:4px;
+                     font-size:11px; font-weight:700; cursor:pointer; }
     .print-bar { background:#0d1117; padding:8px 20px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .print-bar span { color:#aaa; font-size:11px; }
     .btn-print-all  { background:#2e7d32; color:#fff; border:none; padding:7px 18px; border-radius:5px;
@@ -7698,6 +7714,21 @@ async function lbOpenSheetsCore(cfg) {
     if (window.pdfjsLib) {
       pdfjsLib.GlobalWorkerOptions.workerSrc =
         'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
+    // Print just one self-drawn sheet: open a bare window holding only that
+    // sheet's SVG and invoke the browser print dialog (where "Save as PDF"
+    // gives a single-unit PDF without any page chrome).
+    function printDrawnSheet(btn) {
+      const block = btn.closest('.sheet-block');
+      const svg   = block.querySelector('.drawn-sheet').innerHTML;
+      const name  = (block.querySelector('.unit-meta-bar strong') || {}).textContent || 'Record Sheet';
+      const pw = window.open('', '_blank');
+      if (!pw) return;
+      pw.document.write('<html><head><title>' + name + ' — Record Sheet</title>'
+        + '<style>@page{size:letter;margin:6mm} html,body{margin:0;padding:0} svg{width:100%;height:auto;display:block}</style>'
+        + '</head><body>' + svg + '</body></html>');
+      pw.document.close();
+      setTimeout(() => { pw.focus(); pw.print(); }, 350);
     }
   <\/script>
   <script src="${new URL('sheets-popup.js', window.location.href).href}?v=${Date.now()}"><\/script>
