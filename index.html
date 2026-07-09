@@ -5551,8 +5551,18 @@ function rsGyroSlots(name) {
   return 4;
 }
 
+// Map SSW's engine name to the label the reference sheet prints in the crit
+// slots (e.g. "Fusion Engine" -> "Standard Fusion", "XL Engine" -> "XL
+// Fusion").
+function rsEngineLabel(name) {
+  const n = (name || 'Fusion Engine').trim();
+  if (/^fusion engine$/i.test(n)) return 'Standard Fusion';
+  return n.replace(/\s*Engine$/i, ' Fusion').replace(/\s+/g, ' ').trim();
+}
+
 function rsBuildCrits(m) {
-  const engineName = (m.engine && m.engine.name) || 'Fusion Engine';
+  const engineRaw = (m.engine && m.engine.name) || 'Fusion Engine';
+  const engineName = rsEngineLabel(engineRaw);
   const gyroName = m.gyro || 'Standard Gyro';
   const act = m.actuators || { lla: true, rla: true, lh: true, rh: true };
   const mk = (n) => new Array(n).fill(null);
@@ -5575,8 +5585,8 @@ function rsBuildCrits(m) {
   if (act.rla) crits.ra[i++] = 'Lower Arm Actuator';
   if (act.rh) crits.ra[i++] = 'Hand Actuator';
 
-  const engCT = rsEngineCTSlots(engineName);
-  const engSide = rsEngineSideSlots(engineName);
+  const engCT = rsEngineCTSlots(engineRaw);
+  const engSide = rsEngineSideSlots(engineRaw);
   const gyroN = rsGyroSlots(gyroName);
   let ci = 0;
   const firstEng = Math.min(3, engCT);
@@ -5660,13 +5670,29 @@ function rsComponentDamage(x, y, w) {
   const rows = [['Engine Hits', 3], ['Gyro Hits', 2], ['Sensor Hits', 2], ['Life Support', 1]];
   let yy = y;
   rows.forEach(([label, n]) => {
-    svg += `<text x="${x + w - 60}" y="${yy + 5}" text-anchor="end" font-family="sans-serif" font-size="11">${label}</text>`;
+    svg += `<text x="${x + w/2 + 10}" y="${yy + 5}" text-anchor="end" font-family="sans-serif" font-size="11">${label}</text>`;
     for (let i = 0; i < n; i++) {
-      svg += `<circle cx="${x + w - 40 + i * 22}" cy="${yy}" r="8" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+      svg += `<circle cx="${x + w/2 + 24 + i * 22}" cy="${yy}" r="8" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
     }
     yy += 26;
   });
   return { svg, h: yy - y };
+}
+
+// The reference sheet's Damage Transfer Diagram: a fixed biped silhouette
+// (BipedDamageTransferDiagramSVG) shown in the crit table's centre column,
+// used during play to trace where damage transfers when a location is
+// destroyed. Pure static art like the armor silhouettes.
+function rsTransferDiagram(x, y, w) {
+  const S = rsSilData;
+  if (!S || !S.transferPath) return { svg: '', h: 0 };
+  const viewW = 744.09448819, viewH = 1052.3622047;
+  const h = viewH * (w / viewW);
+  const svg = `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 ${viewW} ${viewH}" overflow="visible">`
+    + `<g transform="translate(0,${S.transferTransformY})"><path d="${S.transferPath}" fill="#000"/></g></svg>`
+    + `<text x="${x + w/2}" y="${y + h + 14}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700">DAMAGE TRANSFER</text>`
+    + `<text x="${x + w/2}" y="${y + h + 26}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700">DIAGRAM</text>`;
+  return { svg, h: h + 30 };
 }
 
 // Render a full record sheet SVG for a matched biped mech record (from
@@ -5775,6 +5801,9 @@ function rsSheetSVG(m, pilot) {
   //    counts from the TechManual ammo-per-ton table where known) ──
   const ammoRows = [], weaponGroups = [];
   (m.equipment || []).forEach(eq => {
+    // Jump jets are structural, not weapons — the reference lists them only
+    // in the crit table, never in the weapons & equipment table.
+    if (eq.type === 'jumpjet') return;
     const { base, rear } = rsCleanEquipName(eq.name);
     if (eq.type === 'ammunition') {
       const ammoBase = rsAmmoBaseName(base);
@@ -5855,8 +5884,9 @@ function rsSheetSVG(m, pilot) {
   const llB = rsCritLocation(col1, ty, critColW, 'Left Leg', crits.ll);
   const rlB = rsCritLocation(col3, ty, critColW, 'Right Leg', crits.rl);
   const cd = rsComponentDamage(col2, ty + 6, critColW);
-  critContent += llB.svg + rlB.svg + cd.svg;
-  ty += Math.max(llB.h, rlB.h, cd.h) + 10;
+  const td = rsTransferDiagram(col2 + critColW/2 - 45, ty + cd.h + 10, 90);
+  critContent += llB.svg + rlB.svg + cd.svg + td.svg;
+  ty += Math.max(llB.h, rlB.h, cd.h + td.h + 10) + 10;
   const critBoxH = ty - y + 10;
   svg += rsGroupBox(FX, y, FW, critBoxH, 'Critical Hit Table') + critContent;
   y += critBoxH + 20;
