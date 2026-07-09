@@ -149,10 +149,11 @@ def parse_mech(xml_str):
                 if v is not None:
                     actuators[key] = v.strip().upper() == "TRUE"
         # Movement: SSW stores engine rating; walk MP = rating / tons.
+        # Run MP = ceil(walk * 1.5) per the construction rules (e.g. walk 7
+        # -> run 11, not round-half-to-even's 10).
         if engine["rating"]:
             walk = engine["rating"] // tons if tons else 0
-        run = int(round(walk * 1.5))
-        # Jump jets: count jumpjet equipment entries.
+        run = -(-(walk * 3) // 2)  # ceil(walk * 1.5) via integer math
         hs_el = loadout.find("heatsinks")
         if hs_el is not None:
             try:
@@ -160,22 +161,35 @@ def parse_mech(xml_str):
             except ValueError:
                 pass
             heat_sinks["type"] = text_of(hs_el, "type")
-        jj = 0
         for eq in loadout.findall("equipment"):
             eq_name = text_of(eq, "name")
             eq_type = text_of(eq, "type")
             loc_el = eq.find("location")
             loc = loc_el.text.strip() if loc_el is not None and loc_el.text else ""
             crit = loc_el.get("index", "") if loc_el is not None else ""
-            if "jump jet" in eq_name.lower():
-                jj += 1
             # Keep everything, including ammunition -- the faithful weapons
             # table and critical-hit table both need it.
             equipment.append({
                 "name": eq_name, "type": eq_type,
                 "loc": loc, "crit": crit,
             })
-        jump = jj
+        # Jump jets: SSW stores them in their own <jumpjets> element (NOT in
+        # <equipment>), one <location index=..>LOC</location> per jet. Jump
+        # MP = number of jets. Fold each jet into the equipment list so it
+        # lands in the crit table at its real slot, like the reference tool.
+        jj_el = loadout.find("jumpjets")
+        if jj_el is not None:
+            jj_type = text_of(jj_el, "type") or "Jump Jet"
+            if jj_type.endswith("Jet"):
+                jj_type += "s"  # reference sheet labels these "Jump Jets"
+            for loc_el in jj_el.findall("location"):
+                loc = loc_el.text.strip() if loc_el.text else ""
+                crit = loc_el.get("index", "")
+                equipment.append({
+                    "name": jj_type, "type": "jumpjet",
+                    "loc": loc, "crit": crit,
+                })
+                jump += 1
 
     return {
         "name": full_name,
