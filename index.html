@@ -5420,6 +5420,37 @@ const RS_WEAPON_STATS = {
 
 // Ammo shots-per-ton (TechManual): used to render "Ammo (X) n/n" like the
 // reference. Anything unlisted just shows the ammo name with no count.
+// Clan weapon stats overrides ([crits, heat, dmg, min, sht, med, lng]) —
+// same names as Inner Sphere gear but different numbers (e.g. a Clan ER PPC
+// does 15 damage to the IS version's 10). Used when the unit's tech base is
+// Clan; anything not listed falls through to the IS table.
+const RS_WEAPON_STATS_CLAN = {
+  'ER Micro Laser': [1,1,2,0,1,2,4], 'ER Small Laser': [1,2,5,0,2,4,6],
+  'ER Medium Laser': [1,5,7,0,5,10,15], 'ER Large Laser': [1,12,10,0,8,15,25],
+  'Micro Pulse Laser': [1,1,3,0,1,2,3], 'Small Pulse Laser': [1,2,3,0,2,4,6],
+  'Medium Pulse Laser': [1,4,7,0,4,8,12], 'Large Pulse Laser': [2,10,10,0,6,14,20],
+  'Heavy Small Laser': [1,3,6,0,1,2,3], 'Heavy Medium Laser': [2,7,10,0,3,6,9],
+  'Heavy Large Laser': [3,18,16,0,5,10,15],
+  'ER PPC': [2,15,15,0,7,14,23], 'Flamer': [1,3,2,0,1,2,3], 'ER Flamer': [1,4,2,0,3,5,7],
+  'Plasma Cannon': [1,7,'Heat',0,6,12,18],
+  'LB 2-X AC': [3,1,2,4,10,20,30], 'LB 5-X AC': [4,1,5,3,8,15,24],
+  'LB 10-X AC': [5,2,10,0,6,12,18], 'LB 20-X AC': [9,6,20,0,4,8,12],
+  'Ultra AC/2': [2,1,2,2,9,18,27], 'Ultra AC/5': [3,1,5,0,7,14,21],
+  'Ultra AC/10': [4,3,10,0,6,12,18], 'Ultra AC/20': [8,7,20,0,4,8,12],
+  'Gauss Rifle': [6,1,15,2,7,15,22], 'AP Gauss Rifle': [1,1,3,0,3,6,9],
+  'HAG/20': [6,4,'1/hit',2,8,16,24], 'HAG/30': [8,6,'1/hit',2,8,16,24], 'HAG/40': [10,8,'1/hit',2,8,16,24],
+  'Machine Gun': [1,0,2,0,1,2,3], 'Light Machine Gun': [1,0,1,0,2,4,6], 'Heavy Machine Gun': [1,0,3,0,1,2,3],
+  'LRM-5': [1,2,'1/hit',0,7,14,21], 'LRM-10': [1,4,'1/hit',0,7,14,21],
+  'LRM-15': [2,5,'1/hit',0,7,14,21], 'LRM-20': [4,6,'1/hit',0,7,14,21],
+  'SRM-2': [1,2,'2/hit',0,3,6,9], 'SRM-4': [1,3,'2/hit',0,3,6,9], 'SRM-6': [1,4,'2/hit',0,3,6,9],
+  'Streak SRM-2': [1,2,'2/hit',0,4,8,12], 'Streak SRM-4': [1,3,'2/hit',0,4,8,12], 'Streak SRM-6': [2,4,'2/hit',0,4,8,12],
+  'ATM-3': [2,2,'1-3/hit',4,5,10,15], 'ATM-6': [3,4,'1-3/hit',4,5,10,15],
+  'ATM-9': [4,6,'1-3/hit',4,5,10,15], 'ATM-12': [5,8,'1-3/hit',4,5,10,15],
+  'Anti-Missile System': [1,1,'–',0,1,2,3], 'Narc Missile Beacon': [1,0,'–',0,4,8,12],
+  'Targeting Computer': [1,0,'–','–','–','–','–'], 'ECM Suite': [1,0,'–','–','–','–','–'],
+  'Active Probe': [1,0,'–','–','–','–','–'],
+};
+
 const RS_AMMO_SHOTS = {
   'AC/2':45,'Autocannon/2':45,'Light AC/2':45,'Ultra AC/2':45,'Rotary AC/2':45,'LB 2-X AC':45,
   'AC/5':20,'Autocannon/5':20,'Light AC/5':20,'Ultra AC/5':20,'Rotary AC/5':20,'LB 5-X AC':20,
@@ -5473,7 +5504,7 @@ const RS_TOHIT_MODS = {
 // successful attack all of a Streak's missiles hit, no cluster roll.
 function rsClusterSize(base) {
   if (/^Streak/i.test(base)) return null;
-  const mm = base.match(/^(?:LRM|SRM|MRM|MML)-(\d+)$/i) || base.match(/^Rocket Launcher (\d+)$/i);
+  const mm = base.match(/^(?:LRM|SRM|MRM|MML|i?ATM)-(\d+)$/i) || base.match(/^Rocket Launcher (\d+)$/i);
   if (!mm) return null;
   const size = parseInt(mm[1], 10);
   return RS_CLUSTER[size] ? size : null;
@@ -5588,6 +5619,30 @@ function rsEngineLabel(name) {
 // item so the renderer can draw one capsule around the whole item, exactly
 // like CritAllocationTableSVG does.
 function rsBuildCrits(m) {
+  // MTF-sourced records carry the COMPLETE authoritative slot lists
+  // (including Endo Steel / Ferro-Fibrous filler) — use them directly.
+  // Consecutive identical labels group into one capsule, matching how
+  // multi-slot items render on the reference sheet.
+  if (m.crits) {
+    const out = {};
+    let uid = 0;
+    ['hd', 'ct', 'lt', 'rt', 'la', 'ra', 'll', 'rl'].forEach(loc => {
+      const n = (loc === 'hd' || loc === 'll' || loc === 'rl') ? 6 : 12;
+      const rows = m.crits[loc] || [];
+      const slots = [];
+      let prev = null, id = 0;
+      for (let k = 0; k < n; k++) {
+        const r = rows[k] || null;
+        if (!r) { slots.push(null); prev = null; continue; }
+        if (r !== prev) id = ++uid;
+        slots.push({ t: r, id });
+        prev = r;
+      }
+      out[loc] = slots;
+    });
+    return out;
+  }
+
   const engineRaw = (m.engine && m.engine.name) || 'Fusion Engine';
   const engineName = rsEngineLabel(engineRaw);
   const gyroName = m.gyro || 'Standard Gyro';
@@ -5751,7 +5806,11 @@ function rsSheetSVG(m, pilot) {
   const gX = 10, gY = 10;
   svg += rsGroupBox(gX, gY, 700, 400, "'Mech Data");
   svg += T(gX + 10, gY + 80, 30, 700, 'start', 'Type:');
-  const typeName = ((m.model || '') + ' ' + (m.chassis || '')).trim() || m.name || '';
+  // Model-first for designation codes ("ARC-2K Archer", like the reference),
+  // chassis-first for config names ("Summoner Prime", not "Prime Summoner").
+  const typeName = (/\d/.test(m.model || '')
+    ? ((m.model || '') + ' ' + (m.chassis || ''))
+    : ((m.chassis || '') + ' ' + (m.model || ''))).trim() || m.name || '';
   svg += T(gX + 10, gY + 120, 35, 500, 'start', esc(typeName));
   svg += T(gX + 15, gY + 160, 30, 700, 'start', 'Movement Points');
   svg += rsDie(gX + 20, gY + 185, 30, '#ffffff', '#000000', 1)
@@ -5789,6 +5848,8 @@ function rsSheetSVG(m, pilot) {
   const eqX = 10, eqY = 440, eqH = 460;
   svg += rsGroupBox(eqX, eqY, 1215, eqH, 'Weapons and Equipment');
   const hasTC = (m.equipment || []).some(eq => /Targeting Computer/i.test(eq.name));
+  const isClanTech = /clan/i.test(m.techBase || '');
+  const statsFor = (base) => (isClanTech && RS_WEAPON_STATS_CLAN[base]) || RS_WEAPON_STATS[base] || null;
   const wc = [15, 90, 435, 505, 575, 655, 735, 810, 885, 965].map(o => eqX + o);
   const heads = ['Qty', 'Type', 'Loc', 'Mod', 'Heat', 'Dmg', 'Min', 'Sht', 'Med', 'Lng'];
   heads.forEach((hh, k) => { svg += T(wc[k], eqY + 80, 32, 700, 'start', hh); });
@@ -5817,7 +5878,7 @@ function rsSheetSVG(m, pilot) {
       mod = v;
       if (wm && wm[2]) mod = { v, star: true }; // conditional — see panel
     }
-    weaponGroups.push({ key, label, loc: eq.loc, qty: 1, stats: RS_WEAPON_STATS[base] || null, mod, base, etype: eq.type });
+    weaponGroups.push({ key, label, loc: eq.loc, qty: 1, stats: statsFor(base), mod, base, etype: eq.type });
   });
   const fmtMod = (v) => v > 0 ? '+' + v : v < 0 ? String(v) : '—';
   const eqRows = ammoRows.concat(weaponGroups);
@@ -5897,7 +5958,7 @@ function rsSheetSVG(m, pilot) {
       svg += T(755, ryy, 24, 500, 'start', esc(r.name));
       svg += T(1195, ryy, 24, 700, 'end', esc(r.mod));
     });
-    svg += T(755, clY + clH + 2, 18, 100, 'start', 'Included in the Mod column; * only when firing cluster ammunition.');
+    svg += T(755, clY + clH + 2, 18, 100, 'start', 'Included in Mod column; * cluster ammo only.');
   } else {
     svg += T(977, clY + clH / 2 + 20, 24, 100, 'middle', 'None.', 'rgb(120,120,120)');
   }
@@ -7500,12 +7561,17 @@ async function lbOpenSheetsCore(cfg) {
   } catch (_) {}
 
   // Self-drawn record-sheet data (built offline by build_sheet_data.py from
-  // the SSW database). Optional — if it fails to load, every unit simply
-  // falls back to the embedded-PDF path below.
-  let mechData = {};
+  // the MegaMek MTF database + SSW BV backfill). Optional — if it fails to
+  // load, every unit simply falls back to the embedded-PDF path below.
+  let mechData = {}, mechAliases = {}, mechByMul = {};
   try {
     const res = await fetch(sheetsBase + 'mech-data.json');
-    if (res.ok) mechData = (await res.json()).mechs || {};
+    if (res.ok) {
+      const j = await res.json();
+      mechData = j.mechs || {};
+      mechAliases = j.aliases || {};
+      mechByMul = j.byMul || {};
+    }
   } catch (_) {}
 
   // Faithful silhouette + circle-coordinate data. Optional — rsSheetSVG falls
@@ -7526,11 +7592,17 @@ async function lbOpenSheetsCore(cfg) {
     return manifest[safe] || null;
   }
 
-  // Match a unit to its self-drawn-sheet record via the same normalization
-  // the Collection/Owned matching uses (sbNorm), so "Archer ARC-2K" etc. line
-  // up regardless of punctuation/parentheticals. Phase 1: bipeds only.
-  function sheetMechData(name) {
-    const rec = mechData[sbNorm(name)];
+  // Match a unit to its self-drawn-sheet record: exact MUL id first (the
+  // MTF data carries each unit's MUL id), then normalized name, then the
+  // IS-name alias (e.g. "Thor Prime" -> "Summoner Prime"). Rendering is
+  // still biped-only; quads/tripods stay on the PDF path for now.
+  function sheetMechData(u) {
+    let key = mechByMul[String(u.Id || '')] || null;
+    if (!key) {
+      const n = sbNorm(u.Name);
+      key = mechData[n] ? n : mechAliases[n];
+    }
+    const rec = key ? mechData[key] : null;
     if (!rec) return null;
     return /biped/i.test(rec.motive || 'Biped') ? rec : null;
   }
@@ -7567,13 +7639,13 @@ async function lbOpenSheetsCore(cfg) {
         ${bonus ? `<span class="unit-bonus">★ ${bonus} — ${LB_ABILITY_DESC[bonus]||''}</span>` : ''}
       </div>`;
 
-      const mechRec = sheetMechData(u.Name);
+      const mechRec = sheetMechData(u);
       if (mechRec) {
         // Self-drawn SVG record sheet (no PDF dependency, no calibration hack).
         embeddedCount++;
         lanceSections += `<div class="sheet-block sheet-drawn">
           ${metaBar}
-          <div class="drawn-note">✍️ Self-drawn record sheet (from SSW data)${file ? ' · scanned PDF also available below' : ''}</div>
+          <div class="drawn-note">✍️ Self-drawn record sheet (from MegaMek data)${file ? ' · scanned PDF also available below' : ''}</div>
           <div class="drawn-sheet">${(() => { const g = getUnitSkill(li, si); return rsSheetSVG(mechRec, { gunnery: g, piloting: g + 1 }); })()}</div>
           <div class="sheet-actions">
             <button class="btn-print-one" onclick="printDrawnSheet(this)">🖨 Print / Save PDF (this sheet)</button>
