@@ -113,25 +113,44 @@ def parse_mech(xml_str):
                 except ValueError:
                     pass
 
-    # --- Baseloadout: movement, heat sinks, equipment ---
+    # --- Engine / gyro / cockpit / actuators / structure & armor tech ---
+    eng_el = root.find("engine")
+    engine = {"name": (eng_el.text or "").strip() if eng_el is not None else "",
+              "rating": 0}
+    if eng_el is not None:
+        try:
+            engine["rating"] = int(eng_el.get("rating", "0"))
+        except ValueError:
+            pass
+    gyro_el = root.find("gyro")
+    gyro = (gyro_el.text or "").strip() if gyro_el is not None else ""
+    cockpit_type_el = root.find("cockpit/type")
+    cockpit = (cockpit_type_el.text or "").strip() if cockpit_type_el is not None and cockpit_type_el.text else "Standard Cockpit"
+    structure_type_el = root.find("structure/type")
+    structure_type = (structure_type_el.text or "").strip() if structure_type_el is not None and structure_type_el.text else "Standard Structure"
+    armor_type_el = root.find("armor/type")
+    armor_type = (armor_type_el.text or "").strip() if armor_type_el is not None and armor_type_el.text else "Standard Armor"
+
+    # --- Baseloadout: movement, heat sinks, actuators, equipment ---
     loadout = root.find("baseloadout")
     walk = run = jump = 0
     heat_sinks = {"count": 0, "type": ""}
     equipment = []
+    actuators = {"lla": True, "rla": True, "lh": True, "rh": True}
     bf = {}
     if loadout is not None:
         bf_el = loadout.find("battleforce")
         if bf_el is not None:
             bf = dict(bf_el.attrib)
+        act_el = loadout.find("actuators")
+        if act_el is not None:
+            for key in ("lla", "rla", "lh", "rh"):
+                v = act_el.get(key)
+                if v is not None:
+                    actuators[key] = v.strip().upper() == "TRUE"
         # Movement: SSW stores engine rating; walk MP = rating / tons.
-        # Prefer explicit if present, else compute from engine.
-        eng = root.find("engine")
-        if eng is not None:
-            try:
-                rating = int(eng.get("rating", "0"))
-                walk = rating // tons if tons else 0
-            except ValueError:
-                walk = 0
+        if engine["rating"]:
+            walk = engine["rating"] // tons if tons else 0
         run = int(round(walk * 1.5))
         # Jump jets: count jumpjet equipment entries.
         hs_el = loadout.find("heatsinks")
@@ -150,15 +169,12 @@ def parse_mech(xml_str):
             crit = loc_el.get("index", "") if loc_el is not None else ""
             if "jump jet" in eq_name.lower():
                 jj += 1
-            # Skip ammunition/actuator noise for the weapons table; keep
-            # weapons + notable gear (energy/ballistic/missile/misc).
-            if eq_type in ("energy", "ballistic", "missile", "physical") \
-                    or ("jump jet" not in eq_name.lower()
-                        and eq_type not in ("ammunition",)):
-                equipment.append({
-                    "name": eq_name, "type": eq_type,
-                    "loc": loc, "crit": crit,
-                })
+            # Keep everything, including ammunition -- the faithful weapons
+            # table and critical-hit table both need it.
+            equipment.append({
+                "name": eq_name, "type": eq_type,
+                "loc": loc, "crit": crit,
+            })
         jump = jj
 
     return {
@@ -170,10 +186,17 @@ def parse_mech(xml_str):
         "techBase": text_of(root, "techbase"),
         "year": text_of(root, "year"),
         "bv": text_of(root, "battle_value"),
+        "cost": text_of(root, "cost"),
         "rulesLevel": text_of(root, "rules_level"),
         "move": {"walk": walk, "run": run, "jump": jump},
         "armor": armor,
+        "armorType": armor_type,
         "structure": structure_for(tons),
+        "structureType": structure_type,
+        "engine": engine,
+        "gyro": gyro,
+        "cockpit": cockpit,
+        "actuators": actuators,
         "heatSinks": heat_sinks,
         "equipment": equipment,
         "pv": bf.get("pv", ""),
