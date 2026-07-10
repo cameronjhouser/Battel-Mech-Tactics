@@ -2654,6 +2654,29 @@
         </div>
       </div>
     </div>
+
+    <!-- ── FORMATION ORGANIZER ────────────────── -->
+    <div class="lb-csv-controls" style="margin-top:14px">
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Formation type</label>
+        <select id="sb-formation-type"></select>
+      </div>
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Lance specialty</label>
+        <select id="sb-special-type" title="Optionally group lances by special type">
+          <option value="">Standard (sort by weight)</option>
+          <option value="recon">Recon / Scout Lance</option>
+          <option value="strike">Strike / Striker Lance</option>
+          <option value="fire">Fire Lance</option>
+          <option value="battle">Battle / Line Lance</option>
+          <option value="assault-sp">Assault Lance (Special)</option>
+          <option value="command">Command Lance</option>
+          <option value="pursuit">Pursuit Lance</option>
+        </select>
+      </div>
+      <button class="lb-btn" onclick="sbBuildFormation()">⚔ Build Formation</button>
+    </div>
+    <div id="sb-formation-out"></div>
   </div>
 </div>
 
@@ -3780,6 +3803,35 @@ const LB_FORMATIONS = {
   'clan-galaxy':    { name:'Galaxy',       lances:45, unitsPerLance:5, total:225, isClan:true },
 };
 
+// The formation-organizer (LB_FORMATIONS/LB_SPECIAL_TYPES + lbAssignToTypes and
+// all the lance-block/drag-drop/command/ability rendering below) is shared by
+// the CSV Formation Builder tab and the Skirmish Force Builder tab. Both build
+// into the SAME lbCurrentLances/lbLanceTypes/lbCmdState/lbUnitBonuses state —
+// there is only ever one "current formation" being edited at a time — so the
+// only thing that differs between the two entry points is which DOM elements
+// (formation-type/special-type/faction selects, output container) the shared
+// functions read from. lbFormationSrc picks that at build time.
+let lbFormationSrc = 'csv'; // 'csv' | 'skirmish'
+function lbFTypeEl()    { return document.getElementById(lbFormationSrc === 'skirmish' ? 'sb-formation-type' : 'lb-formation-type'); }
+function lbSTypeEl()    { return document.getElementById(lbFormationSrc === 'skirmish' ? 'sb-special-type'   : 'lb-special-type'); }
+function lbFFactionEl() { return document.getElementById(lbFormationSrc === 'skirmish' ? 'sb-faction'        : 'lb-csv-faction'); }
+function lbFOutId()     { return lbFormationSrc === 'skirmish' ? 'sb-formation-out' : 'lb-formation-out'; }
+// Skirmish's faction list is live-loaded from MUL (sbFactionMeta), not the
+// curated static LB_FACTIONS array lbIsClanFaction checks against — prefer
+// the live source when it's the active context so newer Clan factions aren't
+// misread as Inner Sphere.
+function lbFormationIsClan() {
+  const fid = lbFFactionEl()?.value || '';
+  if (lbFormationSrc === 'skirmish') return !!(typeof sbFactionMeta !== 'undefined' && sbFactionMeta[fid]?.isClan);
+  return lbIsClanFaction(fid);
+}
+function lbFormationFactionName() {
+  const fid = lbFFactionEl()?.value || '';
+  if (!fid) return 'selected faction';
+  if (lbFormationSrc === 'skirmish') return (typeof sbFactionMeta !== 'undefined' && sbFactionMeta[fid]?.name) || 'selected faction';
+  return LB_FACTIONS.find(f => f.id === fid)?.name || 'selected faction';
+}
+
 /* ── FACTIONS ───────────────────────────────────────────────────── */
 const LB_FACTIONS = [
   { id:'',   name:'Any / Generic',              group:'' },
@@ -3966,6 +4018,11 @@ function lbBuildFormationDropdowns(isClan, which) {
     const cOpts = (isClan ? CLAN_OPTS : IS_CSV_OPTS).map(([v,t]) => `<option value="${v}">${t}</option>`).join('');
     const cfEl = document.getElementById('lb-formation-type');
     if (cfEl) cfEl.innerHTML = cOpts;
+  }
+  if (!which || which === 'skirmish') {
+    const kOpts = (isClan ? CLAN_OPTS : IS_CSV_OPTS).map(([v,t]) => `<option value="${v}">${t}</option>`).join('');
+    const kfEl = document.getElementById('sb-formation-type');
+    if (kfEl) kfEl.innerHTML = kOpts;
   }
 }
 
@@ -4291,6 +4348,8 @@ function sbFactionChanged() {
   sbApplyFactionYearPreset();
   sbClearCatalog();
   sbRenderForce();
+  const isClan = !!sbFactionMeta[document.getElementById('sb-faction')?.value]?.isClan;
+  lbBuildFormationDropdowns(isClan, 'skirmish');
 }
 
 // Auto-suggests the Introduced Year range for factions with a verified
@@ -4778,7 +4837,7 @@ function sbBuildTypeTabs(filtered) {
 function sbAddUnit(id) {
   const unit = document.getElementById('sb-unit-grid')?._umap?.[id];
   if (!unit) return;
-  if (sbForce.length >= 12) { alert('Force is full (12 units max).'); return; }
+  if (sbForce.length >= 500) { alert('Force is full (500 units max).'); return; }
   if (sbForce.some(f => f.unit.Id === id)) return;
   sbForce.push({ unit, skill: 4 });
   sbRenderForce();
@@ -7219,14 +7278,15 @@ function lbAssignToTypes(pool, typeKeys, upl) {
 }
 
 function lbBuildFormation() {
-  const fKey    = document.getElementById('lb-formation-type').value;
-  const specKey = document.getElementById('lb-special-type').value;
+  lbFormationSrc = 'csv';
+  const fKey    = lbFTypeEl().value;
+  const specKey = lbSTypeEl().value;
   const fDef    = LB_FORMATIONS[fKey];
   if (!fDef) return;
 
   const eraRange   = lbParseEraVal(document.getElementById('lb-csv-era')?.value);
-  const csvFacId   = document.getElementById('lb-csv-faction')?.value || '';
-  const csvIsClan  = lbIsClanFaction(csvFacId);
+  const csvFacId   = lbFFactionEl()?.value || '';
+  const csvIsClan  = lbFormationIsClan();
   let available    = lbPoolUnits.filter(r => r.unit).map(r => r.unit);
   if (eraRange) {
     // Keep units introduced UP TO the era end — older units remain in service
@@ -7265,6 +7325,49 @@ function lbBuildFormation() {
   lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered);
 }
 
+// ── Skirmish tab wrapper — organizes the current Tournament Force (sbForce)
+// into lances using the same engine as the CSV Formation Builder, so output
+// is byte-identical for the same input pool. ──────────────────────────────
+function sbBuildFormation() {
+  lbFormationSrc = 'skirmish';
+  const fKey    = lbFTypeEl().value;
+  const specKey = lbSTypeEl().value;
+  const fDef    = LB_FORMATIONS[fKey];
+  if (!fDef) return;
+  if (!sbForce.length) { alert('Add units to your Tournament Force first.'); return; }
+
+  const isClan  = lbFormationIsClan();
+  const facId   = lbFFactionEl()?.value || '';
+  let available = sbForce.map(f => f.unit);
+
+  // Faction tech filter: Clans don't field IS-only mechs; IS factions don't field Clan-only mechs
+  const techFiltered = [];
+  if (isClan) {
+    available = available.filter(u => {
+      const tech = u.Technology?.Name || '';
+      if (tech === 'Inner Sphere') { techFiltered.push(u.Name); return false; }
+      return true;
+    });
+  } else if (facId) {
+    available = available.filter(u => {
+      const tech = u.Technology?.Name || '';
+      if (tech === 'Clan') { techFiltered.push(u.Name); return false; }
+      return true;
+    });
+  }
+
+  const typeKeys = Array(fDef.lances).fill(specKey);
+  const { lances, remaining } = lbAssignToTypes(available, typeKeys, fDef.unitsPerLance);
+
+  lbCurrentLances  = lances.map(l => [...l]);
+  lbLanceTypes     = typeKeys.slice();
+  lbFormationDirty = false;
+  lbCmdState       = {};
+  lbUnitBonuses    = {};
+
+  lbRenderLanceOutput(fDef, [], remaining, techFiltered);
+}
+
 function lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered) {
   techFiltered = techFiltered || [];
   const lances  = lbCurrentLances;
@@ -7280,7 +7383,7 @@ function lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered) {
     <div class="lb-formation-header">
       <span class="lb-formation-title">${fDef.name}</span>
       <span class="lb-formation-meta">
-        ${lances.length} ${lbGroupWord(lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||''), lances.length)} &nbsp;·&nbsp;
+        ${lances.length} ${lbGroupWord(lbFormationIsClan(), lances.length)} &nbsp;·&nbsp;
         Total PV: <span style="color:var(--accent)" id="lb-total-pv">${totalPV}</span> &nbsp;·&nbsp;
         Supply: <span style="color:var(--green)" id="lb-total-sp">${supply}</span>
         &nbsp;·&nbsp; <button class="lb-btn-sm" onclick="lbPrintLances()" style="padding:2px 10px">🖨 Print</button>
@@ -7297,9 +7400,8 @@ function lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered) {
   html += `</div></div>`;
 
   if (techFiltered && techFiltered.length > 0) {
-    const csvFacName = LB_FACTIONS.find(f => f.id === (document.getElementById('lb-csv-faction')?.value||''))?.name || 'selected faction';
     html += `<div class="lb-unresolved" style="margin-top:10px;color:var(--red)">
-      ⚠ Wrong tech excluded for ${csvFacName}: ${techFiltered.join(', ')}</div>`;
+      ⚠ Wrong tech excluded for ${lbFormationFactionName()}: ${techFiltered.join(', ')}</div>`;
   }
   if (unresolved && unresolved.length > 0) {
     html += `<div class="lb-unresolved" style="margin-top:10px">
@@ -7310,14 +7412,14 @@ function lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered) {
       ${remaining.length} unit${remaining.length!==1?'s':''} in pool not used by this formation size.</div>`;
   }
 
-  document.getElementById('lb-formation-out').innerHTML = html;
+  document.getElementById(lbFOutId()).innerHTML = html;
   // Apply skill multipliers after render (skill selects now exist in DOM)
   lbCurrentLances.forEach((_, li) => lbSkillChanged(li));
   lbUpdateTotalPV();
 }
 
 function lbPrintLances() {
-  const fKey = document.getElementById('lb-formation-type').value;
+  const fKey = lbFTypeEl().value;
   const fDef = LB_FORMATIONS[fKey] || {};
   const totalPV = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
 
@@ -7363,7 +7465,7 @@ function lbPrintLances() {
     const lanceWide = (LB_TYPE_ABILITIES[lanceType] || {}).lanceWide || [];
 
     const pvLabel = skill === 4 ? `${rawPV} PV` : `${lancePV} PV (×${mult.toFixed(2)})`;
-    const isClanPrintCsv = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+    const isClanPrintCsv = lbFormationIsClan();
     html += `<div class="lance">
       <div class="lance-hdr"><span>${lbGroupLabel(isClanPrintCsv, li)} — ${typeLabel}</span><span>${pvLabel}</span></div>`;
 
@@ -7404,7 +7506,7 @@ function lbPrintLances() {
 function lbDownloadCards() {
   const units = lbCurrentLances.flat().filter(u => u && u.Id);
   if (!units.length) return;
-  const fKey    = document.getElementById('lb-formation-type').value;
+  const fKey    = lbFTypeEl().value;
   const fDef    = LB_FORMATIONS[fKey] || {};
   const totalPV = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
   const MUL_CARD = 'https://masterunitlist.azurewebsites.net/Unit/Card/';
@@ -7420,7 +7522,7 @@ function lbDownloadCards() {
     const lanceWide  = (LB_TYPE_ABILITIES[lanceType] || {}).lanceWide || [];
 
     // Lance/Star header row
-    const isClanDlCards = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+    const isClanDlCards = lbFormationIsClan();
     cardRows += `<div class="lance-hdr">
       <span class="lhdr-title">${lbGroupLabel(isClanDlCards, li)} — ${typeLabel}</span>
       <span class="lhdr-meta">${lancePV} PV &nbsp;·&nbsp; ${skillTxt}</span>
@@ -7829,9 +7931,9 @@ async function lbOpenSheetsCore(cfg) {
 // ── CSV tab wrapper ──────────────────────────────────────────────────────────
 async function lbOpenSheets() {
   if (!lbCurrentLances.flat().filter(Boolean).length) return;
-  const fKey   = document.getElementById('lb-formation-type').value;
+  const fKey   = lbFTypeEl().value;
   const fDef   = LB_FORMATIONS[fKey] || {};
-  const isClan = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+  const isClan = lbFormationIsClan();
   await lbOpenSheetsCore({
     lances:      lbCurrentLances,
     lanceTypes:  lbLanceTypes,
@@ -7967,12 +8069,12 @@ function lbLanceStatsHtml(units, li) {
     ? Math.round(units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length)
     : '—';
   const curType   = lbLanceTypes[li] || '';
-  const factionId = document.getElementById('lb-csv-faction')?.value || '';
+  const factionId = lbFFactionEl()?.value || '';
   let typeOpts = '';
   let lastFac = false;
   lbGetFactionTypeOpts(factionId, units, curType).forEach(({ v, t, disabled, faction }) => {
     if (faction && !lastFac) {
-      typeOpts += `<optgroup label="— ${LB_FACTIONS.find(f=>f.id===factionId)?.name||'Faction'} —">`;
+      typeOpts += `<optgroup label="— ${lbFormationFactionName()} —">`;
       lastFac = true;
     }
     // For CSV tab keep current selection even if no longer qualifies; hide others that don't qualify
@@ -8043,7 +8145,7 @@ function lbRenderLanceBlock(units, li, specKey) {
   const compStr  = [1,2,3,4].filter(s=>counts[s]>0).map(s=>`${counts[s]}× ${LB_SZ[s]}`).join(' · ');
   const eligible = lbCheckLanceTypes(counts, units.length);
 
-  const isClanBlock = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+  const isClanBlock = lbFormationIsClan();
   let html = `<div class="lb-lance-block" id="lb-block-${li}">
     <div class="lb-lance-title">
       ${lbGroupLabel(isClanBlock, li)}
@@ -8068,8 +8170,8 @@ async function lbLoadVariants(selectEl) {
   const chassis   = selectEl.dataset.chassis;
   const currentId = selectEl.options[0].value;
 
-  const varFaction  = document.getElementById('lb-csv-faction')?.value || '';
-  const varEraRange = lbParseEraVal(document.getElementById('lb-csv-era')?.value);
+  const varFaction  = lbFFactionEl()?.value || '';
+  const varEraRange = lbFormationSrc === 'skirmish' ? null : lbParseEraVal(document.getElementById('lb-csv-era')?.value);
   const cacheKey    = `${chassis}__${varFaction}__${varEraRange?.max||''}`;
   let variants = lbVariantsCache[cacheKey];
   if (!variants) {
@@ -8142,7 +8244,7 @@ function lbSwapUnit(li, si, selectEl) {
 }
 
 function lbReplanLances() {
-  const fKey = document.getElementById('lb-formation-type').value;
+  const fKey = lbFTypeEl().value;
   const fDef = LB_FORMATIONS[fKey];
   if (!fDef) return;
 
