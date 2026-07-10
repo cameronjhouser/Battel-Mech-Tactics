@@ -18,7 +18,12 @@
   #lb-mode-skirmish .sb-force-list {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     align-content: start; align-items: start; gap: 8px;
+    max-height: calc(100vh - 220px);
   }
+  /* Taller scroll areas for the catalog and lance lists — this page has the
+     vertical room, and the embedded tab's shorter boxes meant more
+     scrolling than necessary. */
+  #lb-mode-skirmish .sb-table-wrap { max-height: calc(100vh - 220px); }
   .sfb-back { font-size: 12px; color: var(--text2); margin-left: auto; white-space: nowrap; }
   .sfb-back a { color: var(--accent); text-decoration: none; }
   .sfb-back a:hover { text-decoration: underline; }
