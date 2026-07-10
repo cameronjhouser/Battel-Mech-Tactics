@@ -15,14 +15,23 @@
   .sfb-collapse summary {
     cursor: pointer; list-style: none; user-select: none;
     display: flex; align-items: center; gap: 6px;
-    font-family: var(--mono); font-size: 10px; color: var(--accent2);
-    letter-spacing: 0.12em; text-transform: uppercase;
+    font-family: var(--mono); font-size: 13px; color: var(--accent2);
+    letter-spacing: 0.1em; text-transform: uppercase;
     margin-bottom: 10px;
   }
   .sfb-collapse summary::-webkit-details-marker { display: none; }
   .sfb-collapse summary::before { content: '▾'; }
   .sfb-collapse:not([open]) summary::before { content: '▸'; }
   .sfb-collapse:not([open]) summary { margin-bottom: 0; }
+
+  /* Bigger, more readable labels/fields than the embedded-tab defaults —
+     this page has the room for it. */
+  #lb-mode-skirmish .sb-fg-label { font-size: 12px; }
+  #lb-mode-skirmish .sb-fg-check { font-size: 13px; }
+  #lb-mode-skirmish .sb-filter-bar input[type=text],
+  #lb-mode-skirmish .sb-filter-bar input[type=number],
+  #lb-mode-skirmish .sb-filter-bar select { font-size: 13px; height: 32px; }
+  #lb-mode-skirmish .sb-fg-dash { font-size: 13px; }
 </style>
 </head>
 <body>
@@ -95,8 +104,8 @@
     </details>
 
     <!-- Grouped filter bar (collapsed by default — most sessions don't touch it) -->
-    <details class="card sb-filter-card">
-      <summary class="card-title">Filters <span id="sb-filter-count" class="sb-filter-count-chip"></span></summary>
+    <details class="sfb-collapse">
+      <summary>Filters <span id="sb-filter-count" class="sb-filter-count-chip"></span></summary>
     <div class="sb-filter-bar">
       <div class="sb-fgroup sb-fgroup-grow">
         <label class="sb-fg-label">Search name</label>
