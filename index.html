@@ -919,6 +919,15 @@
   .sb-force-remove:hover { color:#ff6666; }
   .sb-skill-sel { font-size:10px; background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:3px; padding:2px 3px; flex-shrink:0; }
   .sb-empty-hint { font-size:11px; color:var(--text3); text-align:center; padding:18px 0; }
+  /* Lance / Star grouping in the force panel */
+  .sb-lance-group { border:1px solid var(--border); border-radius:5px; padding:6px; margin-bottom:8px; background:var(--bg1); }
+  .sb-lance-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:4px; }
+  .sb-lance-title { font-family:var(--cond); font-weight:700; font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:var(--text); }
+  .sb-lance-title .sb-lance-sub { font-size:9px; color:var(--text3); font-weight:400; margin-left:5px; letter-spacing:0; text-transform:none; }
+  .sb-lance-pv { font-family:var(--mono); font-size:11px; color:var(--accent); }
+  .sb-lance-spec-sel { width:100%; font-size:10px; background:var(--bg3); color:var(--text); border:1px solid var(--border2); border-radius:3px; padding:3px 4px; margin-bottom:5px; }
+  .sb-lance-group .sb-force-unit { margin-bottom:3px; }
+  .sb-lance-group .sb-force-unit:last-child { margin-bottom:0; }
   @media(max-width:900px) { .sb-layout { grid-template-columns:1fr; } .sb-force-panel { position:static; } }
 </style>
 </head>
@@ -2451,7 +2460,10 @@
           <button class="lb-btn-sm" onclick="sbDownloadCards()" style="padding:2px 10px;margin-left:auto">📇 Cards</button>
           <button class="lb-btn-sm" onclick="sbOpenSheets()" style="padding:2px 10px">📋 Sheets</button>
         </div>
-        <div class="card" style="padding:8px 10px;margin-bottom:0">
+        <!-- Hidden for now — full formation-engine view (drag-and-drop, commander,
+             per-unit abilities). Re-enable by dropping "display:none" once the
+             simpler per-group specialty picker below isn't enough. -->
+        <div class="card" style="padding:8px 10px;margin-bottom:0;display:none">
           <div class="card-title" style="font-size:12px;margin-bottom:6px">Build Formation</div>
           <div style="display:flex;flex-direction:column;gap:6px">
             <select id="sb-formation-type" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:4px 6px"></select>
@@ -2496,7 +2508,7 @@
       </div>
     </div>
 
-    <div id="sb-formation-out" style="margin-top:14px"></div>
+    <div id="sb-formation-out" style="margin-top:14px;display:none"></div>
   </div>
 </div>
 
@@ -3118,6 +3130,7 @@ let sbCollection = {};   // normalized name -> true (from uploaded CSV)
 const SB_COLLECTION_STORAGE_KEY = 'bmtSavedCollections.v1';
 let sbCatalog    = [];   // all MUL units for current faction/era
 let sbForce      = [];   // array of { unit, skill }
+let sbLanceSpecs = [];   // per-lance-group index -> chosen specialty key ('' = Standard)
 let sbInited     = false;
 let sbSortKey    = 'BFPointValue';
 let sbSortDir    = 1;    // 1=asc, -1=desc
@@ -3907,8 +3920,14 @@ function sbSetSkill(idx, val) {
 
 function sbClearForce() {
   sbForce = [];
+  sbLanceSpecs = [];
   sbRenderForce();
   sbRenderBrowse();
+}
+
+function sbSetLanceSpec(groupIdx, val) {
+  sbLanceSpecs[groupIdx] = val;
+  sbRenderForce();
 }
 
 // Saved lances persist the full unit data alongside each unit's chosen
@@ -4002,6 +4021,7 @@ function sbLoadSelected() {
   const saved = sbStoredLances()[name];
   if (!saved?.force?.length) { alert('That saved force has no units.'); return; }
   sbForce = saved.force;
+  sbLanceSpecs = [];
   sbRenderForce();
   sbRenderBrowse();
   localStorage.setItem('bmtSavedLances.lastName', name);
@@ -4423,10 +4443,35 @@ function sbRenderForce() {
     </div>`;
   };
 
-  // Plain flat list while the force is being assembled — once you're ready,
-  // "Build Formation" (above) organizes it into real lances with drag-and-
-  // drop, commander picks, and per-unit abilities.
-  listEl.innerHTML = sbForce.map((f, idx) => unitRow(f, idx)).join('');
+  // Group the force into lances (IS, 4 units) or stars (Clan, 5 units) in
+  // add order, each with an editable Lance Specialty picker (reuses the
+  // formation engine's own qualification check — lbGetFactionTypeOpts —
+  // to disable specialties this group's unit mix doesn't qualify for).
+  const factionId = sbCurrentFactionId();
+  const isClan    = !!sbFactionMeta[factionId]?.isClan;
+  const groupSize = isClan ? 5 : 4;
+  const groupWord = isClan ? 'Star' : 'Lance';
+
+  let html = '';
+  for (let start = 0, g = 0; start < sbForce.length; start += groupSize, g++) {
+    const members  = sbForce.slice(start, start + groupSize);
+    const groupPV  = members.reduce((s, m) => s + sbAdjPV(m.unit, m.skill), 0);
+    const full     = members.length === groupSize;
+    const subNote  = full ? '' : `<span class="sb-lance-sub">${members.length}/${groupSize}</span>`;
+    const curSpec  = sbLanceSpecs[g] || '';
+    const specOpts = lbGetFactionTypeOpts(factionId, members.map(m => m.unit), curSpec)
+      .map(o => `<option value="${o.v}"${o.v===curSpec?' selected':''}${o.disabled&&o.v!==curSpec?' disabled':''}>${lbEsc(o.t)}${o.disabled&&o.v===curSpec?' (no longer qualifies)':''}</option>`)
+      .join('');
+    html += `<div class="sb-lance-group">
+      <div class="sb-lance-head">
+        <span class="sb-lance-title">${groupWord} ${g+1}${subNote}</span>
+        <span class="sb-lance-pv">${groupPV} PV</span>
+      </div>
+      <select class="sb-lance-spec-sel" onchange="sbSetLanceSpec(${g},this.value)" title="Lance specialty">${specOpts}</select>
+      ${members.map((f, mi) => unitRow(f, start + mi)).join('')}
+    </div>`;
+  }
+  listEl.innerHTML = html;
 }
 
 // Count how many units in the force carry each Alpha Strike special ability
