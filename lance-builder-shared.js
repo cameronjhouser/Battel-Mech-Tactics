@@ -1130,7 +1130,7 @@ function sbRenderBrowse() {
   sbCatalog.forEach(u => { tbody._umap[u.Id] = u; });
 
   if (!units.length) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:16px">No units match filters.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text3);padding:16px">No units match filters.</td></tr>`;
     return;
   }
 
@@ -1142,6 +1142,7 @@ function sbRenderBrowse() {
     const role    = u.Role?.Name || '—';
     const mv      = u.BFMove || '—';
     const armor   = u.BFArmor ?? '—';
+    const structure = u.BFStructure ?? '—';
     const ov      = u.BFOverheat || '—';
     const pv      = u.BFPointValue || '?';
     const intro   = u.DateIntroduced ?? '—';
@@ -1152,6 +1153,7 @@ function sbRenderBrowse() {
       <td class="sb-col-dmg">${mv}</td>
       <td class="sb-col-dmg">${dmg}</td>
       <td class="sb-col-dmg">${armor}</td>
+      <td class="sb-col-dmg">${structure}</td>
       <td class="sb-col-dmg">${ov}</td>
       <td class="sb-col-abil" title="${lbEsc(abil)}">${lbEsc(abil)}</td>
       <td class="sb-col-dmg">${lbEsc(String(intro))}</td>
@@ -1180,7 +1182,7 @@ function sbRenderBrowse() {
     const list = groups[t];
     const ownedInGroup = hasCol ? list.filter(u => sbIsOwned(u)).length : 0;
     const ownedTag = ownedInGroup ? `<span class="sb-group-owned">${ownedInGroup} owned</span>` : '';
-    return `<tr class="sb-group-row"><td colspan="10">${lbEsc(sbTypeLabel(t))}`
+    return `<tr class="sb-group-row"><td colspan="11">${lbEsc(sbTypeLabel(t))}`
       + `<span class="sb-group-count">${list.length}</span>${ownedTag}</td></tr>`
       + list.map(unitRow).join('');
   }).join('');
