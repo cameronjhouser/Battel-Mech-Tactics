@@ -1705,11 +1705,19 @@ function sbCardSVG(u, skill) {
   return svg;
 }
 
+// 2 columns x 4 rows per printed page. Each page is its own fixed-size grid
+// (not one grid spanning the whole document) because browsers fragment a
+// single CSS grid across print-page boundaries unreliably — letting a page
+// break land wherever the grid naturally overflows produces inconsistent
+// per-page counts and can trigger the browser's shrink-to-fit. Sizing is
+// computed in inches against the exact @page content box (Letter minus
+// margins) so 8 cards always fit without needing that fallback.
+const SB_CARDS_PER_PAGE = 8;
+const SB_CARD_W_IN = 3.7; // → height ≈ 3.7/1.527 ≈ 2.42in; 4 rows + gaps ≈ 10.1in of 10.2in usable
+
 // Builds the roster/summary page + paginated card grid HTML shared by the
-// card-print flows. rows: [{ unit, skill }]. title: doc title. groupOf(idx):
-// optional — returns a group label to insert as a break before that card
-// (e.g. "Lance 1"); omit for a flat, ungrouped grid.
-function sbCardsDocHtml(rows, title, groupOf) {
+// card-print flows. rows: [{ unit, skill }].
+function sbCardsDocHtml(rows, title) {
   const totalPV = rows.reduce((s, r) => s + sbAdjPV(r.unit, r.skill), 0);
   const totalTon = rows.reduce((s, r) => s + (parseInt(r.unit.Tonnage, 10) || 0), 0);
 
@@ -1721,16 +1729,12 @@ function sbCardsDocHtml(rows, title, groupOf) {
     <td class="num">${r.unit.Tonnage || '—'}</td>
   </tr>`).join('');
 
-  let cardCells = '';
-  let lastGroup = undefined;
-  rows.forEach((r, i) => {
-    const group = groupOf ? groupOf(i) : undefined;
-    if (group !== undefined && group !== lastGroup) {
-      cardCells += `<div class="card-group-hdr">${lbEsc(group)}</div>`;
-      lastGroup = group;
-    }
-    cardCells += `<div class="card-wrap">${sbCardSVG(r.unit, r.skill)}</div>`;
-  });
+  let cardPages = '';
+  for (let start = 0; start < rows.length; start += SB_CARDS_PER_PAGE) {
+    const pageRows = rows.slice(start, start + SB_CARDS_PER_PAGE);
+    cardPages += `<div class="card-page">` + pageRows.map(r =>
+      `<div class="card-wrap">${sbCardSVG(r.unit, r.skill)}</div>`).join('') + `</div>`;
+  }
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8">
   <title>${lbEsc(title)}</title>
@@ -1746,11 +1750,11 @@ function sbCardsDocHtml(rows, title, groupOf) {
     td.num, th.num { text-align:right; }
     tfoot td { font-weight:700; background:#eee; }
     .roster-page { page-break-after:always; }
-    .card-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.25in; align-content:start; }
-    .card-group-hdr { grid-column:1/-1; font-size:13px; font-weight:700; padding:6px 0 2px;
-      border-top:2px solid #333; break-after:avoid; page-break-after:avoid; }
-    .card-group-hdr:first-child { border-top:none; }
-    .card-wrap { break-inside:avoid; page-break-inside:avoid; }
+    .card-page {
+      display:grid; grid-template-columns:repeat(2, ${SB_CARD_W_IN}in); justify-content:center;
+      gap:0.15in; page-break-after:always; page-break-inside:avoid;
+    }
+    .card-page:last-child { page-break-after:auto; }
     .card-wrap svg { width:100%; height:auto; display:block; border:1px solid #bbb; border-radius:4px; }
     @media print { .no-print { display:none; } }
   </style></head><body>
@@ -1764,19 +1768,16 @@ function sbCardsDocHtml(rows, title, groupOf) {
       <tfoot><tr><td colspan="3">${rows.length} Unit${rows.length !== 1 ? 's' : ''}</td><td class="num">${totalPV}</td><td class="num">${totalTon}</td></tr></tfoot>
     </table>
   </div>
-  <div class="card-grid">${cardCells}</div>
+  ${cardPages}
   </body></html>`;
 }
 
 function sbDownloadCards() {
   if (!sbForce.length) { alert('Add units to your force first.'); return; }
-  const { groups, isClan } = sbForceGroups();
+  const { groups } = sbForceGroups();
   const rows = groups.flat();
-  // Map each flat-row index back to its lance's label for the card-grid group headers
-  const groupLabelForRow = [];
-  groups.forEach((members, li) => members.forEach(() => groupLabelForRow.push(lbGroupLabel(isClan, li))));
 
-  const html = sbCardsDocHtml(rows, 'Tournament Force — Alpha Strike Cards', i => groupLabelForRow[i]);
+  const html = sbCardsDocHtml(rows, 'Tournament Force — Alpha Strike Cards');
   const w = window.open('', '_blank');
   if (w) {
     w.document.write(html);
