@@ -8,6 +8,15 @@
  * page that only has a subset of them.
  */
 
+// Base URL for resolving sheets/ and sheets-popup.js — anchored to THIS
+// script's own location (captured synchronously at load time via
+// document.currentScript, which is only valid during initial execution),
+// not the including page's URL. Both assets live at the repo root next to
+// this file, but the pages that load it don't all live at the repo root
+// (skirmish-force-builder/index.html is one directory deeper), so
+// resolving against window.location.href would 404 there.
+const LB_SHARED_BASE = (document.currentScript && document.currentScript.src) || window.location.href;
+
 /* ══════════════════════════════════════════════════════
    LANCE BUILDER
 ══════════════════════════════════════════════════════ */
@@ -3483,7 +3492,7 @@ async function lbOwnedOpenSelectedSheets() {
 
 async function lbOwnedLoadSheetManifest() {
   if (lbOwnedSheetManifest) return lbOwnedSheetManifest;
-  const sheetsBase = new URL('sheets/', window.location.href).href;
+  const sheetsBase = new URL('sheets/', LB_SHARED_BASE).href;
   try {
     const res = await fetch(sheetsBase + 'manifest.json');
     lbOwnedSheetManifest = res.ok ? ((await res.json()).sheets || {}) : {};
@@ -3893,7 +3902,7 @@ function lbDownloadCards() {
 //           isClan, getLancePV(li), getSkillText(li) }
 async function lbOpenSheetsCore(cfg) {
   const MORDEL     = 'https://mordel.net/tro.php?a=v&fltr=qf.000.Name~Contains~';
-  const sheetsBase = new URL('sheets/', window.location.href).href;
+  const sheetsBase = new URL('sheets/', LB_SHARED_BASE).href;
   const pdfBase    = 'https://battletech-sheets.cjhapril.workers.dev/';
   const { lances, lanceTypes, cmdState, unitBonuses,
           fDef, totalPV, isClan, getLancePV, getSkillText } = cfg;
@@ -4151,7 +4160,7 @@ async function lbOpenSheetsCore(cfg) {
       setTimeout(() => { pw.focus(); pw.print(); }, 350);
     }
   <\/script>
-  <script src="${new URL('sheets-popup.js', window.location.href).href}?v=${Date.now()}"><\/script>
+  <script src="${new URL('sheets-popup.js', LB_SHARED_BASE).href}?v=${Date.now()}"><\/script>
   </head><body>
   <div class="page-header">
     <h1>${fDef.name||'Formation'} — Classic BattleTech Record Sheets</h1>
