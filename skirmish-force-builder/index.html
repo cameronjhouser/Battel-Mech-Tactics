@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skirmish Force Builder — BattleMech Tournament</title>
+<meta name="description" content="Build an Alpha Strike force from the Master Unit List, organize it into lances, and print cards or record sheets.">
+<link rel="stylesheet" href="../lance-builder-shared.css">
+<style>
+  main { max-width: 1400px; margin: 0 auto; padding: 20px 24px 60px; }
+  .sfb-back { font-size: 12px; color: var(--text2); margin-left: auto; white-space: nowrap; }
+  .sfb-back a { color: var(--accent); text-decoration: none; }
+  .sfb-back a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">BMT<span>Skirmish Force Builder</span></div>
+    <span class="sfb-back">Part of the <a href="../index.html">BattleMech Tournament rulebook</a></span>
+  </div>
+</header>
+
+<main>
+  <div class="page-title">Skirmish Force Builder</div>
+  <div class="page-sub">Build an Alpha Strike force from the Master Unit List, organize it into lances, and print cards or record sheets.</div>
+
+  <div id="lb-mode-skirmish">
+    <!-- Top controls -->
+    <div class="grid-2">
+      <div class="card" style="padding:12px 14px;margin-bottom:0">
+        <div class="card-title">Unit Source</div>
+        <div class="sb-browse-controls" style="margin-bottom:0">
+          <label class="lb-file-label">
+            <span>📂 Collection CSV</span>
+            <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
+          </label>
+          <div class="sb-fgroup sb-fgroup-grow">
+            <label class="sb-fg-label">Saved lists</label>
+            <select id="sb-collection-select"><option value="">No saved lists</option></select>
+          </div>
+          <button class="lb-btn-sm" onclick="sbSaveCollectionPrompt()" style="padding:4px 12px">Save List</button>
+          <button class="lb-btn-sm" onclick="sbLoadCollectionSelected()" style="padding:4px 12px">Load</button>
+          <button class="lb-btn-sm" onclick="sbDeleteCollectionSelected()" style="padding:4px 12px;background:var(--red);color:#fff">Delete</button>
+        </div>
+      </div>
+      <div class="card" style="padding:12px 14px;margin-bottom:0">
+        <div class="card-title">Catalog</div>
+        <div class="sb-browse-controls" style="margin-bottom:0">
+          <div class="sb-fgroup" style="flex:1 1 100%">
+            <label class="sb-fg-label">Faction</label>
+            <select id="sb-faction" onchange="sbFactionChanged()"></select>
+          </div>
+          <div class="sb-fgroup" style="flex:1 1 100%">
+            <label class="sb-fg-label">General / Clan group</label>
+            <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above, it does not narrow or replace it"></select>
+          </div>
+          <div class="sb-fgroup" style="flex:1 1 100%">
+            <label class="sb-fg-label">Era</label>
+            <select id="sb-era" onchange="sbClearCatalog()">
+              <option value="" selected>Select era…</option>
+              <option value="16">Dark Age (3131–3150)</option>
+              <option value="257">ilClan (3151–present)</option>
+              <option value="254">Late Republic (3101–3130)</option>
+              <option value="15">Early Republic (3081–3100)</option>
+              <option value="14">Jihad (3068–3080)</option>
+              <option value="247">Civil War (3062–3067)</option>
+              <option value="13">Clan Invasion (3050–3061)</option>
+              <option value="256">Late SW – Renaissance (3020–3049)</option>
+              <option value="255">Late SW – LosTech (2901–3019)</option>
+              <option value="11">Early Succession War (2781–2900)</option>
+              <option value="10">Star League (2571–2780)</option>
+            </select>
+          </div>
+          <button class="lb-btn" onclick="sbFetchCatalog()">Load Catalog</button>
+          <button class="lb-btn-sm" onclick="sbClearForce()" style="padding:4px 12px;background:var(--red);color:#fff">Clear Force</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grouped filter bar (collapsed by default — most sessions don't touch it) -->
+    <details class="card sb-filter-card">
+      <summary class="card-title">Filters <span id="sb-filter-count" class="sb-filter-count-chip"></span></summary>
+    <div class="sb-filter-bar">
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Search name</label>
+        <input type="text" id="sb-filter-name" placeholder="e.g. Fenris, Warhammer…" oninput="sbRenderBrowse()">
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">Role</label>
+        <select id="sb-filter-role" onchange="sbRenderBrowse()"><option value="">All roles</option></select>
+      </div>
+      <div class="sb-fgroup sb-fgroup-grow" style="position:relative">
+        <label class="sb-fg-label">Abilities <span id="sb-abil-mode" class="sb-abil-mode" onclick="sbToggleAbilMode(event)" title="Toggle match mode">match ALL</span></label>
+        <button type="button" id="sb-abil-btn" class="sb-abil-btn" onclick="sbToggleAbilMenu(event)">Any ability ▾</button>
+        <div id="sb-abil-menu" class="sb-abil-menu" style="display:none">
+          <input type="text" id="sb-abil-search" class="sb-abil-search" placeholder="Filter abilities…" oninput="sbRenderAbilMenu()">
+          <div id="sb-abil-list" class="sb-abil-list"></div>
+          <div class="sb-abil-foot">
+            <span id="sb-abil-selcount">0 selected</span>
+            <button type="button" onclick="sbClearAbil()">Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">Size (min–max)</label>
+        <div class="sb-fg-range">
+          <select id="sb-filter-size-min" onchange="sbRenderBrowse()" title="Minimum size">
+            <option value="">Any</option>
+            <option value="1">Light</option>
+            <option value="2">Medium</option>
+            <option value="3">Heavy</option>
+            <option value="4">Assault</option>
+          </select>
+          <span class="sb-fg-dash">–</span>
+          <select id="sb-filter-size-max" onchange="sbRenderBrowse()" title="Maximum size">
+            <option value="">Any</option>
+            <option value="1">Light</option>
+            <option value="2">Medium</option>
+            <option value="3">Heavy</option>
+            <option value="4">Assault</option>
+          </select>
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">Move (min–max)</label>
+        <div class="sb-fg-range">
+          <input type="number" id="sb-filter-move-min" placeholder="min" min="0" max="99" oninput="sbRenderBrowse()">
+          <span class="sb-fg-dash">–</span>
+          <input type="number" id="sb-filter-move-max" placeholder="max" min="0" max="99" oninput="sbRenderBrowse()">
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">PV (min–max)</label>
+        <div class="sb-fg-range">
+          <input type="number" id="sb-filter-pv-min" placeholder="min" min="1" max="999" oninput="sbRenderBrowse()">
+          <span class="sb-fg-dash">–</span>
+          <input type="number" id="sb-filter-pv-max" placeholder="max" min="1" max="999" oninput="sbRenderBrowse()">
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-label">Min damage S / M / L</label>
+        <div class="sb-fg-range">
+          <input type="number" class="sb-fg-dmg" id="sb-filter-dmg-s" placeholder="S" min="0" max="20" oninput="sbRenderBrowse()">
+          <input type="number" class="sb-fg-dmg" id="sb-filter-dmg-m" placeholder="M" min="0" max="20" oninput="sbRenderBrowse()">
+          <input type="number" class="sb-fg-dmg" id="sb-filter-dmg-l" placeholder="L" min="0" max="20" oninput="sbRenderBrowse()">
+        </div>
+      </div>
+      <div class="sb-fgroup" title="Verified: MUL's own faction+era view caps units at the specific faction's dissolution year (shown on MUL's faction page, e.g. Clan Wolverine 2807-2823), not the broader era's end date. Set max to that year to reproduce MUL's exact displayed count.">
+        <label class="sb-fg-label">Introduced yr (min–max)</label>
+        <div class="sb-fg-range">
+          <input type="number" id="sb-filter-intro-min" placeholder="min" min="1" max="9999" oninput="sbRenderBrowse()" style="width:56px">
+          <span class="sb-fg-dash">–</span>
+          <input type="number" id="sb-filter-intro-max" placeholder="max" min="1" max="9999" oninput="sbRenderBrowse()" style="width:56px">
+        </div>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-check"><input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only</label>
+      </div>
+      <div class="sb-fgroup">
+        <label class="sb-fg-check" title="Verified against MUL's own combined faction+era view: it includes Introductory/Experimental/Advanced units alongside Standard, so this is OFF by default. Check it if your event's rules restrict to Standard only.">
+          <input type="checkbox" id="sb-standard-rules-only" onchange="sbRenderBrowse()"> Standard rules only</label>
+      </div>
+      <div class="sb-fgroup sb-fgroup-actions">
+        <button class="sb-clear-btn" onclick="sbClearFilters()" title="Reset all filters">Clear filters</button>
+      </div>
+    </div>
+    </details>
+
+    <div id="sb-status" class="lb-status">Select faction + era, then click Load Catalog. Upload a collection CSV to mark owned units.</div>
+
+    <div class="sb-layout">
+      <!-- Catalog table -->
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="sec-label" style="margin:0">Available Units</span>
+          <span id="sb-catalog-count" style="font-size:11px;color:var(--text2)"></span>
+          <button type="button" class="sb-debug-btn" onclick="sbShowDebugSample()" title="Show a few raw unit records for troubleshooting">🔍 Inspect raw data</button>
+        </div>
+        <textarea id="sb-debug-out" class="sb-debug-out" style="display:none" readonly onclick="this.select()"></textarea>
+        <div id="sb-type-tabs" class="sb-type-tabs"></div>
+        <div class="sb-table-wrap">
+          <table class="sb-table">
+            <thead>
+              <tr>
+                <th data-sk="Name" onclick="sbSort('Name')">Name</th>
+                <th data-sk="BFPointValue" onclick="sbSort('BFPointValue')">PV</th>
+                <th data-sk="Role" onclick="sbSort('Role')">Role</th>
+                <th data-sk="BFMove" onclick="sbSort('BFMove')">Move</th>
+                <th class="sb-th-dmg">Dmg <span data-sk="DmgS" onclick="sbSort('DmgS')">S</span><span class="sb-th-slash">/</span><span data-sk="DmgM" onclick="sbSort('DmgM')">M</span><span class="sb-th-slash">/</span><span data-sk="DmgL" onclick="sbSort('DmgL')">L</span></th>
+                <th data-sk="BFArmor" onclick="sbSort('BFArmor')">Armor</th>
+                <th data-sk="BFOverheat" onclick="sbSort('BFOverheat')">OV</th>
+                <th data-sk="BFAbilities" onclick="sbSort('BFAbilities')">Abilities</th>
+                <th data-sk="Intro" onclick="sbSort('Intro')">Intro</th>
+                <th class="sb-col-add"></th>
+              </tr>
+            </thead>
+            <tbody id="sb-unit-grid"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Force panel -->
+      <div class="sb-force-panel">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="sec-label" style="margin:0">Tournament Force</span>
+          <button class="lb-btn-sm" onclick="sbDownloadCards()" style="padding:2px 10px;margin-left:auto">📇 Cards</button>
+          <button class="lb-btn-sm" onclick="sbOpenSheets()" style="padding:2px 10px">📋 Sheets</button>
+        </div>
+        <!-- Hidden for now — full formation-engine view (drag-and-drop, commander,
+             per-unit abilities). Re-enable by dropping "display:none" once the
+             simpler per-group specialty picker below isn't enough. -->
+        <div class="card" style="padding:8px 10px;margin-bottom:0;display:none">
+          <div class="card-title" style="font-size:12px;margin-bottom:6px">Build Formation</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <select id="sb-formation-type" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:4px 6px"></select>
+            <select id="sb-special-type" title="Optionally group lances by special type" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:4px 6px">
+              <option value="">Standard (sort by weight)</option>
+              <option value="recon">Recon / Scout Lance</option>
+              <option value="strike">Strike / Striker Lance</option>
+              <option value="fire">Fire Lance</option>
+              <option value="battle">Battle / Line Lance</option>
+              <option value="assault-sp">Assault Lance (Special)</option>
+              <option value="command">Command Lance</option>
+              <option value="pursuit">Pursuit Lance</option>
+            </select>
+            <button class="lb-btn" onclick="sbBuildFormation()" style="width:100%">⚔ Build Formation</button>
+          </div>
+        </div>
+        <div class="card" style="padding:8px 10px;margin-bottom:0">
+          <div class="card-title" style="font-size:12px;margin-bottom:6px">Saved Lances</div>
+          <div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap">
+            <button class="lb-btn-sm" onclick="sbSaveForcePrompt()" style="padding:2px 7px;flex-shrink:0" title="Save current force">💾</button>
+            <select id="sb-saved-select" style="flex:1 1 auto;min-width:0;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:3px 4px"><option value="">No saved forces</option></select>
+            <button class="lb-btn-sm" onclick="sbLoadSelected()" style="padding:2px 7px;flex-shrink:0" title="Load selected force">📂</button>
+            <button class="lb-btn-sm" onclick="sbDeleteSelected()" style="padding:2px 7px;flex-shrink:0" title="Delete selected force">🗑️</button>
+          </div>
+        </div>
+        <div class="sb-pv-meter">
+          <div class="sb-pv-row">
+            <span class="sb-pv-label">TOTAL PV</span>
+            <span class="sb-pv-value" id="sb-pv-total">0</span>
+            <div class="sb-pv-limit-wrap">/ <input type="number" id="sb-pv-limit" class="sb-pv-limit" value="250" min="1" max="9999" oninput="sbRenderForce()"> PV</div>
+          </div>
+          <div class="sb-pv-bar-track">
+            <div class="sb-pv-bar-fill" id="sb-pv-bar" style="width:0%;background:var(--green)"></div>
+          </div>
+          <div class="sb-rules-bar" id="sb-rules-bar"></div>
+          <div class="sb-dmg-totals" id="sb-dmg-totals"></div>
+          <div class="sb-abil-totals" id="sb-abil-totals"></div>
+        </div>
+        <div id="sb-force-list" class="sb-force-list">
+          <div class="sb-empty-hint">No units selected.<br>Click + to add from the catalog.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sb-formation-out" style="margin-top:14px;display:none"></div>
+  </div>
+</main>
+
+<footer>BMT — BATTLEMECH TOURNAMENT &nbsp;·&nbsp; SKIRMISH FORCE BUILDER &nbsp;·&nbsp; <a href="../index.html" style="color:inherit">Back to the full rulebook</a></footer>
+
+<script src="../lance-builder-shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  sbMigrateCsvLists();
+  sbInit();
+  sbRefreshSavedSelect();
+  sbRefreshCollectionSelect();
+});
+</script>
+
+</body>
+</html>
