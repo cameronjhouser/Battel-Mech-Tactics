@@ -2215,93 +2215,16 @@
 <!-- ═══════════════════════════════════════════════════════ LANCE BUILDER -->
 <div class="page" id="page-lance">
   <div class="page-title">Lance Builder</div>
-  <div class="page-sub">Search the Master Unit List to find Alpha Strike units and auto-build your lance — or upload a CSV roster to auto-generate a full formation.</div>
+  <div class="page-sub">Manage your owned units, or build a Tournament Force and auto-organize it into lances by formation type.</div>
 
   <!-- ── TAB SWITCHER ───────────────────────── -->
   <div style="display:flex;gap:8px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:0">
-    <button class="lb-mode-btn on" id="lb-tab-search" onclick="lbSwitchMode('search')">Manual Search</button>
-    <button class="lb-mode-btn"   id="lb-tab-owned"  onclick="lbSwitchMode('owned')">Owned Units</button>
-    <button class="lb-mode-btn"   id="lb-tab-csv"    onclick="lbSwitchMode('csv')">CSV Formation Builder</button>
+    <button class="lb-mode-btn on" id="lb-tab-owned"  onclick="lbSwitchMode('owned')">Owned Units</button>
     <button class="lb-mode-btn"   id="lb-tab-skirmish" onclick="lbSwitchMode('skirmish')">Skirmish Force Builder</button>
   </div>
 
-  <!-- ── MANUAL SEARCH MODE ────────────────── -->
-  <div id="lb-mode-search">
-    <div class="lb-layout">
-      <div>
-        <div class="lb-search-form">
-          <input id="lb-name" type="text" placeholder="Unit name (e.g. Warhammer, Atlas, Locust…)" />
-          <select id="lb-weight">
-            <option value="">All weights</option>
-            <option value="20,35">Light (20–35t)</option>
-            <option value="40,55">Medium (40–55t)</option>
-            <option value="60,75">Heavy (60–75t)</option>
-            <option value="80,100">Assault (80–100t)</option>
-          </select>
-          <select id="lb-era">
-            <option value="">All Eras</option>
-            <option value="0-2570">Age of War (≤ 2570)</option>
-            <option value="2571-2780">Star League (2571–2780)</option>
-            <option value="2781-3049">Succession Wars (2781–3049)</option>
-            <option value="3050-3061">Clan Invasion (3050–3061)</option>
-            <option value="3062-3067">Civil War (3062–3067)</option>
-            <option value="3068-3080">Jihad (3068–3080)</option>
-            <option value="3081-3130">Republic Era (3081–3130)</option>
-            <option value="3131-3150">Dark Age (3131–3150)</option>
-            <option value="3151-9999">ilClan (3151+)</option>
-          </select>
-          <select id="lb-type">
-            <option value="18">BattleMech</option>
-            <option value="">All types</option>
-            <option value="23">Combat Vehicle</option>
-            <option value="21">Battle Armor</option>
-            <option value="22">Aerospace</option>
-          </select>
-          <select id="lb-faction" onchange="lbFactionChanged()" title="Filter units by faction availability"></select>
-          <button class="lb-btn" onclick="lbSearch()">Search MUL</button>
-          <button class="lb-btn" onclick="lbClearSearch()" style="background:var(--red)">Clear Search</button>
-        </div>
-        <div id="lb-status" class="lb-status">Enter a unit name and hit Search.</div>
-        <div id="lb-results" class="lb-results" style="display:none"></div>
-      </div>
-      <div>
-        <div class="lb-search-form" style="margin-bottom:10px">
-          <select id="lb-search-formation" onchange="lbSearchFormationChanged()" style="flex:1 1 200px">
-            <option value="lance">Lance (4 units · 1 lance)</option>
-            <option value="aug-lance">Augmented Lance (6 units · 1 lance)</option>
-            <option value="demi">Demi-Company (6 units · 2 lances)</option>
-            <option value="company">Company (12 units · 3 lances)</option>
-            <option value="aug-company">Augmented Company (12 units · 3 lances)</option>
-          </select>
-          <select id="lb-search-special-type" style="flex:1 1 160px" title="Lance type for Auto Roster">
-            <option value="">Standard (sort by weight)</option>
-            <option value="recon">Recon / Scout Lance</option>
-            <option value="strike">Strike / Striker Lance</option>
-            <option value="fire">Fire Lance</option>
-            <option value="battle">Battle / Line Lance</option>
-            <option value="assault-sp">Assault Lance (Special)</option>
-            <option value="command">Command Lance</option>
-            <option value="pursuit">Pursuit Lance</option>
-          </select>
-          <button class="lb-btn" onclick="lbAutoRoster()">Auto Roster</button>
-          <button class="lb-btn" onclick="lbSearchDownloadCards()">📇 Cards</button>
-          <button class="lb-btn" onclick="lbSearchOpenSheets()">📋 Sheets</button>
-          <button class="lb-btn" onclick="lbSearchPrintFormation()">🖨 Print</button>
-          <button class="lb-btn" onclick="lbClearRoster()" style="background:var(--red)">Clear</button>
-        </div>
-        <div id="lb-owned-unassigned" class="lb-owned-pool" style="display:none"></div>
-        <div class="lb-roster" id="lb-roster"></div>
-        <div class="lb-totals">
-          <span>Total PV: <span class="lb-totals-pv" id="lb-totalpv">0</span></span>
-          <span>Supply: <span class="lb-totals-sp" id="lb-supply">0</span></span>
-        </div>
-        <div class="lb-analysis" id="lb-analysis"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ── OWNED UNITS MODE ──────────────────── -->
-  <div id="lb-mode-owned" style="display:none">
+  <div id="lb-mode-owned">
     <div class="lb-owned-toolbar">
       <label class="lb-file-label">
         <span>📂 Upload Owned CSV</span>
@@ -2360,88 +2283,6 @@
       </select>
     </div>
     <div id="lb-owned-table" class="lb-owned-table"></div>
-  </div>
-
-  <!-- ── CSV FORMATION BUILDER MODE ────────── -->
-  <div id="lb-mode-csv" style="display:none">
-    <div class="card" style="padding:12px 14px">
-      <div class="card-title">Saved Lists</div>
-      <div class="lb-csv-controls" style="margin-bottom:0">
-        <label class="lb-file-label">
-          <span>📂 Choose CSV file</span>
-          <input type="file" id="lb-csv-input" accept=".csv,.txt" onchange="lbLoadCSV(this)">
-        </label>
-        <div class="sb-fgroup sb-fgroup-grow">
-          <label class="sb-fg-label">Saved lists</label>
-          <select id="lb-csv-saved-select"><option value="">No saved lists</option></select>
-        </div>
-        <button class="lb-btn-sm" onclick="lbCsvSaveListPrompt()" style="padding:4px 12px">Save List</button>
-        <button class="lb-btn-sm" onclick="lbCsvLoadSelected()" style="padding:4px 12px">Load</button>
-        <button class="lb-btn-sm" onclick="lbCsvDeleteSelected()" style="padding:4px 12px;background:var(--red);color:#fff">Delete</button>
-      </div>
-    </div>
-    <div class="lb-csv-controls">
-      <div class="sb-fgroup sb-fgroup-grow">
-        <label class="sb-fg-label">Formation type</label>
-        <select id="lb-formation-type">
-          <option value="lance">Lance (4 units · 1 lance)</option>
-          <option value="aug-lance">Augmented Lance (6 units · 1 lance + support)</option>
-          <option value="demi">Demi-Company (6 units · 1–2 lances)</option>
-          <option value="company" selected>Company (12 units · 3 lances)</option>
-          <option value="aug-company">Augmented Company (12 units · 3 lances)</option>
-          <option value="ctf">Company Task Force (18–24 units · 4–6 lances)</option>
-          <option value="battalion">Battalion (40 units · 10 lances)</option>
-          <option value="air-lance">Air Lance (8 units · 2 lances)</option>
-          <option value="aug-battalion">Augmented Battalion (56 units · 14 lances)</option>
-          <option value="reinf-battalion">Reinforced Battalion (48 units · 12 lances)</option>
-          <option value="sl-battalion">SL Reinforced Battalion (64 units · 16 lances)</option>
-          <option value="regiment">Regiment (108 units · 27 lances)</option>
-          <option value="reinf-regiment">Reinforced Regiment (192 units · 48 lances)</option>
-          <option value="brigade">Brigade (324 units · 81 lances)</option>
-          <option value="reinf-brigade">Reinforced Brigade (432 units · 108 lances)</option>
-          <option value="prov-brigade">Provisional Brigade (216 units · 54 lances)</option>
-        </select>
-      </div>
-      <div class="sb-fgroup sb-fgroup-grow">
-        <label class="sb-fg-label">Lance specialty</label>
-        <select id="lb-special-type" title="Optionally group lances by special type">
-          <option value="">Standard (sort by weight)</option>
-          <option value="recon">Recon / Scout Lance</option>
-          <option value="strike">Strike / Striker Lance</option>
-          <option value="fire">Fire Lance</option>
-          <option value="battle">Battle / Line Lance</option>
-          <option value="assault-sp">Assault Lance (Special)</option>
-          <option value="command">Command Lance</option>
-          <option value="pursuit">Pursuit Lance</option>
-        </select>
-      </div>
-      <div class="sb-fgroup sb-fgroup-grow">
-        <label class="sb-fg-label">Era</label>
-        <select id="lb-csv-era" title="Only include units introduced in this era or earlier">
-          <option value="">All Eras</option>
-          <option value="0-2570">Age of War (≤ 2570)</option>
-          <option value="2571-2780">Star League (2571–2780)</option>
-          <option value="2781-3049">Succession Wars (2781–3049)</option>
-          <option value="3050-3061">Clan Invasion (3050–3061)</option>
-          <option value="3062-3067">Civil War (3062–3067)</option>
-          <option value="3068-3080">Jihad (3068–3080)</option>
-          <option value="3081-3130">Republic Era (3081–3130)</option>
-          <option value="3131-3150">Dark Age (3131–3150)</option>
-          <option value="3151-9999">ilClan (3151+)</option>
-        </select>
-      </div>
-      <div class="sb-fgroup sb-fgroup-grow">
-        <label class="sb-fg-label">Faction</label>
-        <select id="lb-csv-faction" title="Filter pool by faction availability"></select>
-      </div>
-      <button class="lb-btn" id="lb-build-btn" onclick="lbBuildFormation()" disabled>Build Formation</button>
-    </div>
-    <div id="lb-csv-status" class="lb-status">Upload a CSV with one unit name per row to get started.</div>
-    <div id="lb-csv-pool" style="display:none">
-      <div class="sec-label" style="margin:12px 0 8px">Resolved Unit Pool</div>
-      <div id="lb-pool-list" class="lb-results"></div>
-    </div>
-    <div id="lb-formation-out"></div>
   </div>
 
   <!-- ── SKIRMISH FORCE BUILDER ────────────────── -->
@@ -2654,6 +2495,29 @@
         </div>
       </div>
     </div>
+
+    <!-- ── FORMATION ORGANIZER ────────────────── -->
+    <div class="lb-csv-controls" style="margin-top:14px">
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Formation type</label>
+        <select id="sb-formation-type"></select>
+      </div>
+      <div class="sb-fgroup sb-fgroup-grow">
+        <label class="sb-fg-label">Lance specialty</label>
+        <select id="sb-special-type" title="Optionally group lances by special type">
+          <option value="">Standard (sort by weight)</option>
+          <option value="recon">Recon / Scout Lance</option>
+          <option value="strike">Strike / Striker Lance</option>
+          <option value="fire">Fire Lance</option>
+          <option value="battle">Battle / Line Lance</option>
+          <option value="assault-sp">Assault Lance (Special)</option>
+          <option value="command">Command Lance</option>
+          <option value="pursuit">Pursuit Lance</option>
+        </select>
+      </div>
+      <button class="lb-btn" onclick="sbBuildFormation()">⚔ Build Formation</button>
+    </div>
+    <div id="sb-formation-out"></div>
   </div>
 </div>
 
@@ -2833,726 +2697,13 @@ function hMapInit() {
 const MUL_API = 'https://masterunitlist.azurewebsites.net/Unit/QuickList';
 const LB_SZ = ['','Light','Medium','Heavy','Assault'];
 const LB_SZ_CLS = ['','sz1','sz2','sz3','sz4'];
-let lbSearchFormKey      = 'lance';
-let lbSearchLances       = [[null, null, null, null]]; // 2D: [lance_idx][slot_idx]
-let lbSearchLanceTypes   = [''];   // per-lance special type key
-let lbSearchLanceSkills  = [3];    // per-lance skill (3 = Regular, default)
-let lbSearchCmdState     = {};     // `${li}-${si}` -> true if commander
-let lbSearchUnitBonuses  = {};     // `${li}-${si}` -> chosen command ability string
-
-function lbSearchGetLanceTaken(li, excludeSi) {
-  const s = new Set();
-  (lbSearchLances[li] || []).forEach((_, si) => {
-    if (si === excludeSi) return;
-    const b = lbSearchUnitBonuses[`${li}-${si}`];
-    if (b) s.add(b);
-  });
-  return s;
-}
-function lbSearchSetUnitBonus(li, si, ability) {
-  lbSearchUnitBonuses[`${li}-${si}`] = ability;
-  lbRenderLance();
-}
-
-async function lbSearch() {
-  const name = document.getElementById('lb-name').value.trim();
-  const weight = document.getElementById('lb-weight').value;
-  const type = document.getElementById('lb-type').value;
-  const status = document.getElementById('lb-status');
-  const resultsEl = document.getElementById('lb-results');
-
-  if (!name && !weight) {
-    status.textContent = 'Enter a unit name or select a weight class to search.';
-    status.className = 'lb-status err';
-    return;
-  }
-
-  status.textContent = 'Searching Master Unit List…';
-  status.className = 'lb-status';
-  resultsEl.style.display = 'none';
-
-  const faction  = document.getElementById('lb-faction')?.value || '';
-  const eraRange = lbParseEraVal(document.getElementById('lb-era')?.value);
-  const params = new URLSearchParams();
-  if (name) params.set('Name', name);
-  if (type) params.set('Types', type);
-  if (weight) {
-    const [wmin, wmax] = weight.split(',');
-    params.set('MinTons', wmin);
-    params.set('MaxTons', wmax);
-  }
-  if (faction) params.set('Factions', faction);
-  // Era is filtered client-side (MUL doesn't reliably support year range params)
-
-  try {
-    const res = await fetch(`${MUL_API}?${params}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    let units = data.Units || data;
-    if (!units || units.length === 0) {
-      status.textContent = 'No units found. Try a different name or filter.';
-      return;
-    }
-    // Client-side era filter: keep units introduced UP TO the era end
-    if (eraRange) {
-      units = units.filter(u => (parseInt(u.DateIntroduced) || 0) <= eraRange.max);
-      if (units.length === 0) {
-        status.textContent = 'No units found for that era. Try a different era or name.';
-        return;
-      }
-    }
-    // Client-side tech filter: Clan factions only see Clan/Mixed tech; IS factions only see IS/Mixed
-    const isClanSearch = lbIsClanFaction(faction);
-    if (faction) {
-      units = units.filter(u => {
-        const tech = u.Technology?.Name || '';
-        if (isClanSearch) return tech !== 'Inner Sphere';
-        else              return tech !== 'Clan';
-      });
-      if (units.length === 0) {
-        status.textContent = 'No units found with compatible tech for the selected faction.';
-        return;
-      }
-    }
-    status.textContent = `${units.length} unit${units.length !== 1 ? 's' : ''} found — click a row to add to roster.`;
-    lbRenderResults(units);
-  } catch(e) {
-    status.textContent = `Error: ${e.message}. Check your connection and try again.`;
-    status.className = 'lb-status err';
-  }
-}
-
-function lbRenderResults(units) {
-  const el = document.getElementById('lb-results');
-  el.innerHTML = units.map(u => {
-    const sz = u.BFSize || 0;
-    const role = u.Role ? u.Role.Name : '—';
-    const mv = u.BFMove || '?';
-    const pv = u.BFPointValue || '?';
-    return `<div class="lb-result-row" onclick="lbAdd(${u.Id})">
-      <div class="lb-rname">
-        ${u.Name}
-        <small>${u.Tonnage || '?'}t &nbsp;·&nbsp; ${role} &nbsp;·&nbsp; MV ${mv} &nbsp;·&nbsp; ${u.DateIntroduced||'?'}</small>
-      </div>
-      <span class="lb-rpill ${LB_SZ_CLS[sz]}">${LB_SZ[sz] || '?'}</span>
-      <span class="lb-rpv">${pv} PV</span>
-      <button class="lb-btn-sm" onclick="event.stopPropagation();lbAdd(${u.Id})">+ Add</button>
-    </div>`;
-  }).join('');
-  el.style.display = 'block';
-  // store lookup map
-  el._units = {};
-  units.forEach(u => el._units[u.Id] = u);
-}
-
-function lbAdd(id) {
-  const el = document.getElementById('lb-results');
-  const unit = el._units && el._units[id];
-  if (!unit) return;
-  // Tech guard: hard block wrong-tech units for the selected faction
-  const searchFacId  = document.getElementById('lb-faction')?.value || '';
-  const searchIsClan = lbIsClanFaction(searchFacId);
-  const tech = unit.Technology?.Name || '';
-  if (searchFacId) {
-    const status = document.getElementById('lb-status');
-    if (searchIsClan && tech === 'Inner Sphere') {
-      status.textContent = `✗ ${unit.Name} is Inner Sphere tech — not available to Clan factions.`;
-      status.className = 'lb-status err';
-      return;
-    }
-    if (!searchIsClan && tech === 'Clan') {
-      status.textContent = `✗ ${unit.Name} is Clan tech — not available to IS factions.`;
-      status.className = 'lb-status err';
-      return;
-    }
-  }
-  // Find first empty slot across all lances
-  let found = false;
-  outer: for (let li = 0; li < lbSearchLances.length; li++) {
-    for (let si = 0; si < lbSearchLances[li].length; si++) {
-      if (lbSearchLances[li][si] === null) {
-        lbSearchLances[li][si] = unit;
-        found = true;
-        break outer;
-      }
-    }
-  }
-  if (!found) {
-    const fDef = LB_FORMATIONS[lbSearchFormKey];
-    alert(`Roster is full (${fDef ? fDef.total : lbSearchLances.flat().length} units max). Remove a unit first.`);
-    return;
-  }
-  lbRenderLance();
-}
-
-function lbRemove(li, si) {
-  if (lbSearchLances[li]) lbSearchLances[li][si] = null;
-  lbRenderLance();
-}
-
-function lbSearchGetAdjPV(li) {
-  const skill = lbSearchLanceSkills[li] ?? 3;
-  const mult  = LB_SKILL_MULT[skill] ?? 1.0;
-  const rawPV = (lbSearchLances[li] || []).reduce((s, u) => s + (u ? (u.BFPointValue||0) : 0), 0);
-  return Math.round(rawPV * mult);
-}
-
-function lbRenderLance() {
-  const roster = document.getElementById('lb-roster');
-  if (!roster) return;
-
-  const skillOptDefs = [
-    ['0','Skill 0 — Legendary'],['1','Skill 1 — Elite'],
-    ['2','Skill 2 — Veteran'],  ['3','Skill 3 — Regular'],
-    ['4','Skill 4 — Green'],
-  ];
-  // General lance type eligibility checks (by weight counts)
-  const genChecks = [
-    { name:'Light Lance',   fn:(c,t)=> c[1]>=2 && c[3]===0 && c[4]===0, note:'2+ Light, no Heavy/Assault' },
-    { name:'Medium Lance',  fn:(c,t)=> c[2]>=2 && c[4]===0,             note:'2+ Medium, no Assault'      },
-    { name:'Heavy Lance',   fn:(c,t)=> c[3]>=2,                         note:'2+ Heavy'                   },
-    { name:'Assault Lance', fn:(c,t)=> c[4]>=2 && c[1]===0,             note:'2+ Assault, no Light'       },
-  ];
-
-  let html = '';
-  lbSearchLances.forEach((lanceSlots, li) => {
-    const specKey   = lbSearchLanceTypes[li] || '';
-    const skill     = lbSearchLanceSkills[li] ?? 3;
-    const adjPV     = lbSearchGetAdjPV(li);
-    const mult      = LB_SKILL_MULT[skill] ?? 1.0;
-    const rawPV     = lanceSlots.reduce((s,u)=>s+(u?(u.BFPointValue||0):0), 0);
-    const pvLabel   = skill === 3 ? `${rawPV} PV` : `${adjPV} PV <span style="font-size:9px;opacity:.7">×${mult.toFixed(2)}</span>`;
-    const lanceWide = (LB_TYPE_ABILITIES[specKey] || {}).lanceWide || [];
-    const typeInfo  = LB_TYPE_ABILITIES[specKey] || {};
-    const filled    = lanceSlots.filter(u => u !== null);
-    const counts    = [0,0,0,0,0];
-    filled.forEach(u => { const s=u.BFSize||0; if(s>=1&&s<=4) counts[s]++; });
-    const compPips  = [1,2,3,4].filter(s=>counts[s]>0)
-      .map(s=>`<span class="lb-comp-pip ${LB_SZ_CLS[s]}">${counts[s]}× ${LB_SZ[s]}</span>`).join('');
-
-    // Type dropdown — disable ineligible, include faction-specific options
-    const factionId = document.getElementById('lb-faction')?.value || '';
-    const typeOpts  = lbGetFactionTypeOpts(factionId, filled, specKey);
-    let typeOptsHtml = '';
-    let lastFaction = false;
-    typeOpts.forEach(({ v, t, disabled, faction }) => {
-      if (faction && !lastFaction) { typeOptsHtml += `<optgroup label="— ${LB_FACTIONS.find(f=>f.id===factionId)?.name||'Faction'} —">`; lastFaction = true; }
-      const sel = v === specKey ? ' selected' : '';
-      const dis = disabled ? ' disabled' : '';
-      typeOptsHtml += `<option value="${v}"${sel}${dis}>${t}${disabled&&v?'  ✗':''}</option>`;
-    });
-    if (lastFaction) typeOptsHtml += `</optgroup>`;
-    const skillOptsHtml = skillOptDefs.map(([v,t]) =>
-      `<option value="${v}"${skill==v?' selected':''}>${t}</option>`).join('');
-
-    const isClanSearch = lbIsClanFaction(document.getElementById('lb-faction')?.value||'');
-    html += `<div class="lb-lance-group" id="lb-sgroup-${li}">
-      <div class="lb-lance-group-hdr">
-        <span style="white-space:nowrap">${lbGroupLabel(isClanSearch, li)}</span>
-        <select class="lb-lance-type-sel" onchange="lbSearchTypeChanged(${li},this.value)" style="flex:1 1 110px;font-size:11px">${typeOptsHtml}</select>
-        <select class="lb-skill-sel" id="lb-sskill-${li}" onchange="lbSearchSkillChanged(${li})" style="flex:1 1 120px;font-size:11px">${skillOptsHtml}</select>
-        <span class="lb-lance-pv-sm" id="lb-spv-${li}">${pvLabel}</span>
-      </div>`;
-
-    lanceSlots.forEach((unit, si) => {
-      if (!unit) {
-        html += `<div class="lb-slot" id="lb-slot-${li}-${si}">Slot ${si+1} — empty</div>`;
-        return;
-      }
-      const isCmd      = !!lbSearchCmdState[`${li}-${si}`];
-      const unitBonus  = lbSearchUnitBonuses[`${li}-${si}`] || '';
-      const sz         = unit.BFSize || 0;
-      const role       = unit.Role ? unit.Role.Name : '—';
-      const mv         = unit.BFMove || '?';
-      const pv         = unit.BFPointValue || '?';
-      const dmg        = `${unit.BFDamageShort??'–'}/${unit.BFDamageMedium??'–'}/${unit.BFDamageLong??'–'}/${unit.BFDamageExtreme??'–'}`;
-      const ov         = unit.BFOverheat ?? '?';
-      const armor      = unit.BFArmor ?? '?';
-      const struct     = unit.BFStructure ?? '?';
-      const abil       = unit.BFAbilities || '—';
-
-      // Per-unit command ability picker (Command lance only)
-      let perUnitHtml = '';
-      if (typeInfo.perUnit?.length) {
-        const taken     = lbSearchGetLanceTaken(li, si);
-        const available = typeInfo.perUnit.filter(a => !taken.has(a) || a === unitBonus);
-        const bOpts     = available.map(a =>
-          `<option value="${a}"${a===unitBonus?' selected':''}>${a}</option>`).join('');
-        perUnitHtml = `<div class="lb-cmd-pick" style="margin-top:4px">
-          <select onchange="lbSearchSetUnitBonus(${li},${si},this.value)">
-            <option value="">— pick command ability —</option>${bOpts}
-          </select>
-        </div>`;
-        if (unitBonus) perUnitHtml +=
-          `<div style="font-size:10px;color:var(--orange);margin-top:2px">★ ${unitBonus}</div>` +
-          `<div style="font-size:9px;color:var(--text3)">${LB_ABILITY_DESC[unitBonus]||''}</div>`;
-      }
-
-      html += `<div class="lb-slot filled${isCmd?' lb-slot-cmd':''}" id="lb-slot-${li}-${si}">
-        <div class="lb-card-header">
-          <div>
-            <div class="lb-card-name">${isCmd?'★ ':''}${unit.Name}${isCmd?' <span style="font-size:10px;color:var(--accent)">(CMD)</span>':''}</div>
-            <div class="lb-card-sub">
-              <span class="lb-rpill ${LB_SZ_CLS[sz]}" style="margin-right:4px">${LB_SZ[sz]||'?'}</span>
-              ${role} &nbsp;·&nbsp; ${unit.Tonnage||'?'}t
-            </div>
-          </div>
-          <div style="text-align:right">
-            <div class="lb-card-pv">${pv}</div>
-            <div style="font-size:10px;color:var(--text3)">PV</div>
-          </div>
-        </div>
-        <div class="lb-card-stats">
-          <div class="lb-stat"><div class="lb-stat-lbl">MV</div><div class="lb-stat-val">${mv}</div></div>
-          <div class="lb-stat"><div class="lb-stat-lbl">A / S</div><div class="lb-stat-val">${armor} / ${struct}</div></div>
-          <div class="lb-stat"><div class="lb-stat-lbl">OV</div><div class="lb-stat-val">${ov}</div></div>
-          <div class="lb-stat" style="grid-column:1/-1"><div class="lb-stat-lbl">DMG S / M / L / E</div><div class="lb-stat-val">${dmg}</div></div>
-        </div>
-        <div class="lb-card-abilities">${abil}${perUnitHtml}</div>
-        <div class="lb-card-footer">
-          <span style="font-size:10px;color:var(--text3)">${unit.Type ? unit.Type.Name : ''}</span>
-          <div style="display:flex;gap:4px">
-            <button class="lb-btn-sm${isCmd?' lb-btn-cmd':''}" onclick="lbSearchToggleCmd(${li},${si})">${isCmd?'★ CMD':'☆ CMD'}</button>
-            <button class="lb-btn-sm lb-btn-rm" onclick="lbRemove(${li},${si})">Remove</button>
-          </div>
-        </div></div>`;
-    });
-
-    // Lance-wide abilities strip
-    if (lanceWide.length) {
-      html += `<div class="lb-lance-abilities-bar">`;
-      lanceWide.forEach(a => {
-        html += `<div><span class="lb-lw-tag">★ ${a}</span><span class="lb-lw-desc">${LB_ABILITY_DESC[a]||''}</span></div>`;
-      });
-      html += `</div>`;
-    }
-
-    // Per-lance analysis — composition + General Lance Types eligibility
-    const genRows = filled.length > 0 ? genChecks.map(c => {
-      const ok = c.fn(counts, filled.length);
-      return `<div class="lb-analysis-row" style="padding:1px 0">
-        <span class="lb-a-label" style="font-size:10px">${c.name}</span>
-        <span class="${ok?'lb-a-ok':'lb-a-no'}" style="font-size:10px">${ok?'✓ Eligible':'✗ '+c.note}</span>
-      </div>`;
-    }).join('') : '';
-
-    html += `<div class="lb-lance-analysis-bar">
-      <div class="lb-comp-bar" style="min-height:16px;margin-bottom:${filled.length?'6px':'0'}">${compPips||'<span style="color:var(--text3);font-size:10px">Empty lance</span>'}</div>
-      ${genRows}
-    </div></div>`;
-  });
-
-  roster.innerHTML = html;
-
-  // Totals (skill-adjusted)
-  let adjTotal = 0;
-  lbSearchLances.forEach((_, li) => { adjTotal += lbSearchGetAdjPV(li); });
-  const supply = Math.ceil(adjTotal * 0.1);
-  document.getElementById('lb-totalpv').textContent = adjTotal;
-  document.getElementById('lb-supply').textContent  = supply;
-
-  const anaEl = document.getElementById('lb-analysis');
-  if (anaEl) anaEl.innerHTML = '';
-}
-
-function lbSearchFormationChanged() {
-  const fKey = document.getElementById('lb-search-formation').value;
-  const fDef = LB_FORMATIONS[fKey];
-  if (!fDef) return;
-  // Preserve filled units in order
-  const filled = lbSearchLances.flat().filter(u => u !== null);
-  lbSearchFormKey     = fKey;
-  lbSearchLances      = Array.from({ length: fDef.lances }, () => Array(fDef.unitsPerLance).fill(null));
-  // Expand or trim per-lance state arrays to match new lance count
-  while (lbSearchLanceTypes.length  < fDef.lances) lbSearchLanceTypes.push('');
-  while (lbSearchLanceSkills.length < fDef.lances) lbSearchLanceSkills.push(3);
-  lbSearchLanceTypes  = lbSearchLanceTypes.slice(0, fDef.lances);
-  lbSearchLanceSkills = lbSearchLanceSkills.slice(0, fDef.lances);
-  lbSearchCmdState     = {};
-  lbSearchUnitBonuses  = {};
-  let idx = 0;
-  outer: for (let li = 0; li < fDef.lances; li++) {
-    for (let si = 0; si < fDef.unitsPerLance; si++) {
-      if (idx >= filled.length) break outer;
-      lbSearchLances[li][si] = filled[idx++];
-    }
-  }
-  lbRenderLance();
-}
-
-function lbAutoRoster() {
-  const specKey = document.getElementById('lb-search-special-type').value;
-  const fDef    = LB_FORMATIONS[lbSearchFormKey];
-  if (!fDef) return;
-  const pool = lbSearchLances.flat().filter(u => u !== null);
-  if (pool.length === 0) {
-    alert('Add units to the roster first, then click Auto Roster to organize them into lances.');
-    return;
-  }
-  const typeKeys = Array(fDef.lances).fill(specKey);
-  const { lances } = lbAssignToTypes(pool, typeKeys, fDef.unitsPerLance);
-  lbSearchLances = Array.from({ length: fDef.lances }, (_, li) => {
-    const picks = lances[li] || [];
-    const slots = Array(fDef.unitsPerLance).fill(null);
-    picks.forEach((u, si) => { slots[si] = u; });
-    return slots;
-  });
-  lbRenderLance();
-}
-
-function lbSearchSkillChanged(li) {
-  const el = document.getElementById(`lb-sskill-${li}`);
-  if (!el) return;
-  lbSearchLanceSkills[li] = parseInt(el.value);
-  const rawPV = (lbSearchLances[li]||[]).reduce((s,u)=>s+(u?(u.BFPointValue||0):0),0);
-  const skill = lbSearchLanceSkills[li];
-  const mult  = LB_SKILL_MULT[skill] ?? 1.0;
-  const adjPV = Math.round(rawPV * mult);
-  const pvEl  = document.getElementById(`lb-spv-${li}`);
-  if (pvEl) pvEl.innerHTML = skill === 3
-    ? `${rawPV} PV`
-    : `${adjPV} PV <span style="font-size:9px;opacity:.7">×${mult.toFixed(2)}</span>`;
-  let adjTotal = 0;
-  lbSearchLances.forEach((_, i) => { adjTotal += lbSearchGetAdjPV(i); });
-  document.getElementById('lb-totalpv').textContent = adjTotal;
-  document.getElementById('lb-supply').textContent  = Math.ceil(adjTotal * 0.1);
-}
-
-function lbSearchTypeChanged(li, val) {
-  lbSearchLanceTypes[li] = val;
-  lbRenderLance(); // re-render to update abilities bar + analysis
-}
-
-function lbSearchToggleCmd(li, si) {
-  const key = `${li}-${si}`;
-  if (lbSearchCmdState[key]) delete lbSearchCmdState[key];
-  else lbSearchCmdState[key] = true;
-  lbRenderLance();
-}
-
-function lbClearRoster() {
-  const fDef = LB_FORMATIONS[lbSearchFormKey] || { lances: 1, unitsPerLance: 4 };
-  lbSearchLances      = Array.from({ length: fDef.lances }, () => Array(fDef.unitsPerLance).fill(null));
-  lbSearchLanceTypes   = Array(fDef.lances).fill('');
-  lbSearchLanceSkills  = Array(fDef.lances).fill(3);
-  lbSearchCmdState     = {};
-  lbSearchUnitBonuses  = {};
-  lbRenderLance();
-}
-
-function lbSearchDownloadCards() {
-  const allUnits = lbSearchLances.flat().filter(u => u && u.Id);
-  if (!allUnits.length) { alert('Add units to the roster first.'); return; }
-  const fDef = LB_FORMATIONS[lbSearchFormKey] || {};
-  const skillLabels = ['Legendary','Elite','Veteran','Regular','Green'];
-  let adjTotal = 0;
-  lbSearchLances.forEach((_, li) => { adjTotal += lbSearchGetAdjPV(li); });
-  const MUL_CARD = 'https://masterunitlist.azurewebsites.net/Unit/Card/';
-
-  let cardRows = '';
-  lbSearchLances.forEach((lanceSlots, li) => {
-    const specKey   = lbSearchLanceTypes[li] || '';
-    const skill     = lbSearchLanceSkills[li] ?? 3;
-    const adjPV     = lbSearchGetAdjPV(li);
-    const mult      = LB_SKILL_MULT[skill] ?? 1.0;
-    const rawPV     = lanceSlots.reduce((s,u)=>s+(u?(u.BFPointValue||0):0),0);
-    const typeLabel = specKey && LB_SPECIAL_TYPES[specKey] ? LB_SPECIAL_TYPES[specKey].name : 'Standard';
-    const pvLabel   = skill === 3 ? `${rawPV} PV` : `${adjPV} PV (×${mult.toFixed(2)})`;
-    const lanceWide = (LB_TYPE_ABILITIES[specKey] || {}).lanceWide || [];
-    const skillTxt  = skillLabels[skill] || 'Regular';
-
-    const isClanCards = lbIsClanFaction(document.getElementById('lb-faction')?.value||'');
-    cardRows += `<div class="lance-hdr">
-      <span class="lhdr-title">${lbGroupLabel(isClanCards, li)} — ${typeLabel}</span>
-      <span class="lhdr-meta">${pvLabel} &nbsp;·&nbsp; ${skillTxt}</span>
-    </div>`;
-
-    if (lanceWide.length) {
-      cardRows += `<div class="lance-wide">`;
-      lanceWide.forEach(a => {
-        cardRows += `<div class="lw-row"><span class="lw-tag">★ LANCE</span> <strong>${a}</strong> — <span class="lw-desc">${LB_ABILITY_DESC[a]||''}</span></div>`;
-      });
-      cardRows += `</div>`;
-    }
-
-    cardRows += `<div class="card-row">`;
-    lanceSlots.forEach((u, si) => {
-      if (!u || !u.Id) return;
-      const isCmd     = !!lbSearchCmdState[`${li}-${si}`];
-      const bonus     = lbSearchUnitBonuses[`${li}-${si}`] || '';
-      const safeName  = u.Name.replace(/'/g, "\\'");
-      let annot = '';
-      if (isCmd) annot += `<div class="annot-cmd">★ LANCE COMMANDER</div>`;
-      if (bonus) annot += `<div class="annot-bonus">
-        <span class="annot-bonus-name">★ ${bonus}</span>
-        <span class="annot-bonus-desc">${LB_ABILITY_DESC[bonus]||''}</span>
-      </div>`;
-      cardRows += `<div class="card-wrap${isCmd?' card-cmd':''}">
-        <img src="${MUL_CARD}${u.Id}" alt="${u.Name}"
-          onerror="this.style.outline='2px dashed #c00';this.style.padding='8px';this.alt='Card unavailable: ${safeName}'"
-        >${annot}
-        <div class="card-name">${isCmd?'★ ':''}${u.Name}</div>
-        <div class="pilot-info">
-          <input class="p-name" type="text" placeholder="Pilot name">
-          <div class="p-skills">
-            <span>GU <input class="p-skill" type="number" min="1" max="8" value="4" title="Gunnery Skill"></span>
-            <span>PI <input class="p-skill" type="number" min="1" max="8" value="5" title="Piloting Skill"></span>
-          </div>
-        </div>
-      </div>`;
-    });
-    cardRows += `</div>`;
-  });
-
-  // Reuse exact same CSS as lbDownloadCards (cards print window)
-  const fDefCsv = document.createElement('div');
-  fDefCsv.innerHTML = '';
-  const w = window.open('','_blank');
-  if (!w) return;
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>${fDef.name||'Formation'} — Alpha Strike Cards</title>
-  <style>
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:Arial,sans-serif; background:#fff; }
-    .header { padding:12px 16px; border-bottom:2px solid #333; margin-bottom:10px; }
-    .header h1 { font-size:16px; }
-    .header p  { font-size:11px; color:#555; margin-top:3px; }
-    .lance-hdr { display:flex; justify-content:space-between; align-items:baseline;
-                 padding:8px 14px 4px; margin-top:14px;
-                 border-top:2px solid #333; background:#f0f0f0; }
-    .lhdr-title { font-size:13px; font-weight:700; }
-    .lhdr-meta  { font-size:10px; color:#555; }
-    .lance-wide { padding:4px 14px 6px; background:#fffbe6; border-bottom:1px solid #ddd; }
-    .lw-row     { font-size:10px; margin-bottom:2px; }
-    .lw-tag     { font-weight:700; color:#a60; margin-right:4px; }
-    .lw-desc    { color:#777; }
-    .card-row   { display:flex; flex-wrap:wrap; gap:10px; padding:10px 14px; }
-    .card-wrap  { display:flex; flex-direction:column; align-items:center; width:220px; }
-    .card-wrap.card-cmd { outline:2px solid gold; border-radius:4px; }
-    .card-wrap img { width:220px; height:auto; display:block; }
-    .card-name  { font-size:10px; font-weight:700; margin-top:3px; text-align:center; }
-    .annot-cmd  { background:gold; color:#000; font-size:9px; font-weight:700;
-                  padding:2px 6px; width:100%; text-align:center; }
-    .annot-bonus { background:#fffbe6; border:1px solid #e6c200; font-size:9px;
-                   padding:2px 6px; width:100%; }
-    .annot-bonus-name { font-weight:700; color:#a60; }
-    .annot-bonus-desc { color:#777; display:block; }
-    .pilot-info { width:100%; margin-top:5px; }
-    .p-name  { width:100%; border:1px solid #aaa; border-radius:2px; padding:2px 4px; font-size:10px; }
-    .p-skills { display:flex; gap:8px; margin-top:3px; font-size:10px; font-weight:700; align-items:center; }
-    .p-skill { width:32px; border:1px solid #aaa; border-radius:2px; padding:2px 2px;
-               text-align:center; font-size:10px; font-weight:700; }
-    @media print { body { margin:0; } .lance-hdr { margin-top:8px; } }
-  </style></head><body>
-  <div class="header">
-    <h1>${fDef.name||'Formation'} — Alpha Strike Cards</h1>
-    <p>Total PV: ${adjTotal} &nbsp;·&nbsp; Supply Points: ${Math.ceil(adjTotal*0.1)}</p>
-  </div>
-  ${cardRows}
-  </body></html>`);
-  w.document.close();
-  w.addEventListener('load', () => setTimeout(() => w.print(), 500));
-}
-
-function lbSearchPrintFormation() {
-  const allFilled = lbSearchLances.flat().filter(u => u !== null);
-  if (!allFilled.length) { alert('Add units to the roster before printing.'); return; }
-  const fDef = LB_FORMATIONS[lbSearchFormKey] || {};
-  let adjTotal = 0;
-  lbSearchLances.forEach((_, li) => { adjTotal += lbSearchGetAdjPV(li); });
-  const skillLabels = ['Legendary','Elite','Veteran','Regular','Green'];
-
-  let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Lance Formation</title>
-  <style>
-    body { font-family:Arial,sans-serif; font-size:11px; color:#000; margin:20px; }
-    h1 { font-size:18px; margin-bottom:2px; }
-    .meta { font-size:11px; color:#555; margin-bottom:16px; }
-    .lances { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
-    .lance { border:1px solid #999; border-radius:4px; page-break-inside:avoid; }
-    .lance-hdr { background:#ddd; padding:6px 10px; font-weight:700; display:flex; justify-content:space-between; border-radius:4px 4px 0 0; }
-    .unit { border-top:1px solid #ddd; padding:6px 10px; }
-    .unit-name { font-weight:700; font-size:12px; }
-    .unit-meta { font-size:10px; color:#555; }
-    .unit-abil { font-size:10px; color:#006; margin-top:1px; }
-    .unit-bonus { font-size:10px; color:#a60; font-weight:700; margin-top:2px; }
-    .unit-bonus-desc { font-size:9px; color:#777; }
-    .pips { font-size:12px; letter-spacing:2px; margin-top:4px; line-height:1.6; word-break:break-all; }
-    .pips-lbl { font-size:10px; font-weight:700; color:#333; display:inline-block; width:18px; }
-    .lance-abilities { padding:5px 10px; background:#fffbe6; font-size:10px; border-top:1px solid #ddd; }
-    .lw-abil { color:#a60; font-weight:700; }
-    .lw-desc { color:#666; font-size:9px; }
-    .lance-stats { padding:5px 10px; background:#f5f5f5; font-size:10px; color:#555; border-top:1px solid #ddd; border-radius:0 0 4px 4px; }
-    @media print { body { margin:10px; } }
-  </style></head><body>
-  <h1>${fDef.name || 'Formation'}</h1>
-  <div class="meta">Total PV: ${adjTotal} &nbsp;·&nbsp; Supply Points: ${Math.ceil(adjTotal*0.1)}</div>
-  <div class="lances">`;
-
-  lbSearchLances.forEach((lanceSlots, li) => {
-    const specKey   = lbSearchLanceTypes[li] || '';
-    const skill     = lbSearchLanceSkills[li] ?? 3;
-    const adjPV     = lbSearchGetAdjPV(li);
-    const rawPV     = lanceSlots.reduce((s,u)=>s+(u?(u.BFPointValue||0):0),0);
-    const mult      = LB_SKILL_MULT[skill] ?? 1.0;
-    const typeLabel = specKey && LB_SPECIAL_TYPES[specKey] ? LB_SPECIAL_TYPES[specKey].name : 'Standard';
-    const pvLabel   = skill === 3 ? `${rawPV} PV` : `${adjPV} PV (×${mult.toFixed(2)})`;
-    const lanceWide = (LB_TYPE_ABILITIES[specKey] || {}).lanceWide || [];
-    const filledSlots = lanceSlots.filter(u => u);
-    const totS = filledSlots.reduce((s,u)=>s+(parseInt(u.BFDamageShort)||0),0);
-    const totM = filledSlots.reduce((s,u)=>s+(parseInt(u.BFDamageMedium)||0),0);
-    const totL = filledSlots.reduce((s,u)=>s+(parseInt(u.BFDamageLong)||0),0);
-    const avgTMM = filledSlots.length
-      ? Math.round(filledSlots.reduce((s,u)=>s+lbCalcTMM(u),0)/filledSlots.length) : 0;
-
-    const isClanPrint = lbIsClanFaction(document.getElementById('lb-faction')?.value||'');
-    html += `<div class="lance">
-      <div class="lance-hdr"><span>${lbGroupLabel(isClanPrint, li)} — ${typeLabel}</span><span>${pvLabel}</span></div>`;
-
-    lanceSlots.forEach((u, si) => {
-      if (!u) return;
-      const isCmd  = !!lbSearchCmdState[`${li}-${si}`];
-      const bonus  = lbSearchUnitBonuses[`${li}-${si}`] || '';
-      const armor  = parseInt(u.BFArmor)||0;
-      const intr   = parseInt(u.BFStructure)||0;
-      const abil   = (u.BFAbilities||'').trim();
-      const dmgStr = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
-      html += `<div class="unit">
-        <div class="unit-name">${isCmd?'★ ':''}${u.Name}${isCmd?' (CMD)':''}</div>
-        <div class="unit-meta">${LB_SZ[u.BFSize||0]} · ${u.Tonnage||'?'}t · ${u.Role?.Name||'—'} · MV ${u.BFMove||'?'} · TMM ${lbCalcTMM(u)} · ${u.BFPointValue||'?'} PV</div>
-        <div class="unit-meta">Dmg S/M/L: ${dmgStr} · Armor: ${armor} · IS: ${intr}</div>
-        ${abil?`<div class="unit-abil">${abil}</div>`:''}
-        ${bonus?`<div class="unit-bonus">★ ${bonus}</div><div class="unit-bonus-desc">${LB_ABILITY_DESC[bonus]||''}</div>`:''}
-        <div class="pips"><span class="pips-lbl">A:</span> ${'○'.repeat(Math.min(armor,30))}${armor>30?` (+${armor-30})`:''}  [${armor}]</div>
-        <div class="pips"><span class="pips-lbl">IS:</span> ${'○'.repeat(Math.min(intr,15))}${intr>15?` (+${intr-15})`:''}  [${intr}]</div>
-      </div>`;
-    });
-
-    if (lanceWide.length) {
-      html += `<div class="lance-abilities">`;
-      lanceWide.forEach(a => {
-        html += `<div><span class="lw-abil">★ ${a}</span> <span class="lw-desc">${LB_ABILITY_DESC[a]||''}</span></div>`;
-      });
-      html += `</div>`;
-    }
-    html += `<div class="lance-stats">Skill: ${skillLabels[skill]||'Regular'} · Dmg S${totS} M${totM} L${totL} · Avg TMM: ${avgTMM}</div></div>`;
-  });
-
-  html += `</div></body></html>`;
-  const w = window.open('','_blank');
-  if (w) { w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
-}
-
-function lbAnalyze(units) {
-  const el = document.getElementById('lb-analysis');
-  if (units.length === 0) { el.innerHTML = ''; return; }
-
-  const counts = [0,0,0,0,0]; // idx 1-4 = Light/Med/Heavy/Assault
-  units.forEach(u => { const s = u.BFSize||0; if(s>=1&&s<=4) counts[s]++; });
-  const total = units.length;
-
-  // Composition bar
-  const compBar = [1,2,3,4].map(s => counts[s] > 0
-    ? `<span class="lb-comp-pip ${LB_SZ_CLS[s]}">${counts[s]}× ${LB_SZ[s]}</span>`
-    : '').join('');
-
-  // General lance type checks
-  const checks = [
-    {
-      name: 'Light Lance',
-      ok: counts[1] >= 2 && counts[3] === 0 && counts[4] === 0,
-      needs: 'Light 2+, no Heavy/Assault'
-    },
-    {
-      name: 'Medium Lance',
-      ok: counts[2] >= 2 && counts[4] === 0,
-      needs: 'Medium 2+, no Assault'
-    },
-    {
-      name: 'Heavy Lance',
-      ok: counts[3] >= 2,
-      needs: 'Heavy 2+'
-    },
-    {
-      name: 'Assault Lance',
-      ok: counts[4] >= 2 && counts[1] === 0,
-      needs: 'Assault 2+, no Light'
-    },
-  ];
-
-  // Special lance type checks (simplified — movement/role data not always in API)
-  const specials = [
-    {
-      name: 'Fire Lance',
-      ok: total >= 3, // full check needs role data
-      note: 'Needs ≥3 Missile Boat/Sniper role units'
-    },
-    {
-      name: 'Battle / Line Lance',
-      ok: (counts[3] + counts[4]) >= Math.ceil(total / 2),
-      note: '≥50% Heavy/Assault'
-    },
-    {
-      name: 'Assault Lance (Special)',
-      ok: (counts[3] + counts[4]) >= 3 && counts[1] === 0,
-      note: '≥3 Heavy/Assault, no Light'
-    },
-  ];
-
-  const generalRows = checks.map(c => `
-    <div class="lb-analysis-row">
-      <span class="lb-a-label">${c.name}</span>
-      <span class="${c.ok ? 'lb-a-ok' : 'lb-a-no'}">${c.ok ? '✓ Eligible' : '✗ ' + c.needs}</span>
-    </div>`).join('');
-
-  const specialRows = specials.map(c => `
-    <div class="lb-analysis-row">
-      <span class="lb-a-label">${c.name}</span>
-      <span class="${c.ok ? 'lb-a-ok' : 'lb-a-no'}">${c.ok ? '✓ May qualify' : '✗ ' + c.note}</span>
-    </div>`).join('');
-
-  el.innerHTML = `
-    <div class="sec-label" style="margin:10px 0 8px">Lance Analysis</div>
-    <div class="lb-analysis-row">
-      <span class="lb-a-label">Composition</span>
-      <div class="lb-comp-bar">${compBar || '<span style="color:var(--text3)">—</span>'}</div>
-    </div>
-    <div style="font-size:10px;color:var(--text3);font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">General Lance Types</div>
-    ${generalRows}
-    <div style="font-size:10px;color:var(--text3);font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">Special Lance Types</div>
-    ${specialRows}
-    <div class="lb-analysis-row" style="margin-top:4px;border-color:var(--text3)">
-      <span class="lb-a-label" style="color:var(--text3)">Speed/Role checks</span>
-      <span class="lb-a-warn">Recon, Strike, Pursuit — verify MV 10+ manually</span>
-    </div>`;
-}
-
-function lbClearSearch() {
-  document.getElementById('lb-name').value = '';
-  const results = document.getElementById('lb-results');
-  results.style.display = 'none';
-  results.innerHTML = '';
-  results._units = {};
-  document.getElementById('lb-status').textContent = 'Enter a unit name and hit Search.';
-  document.getElementById('lb-status').className = 'lb-status';
-}
-
-// allow Enter key to trigger search; initialise search-tab roster
 document.addEventListener('DOMContentLoaded', () => {
-  const inp = document.getElementById('lb-name');
-  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') lbSearch(); });
-  // Populate faction dropdowns on both tabs with correct onchange handlers
-  const fEl = document.getElementById('lb-faction');
-  if (fEl) fEl.outerHTML = lbFactionSelectHtml('lb-faction', 'lbFactionChanged');
-  const fcEl = document.getElementById('lb-csv-faction');
-  if (fcEl) fcEl.outerHTML = lbFactionSelectHtml('lb-csv-faction', 'lbCsvFactionChanged');
   const foEl = document.getElementById('lb-owned-source-faction');
   if (foEl) foEl.outerHTML = lbFactionSelectHtml('lb-owned-source-faction', 'lbOwnedRender');
-  lbRenderLance();
+  sbMigrateCsvLists();
 });
 
-/* ── CSV FORMATION BUILDER ───────────────────────────── */
-const LB_CSV_STORAGE_KEY = 'bmtSavedCsvLists.v1';
-let lbPoolUnits     = []; // resolved units from CSV
+/* ── FORMATION ENGINE (shared by Owned Units + Skirmish Force Builder) ── */
 let lbCurrentLances = []; // [[unit,...], ...] — live formation
 let lbVariantsCache = {}; // chassis -> [unit,...]
 let lbFormationDirty = false;
@@ -3613,10 +2764,12 @@ const LB_ABILITY_DESC = {
 
 let lbUnitBonuses = {}; // `${li}-${si}` -> chosen ability string
 
-// Flat-multiplier skill table used by the Search / CSV Formation Builder /
-// Owned Units tabs (their own pre-existing convention; only 0-4 selectable
-// there). NOT used by the Skirmish Force Builder — see sbAdjPV/
-// sbSkillIncrement below for the correct per-unit-PV-bracket official table.
+// Flat-multiplier skill table used by the organized-lance view (per-lance
+// skill selector rendered by lbLanceStatsHtml, reached from Owned Units'
+// "Send to Build Lance" or Skirmish's "Build Formation"; only 0-4 selectable
+// there). NOT used by Skirmish's flat Tournament Force list before it's
+// organized into lances — see sbAdjPV/sbSkillIncrement below for the correct
+// per-unit-PV-bracket official table used there.
 const LB_SKILL_MULT = { 0: 1.82, 1: 1.62, 2: 1.42, 3: 1.20, 4: 1.00 };
 const SB_SKILL_LEVELS = [0, 1, 2, 3, 4, 5, 6, 7];
 
@@ -3780,6 +2933,26 @@ const LB_FORMATIONS = {
   'clan-galaxy':    { name:'Galaxy',       lances:45, unitsPerLance:5, total:225, isClan:true },
 };
 
+// The formation-organizer (LB_FORMATIONS/LB_SPECIAL_TYPES + lbAssignToTypes and
+// all the lance-block/drag-drop/command/ability rendering below) is shared by
+// Owned Units' "Send to Build Lance" and the Skirmish Force Builder tab, which
+// both build into the SAME lbCurrentLances/lbLanceTypes/lbCmdState/
+// lbUnitBonuses state and Skirmish's formation-type/special-type/faction
+// selects and output container.
+function lbFTypeEl()    { return document.getElementById('sb-formation-type'); }
+function lbSTypeEl()    { return document.getElementById('sb-special-type'); }
+function lbFFactionEl() { return document.getElementById('sb-faction'); }
+function lbFOutId()     { return 'sb-formation-out'; }
+function lbFormationIsClan() {
+  const fid = lbFFactionEl()?.value || '';
+  return !!sbFactionMeta[fid]?.isClan;
+}
+function lbFormationFactionName() {
+  const fid = lbFFactionEl()?.value || '';
+  if (!fid) return 'selected faction';
+  return sbFactionMeta[fid]?.name || 'selected faction';
+}
+
 /* ── FACTIONS ───────────────────────────────────────────────────── */
 const LB_FACTIONS = [
   { id:'',   name:'Any / Generic',              group:'' },
@@ -3919,9 +3092,8 @@ function lbGroupWord(isClan, count) {
   return (isClan ? 'star' : 'lance') + (count !== 1 ? 's' : '');
 }
 
-// Rebuilds formation dropdowns to show IS or Clan options.
-// which: 'search' (search tab only), 'csv' (csv tab only), or omit for both.
-function lbBuildFormationDropdowns(isClan, which) {
+// Rebuilds the Skirmish tab's formation-type dropdown to show IS or Clan options.
+function lbBuildFormationDropdowns(isClan) {
   const CLAN_OPTS = [
     ['clan-star',      'Star (5 units · 1 star)'],
     ['clan-nova',      'Nova (10 units · 2 stars — Mech + Elemental)'],
@@ -3931,15 +3103,7 @@ function lbBuildFormationDropdowns(isClan, which) {
     ['clan-cluster',   'Cluster (75 units · 15 stars)'],
     ['clan-galaxy',    'Galaxy (225 units · 45 stars)'],
   ];
-  const IS_SEARCH_OPTS = [
-    ['lance',       'Lance (4 units · 1 lance)'],
-    ['aug-lance',   'Augmented Lance (6 units · 1 lance)'],
-    ['demi',        'Demi-Company (6 units · 2 lances)'],
-    ['company',     'Company (12 units · 3 lances)'],
-    ['aug-company', 'Augmented Company (12 units · 3 lances)'],
-    ['ctf',         'Company Task Force (20 units · 5 lances)'],
-  ];
-  const IS_CSV_OPTS = [
+  const IS_OPTS = [
     ['lance',            'Lance (4 units · 1 lance)'],
     ['aug-lance',        'Augmented Lance (6 units · 1 lance + support)'],
     ['demi',             'Demi-Company (6 units · 1–2 lances)'],
@@ -3957,59 +3121,16 @@ function lbBuildFormationDropdowns(isClan, which) {
     ['reinf-brigade',    'Reinforced Brigade (432 units · 108 lances)'],
     ['prov-brigade',     'Provisional Brigade (216 units · 54 lances)'],
   ];
-  if (!which || which === 'search') {
-    const sOpts = (isClan ? CLAN_OPTS : IS_SEARCH_OPTS).map(([v,t]) => `<option value="${v}">${t}</option>`).join('');
-    const sfEl = document.getElementById('lb-search-formation');
-    if (sfEl) sfEl.innerHTML = sOpts;
-  }
-  if (!which || which === 'csv') {
-    const cOpts = (isClan ? CLAN_OPTS : IS_CSV_OPTS).map(([v,t]) => `<option value="${v}">${t}</option>`).join('');
-    const cfEl = document.getElementById('lb-formation-type');
-    if (cfEl) cfEl.innerHTML = cOpts;
-  }
-}
-
-function lbFactionChanged() {
-  const factionId = document.getElementById('lb-faction')?.value || '';
-  const isClan    = lbIsClanFaction(factionId);
-  // Rebuild search-tab formation dropdown only
-  lbBuildFormationDropdowns(isClan, 'search');
-  // Reset roster to the newly selected (first) formation
-  const fKey = document.getElementById('lb-search-formation')?.value || (isClan ? 'clan-star' : 'lance');
-  const fDef = LB_FORMATIONS[fKey];
-  if (fDef) {
-    lbSearchFormKey     = fKey;
-    lbSearchLances      = Array.from({ length: fDef.lances }, () => Array(fDef.unitsPerLance).fill(null));
-    lbSearchLanceTypes  = Array(fDef.lances).fill('');
-    lbSearchLanceSkills = Array(fDef.lances).fill(3);
-    lbSearchCmdState    = {};
-    lbSearchUnitBonuses = {};
-  }
-  // Clear stale search results
-  const resEl = document.getElementById('lb-results');
-  if (resEl) { resEl.style.display = 'none'; resEl.innerHTML = ''; resEl._units = {}; }
-  document.getElementById('lb-status').textContent = 'Faction changed — search again to see available units.';
-  document.getElementById('lb-status').className = 'lb-status';
-  lbRenderLance();
-}
-
-function lbCsvFactionChanged() {
-  const factionId = document.getElementById('lb-csv-faction')?.value || '';
-  const isClan    = lbIsClanFaction(factionId);
-  // Rebuild CSV-tab formation dropdown only
-  lbBuildFormationDropdowns(isClan, 'csv');
+  const kOpts = (isClan ? CLAN_OPTS : IS_OPTS).map(([v,t]) => `<option value="${v}">${t}</option>`).join('');
+  const kfEl = document.getElementById('sb-formation-type');
+  if (kfEl) kfEl.innerHTML = kOpts;
 }
 
 function lbSwitchMode(mode) {
-  document.getElementById('lb-mode-search').style.display   = mode === 'search'   ? '' : 'none';
   document.getElementById('lb-mode-owned').style.display    = mode === 'owned'    ? '' : 'none';
-  document.getElementById('lb-mode-csv').style.display      = mode === 'csv'      ? '' : 'none';
   document.getElementById('lb-mode-skirmish').style.display = mode === 'skirmish' ? '' : 'none';
-  document.getElementById('lb-tab-search').classList.toggle('on', mode === 'search');
   document.getElementById('lb-tab-owned').classList.toggle('on', mode === 'owned');
-  document.getElementById('lb-tab-csv').classList.toggle('on', mode === 'csv');
   document.getElementById('lb-tab-skirmish').classList.toggle('on', mode === 'skirmish');
-  if (mode === 'csv') lbCsvRefreshSavedSelect();
   if (mode === 'skirmish') { sbInit(); sbRefreshSavedSelect(); sbRefreshCollectionSelect(); }
 }
 
@@ -4291,6 +3412,8 @@ function sbFactionChanged() {
   sbApplyFactionYearPreset();
   sbClearCatalog();
   sbRenderForce();
+  const isClan = !!sbFactionMeta[document.getElementById('sb-faction')?.value]?.isClan;
+  lbBuildFormationDropdowns(isClan);
 }
 
 // Auto-suggests the Introduced Year range for factions with a verified
@@ -4778,7 +3901,7 @@ function sbBuildTypeTabs(filtered) {
 function sbAddUnit(id) {
   const unit = document.getElementById('sb-unit-grid')?._umap?.[id];
   if (!unit) return;
-  if (sbForce.length >= 12) { alert('Force is full (12 units max).'); return; }
+  if (sbForce.length >= 500) { alert('Force is full (500 units max).'); return; }
   if (sbForce.some(f => f.unit.Id === id)) return;
   sbForce.push({ unit, skill: 4 });
   sbRenderForce();
@@ -4817,6 +3940,41 @@ function sbStoredLances() {
 
 function sbSetStoredLances(lances) {
   localStorage.setItem(SB_SAVED_STORAGE_KEY, JSON.stringify(lances));
+}
+
+// One-time migration: saved CSV Formation Builder lists (bmtSavedCsvLists.v1,
+// pool of {query, unit}) become Skirmish saved forces (bmtSavedLances.v1,
+// force of {unit, skill}) so they stay accessible now that the CSV tab is
+// retired. Non-destructive — the old key is left in place — and guarded by a
+// flag so it only ever runs once. Name collisions get a " (CSV)" suffix;
+// unmatched pool rows (no MUL record) are dropped, matching what the
+// formation builder could actually use.
+function sbMigrateCsvLists() {
+  if (localStorage.getItem('bmtSavedCsvLists.migrated')) return;
+  let csvLists;
+  try {
+    csvLists = JSON.parse(localStorage.getItem('bmtSavedCsvLists.v1') || '{}');
+  } catch (_) { csvLists = {}; }
+  const names = Object.keys(csvLists);
+  if (names.length) {
+    const forces = sbStoredLances();
+    names.forEach(n => {
+      const units = (csvLists[n]?.pool || []).filter(r => r.unit).map(r => ({ unit: r.unit, skill: 4 }));
+      if (!units.length) return;
+      let key = n;
+      if (forces[key]) key = `${n} (CSV)`;
+      if (forces[key]) return; // already migrated under the suffixed name too
+      forces[key] = {
+        name: key,
+        updatedAt: csvLists[n].updatedAt || new Date().toISOString(),
+        unitCount: units.length,
+        totalPV: units.reduce((s, f) => s + (f.unit.BFPointValue || 0), 0),
+        force: units,
+      };
+    });
+    sbSetStoredLances(forces);
+  }
+  localStorage.setItem('bmtSavedCsvLists.migrated', '1');
 }
 
 function sbSaveForcePrompt() {
@@ -6125,7 +5283,6 @@ function rsSheetSVG(m, pilot) {
 /* ── OWNED UNITS ───────────────────────────────────── */
 let lbOwnedRows = [];
 let lbOwnedVisibleIds = [];
-let lbOwnedBuildPool = [];
 let lbOwnedSheetManifest = null;
 const LB_OWNED_STORAGE_KEY = 'bmtOwnedRosters.v1';
 
@@ -6790,7 +5947,6 @@ function lbOwnedLoadRosterPrompt() {
     if (!r.filterData) r.filterData = {};
     if (!r.matches) r.matches = [];
   });
-  lbOwnedBuildPool = [];
   lbOwnedRefreshFactionFilter();
   lbOwnedRender();
   localStorage.setItem('bmtOwnedRosters.lastName', name);
@@ -6939,10 +6095,8 @@ function lbOwnedDeleteRow(rowId) {
   if (!row) return;
   if (!confirm(`Delete ${row.displayName} from this owned-units list?`)) return;
   lbOwnedRows = lbOwnedRows.filter(r => r.id !== rowId);
-  lbOwnedBuildPool = lbOwnedBuildPool.filter(u => u._ownedRowId !== rowId);
   lbOwnedRefreshFactionFilter();
   lbOwnedRender();
-  lbOwnedRenderBuildPool();
   const status = document.getElementById('lb-owned-status');
   if (status) status.textContent = `${row.displayName} deleted from the local owned-units list.`;
 }
@@ -6953,255 +6107,29 @@ function lbOwnedDeleteSelected() {
   if (!confirm(`Delete ${selected.length} selected unit${selected.length !== 1 ? 's' : ''} from this owned-units list?`)) return;
   const ids = new Set(selected.map(r => r.id));
   lbOwnedRows = lbOwnedRows.filter(r => !ids.has(r.id));
-  lbOwnedBuildPool = lbOwnedBuildPool.filter(u => !ids.has(u._ownedRowId));
   lbOwnedRefreshFactionFilter();
   lbOwnedRender();
-  lbOwnedRenderBuildPool();
   const status = document.getElementById('lb-owned-status');
   if (status) status.textContent = `${selected.length} selected unit${selected.length !== 1 ? 's' : ''} deleted from the local owned-units list.`;
 }
 
 function lbOwnedSendToBuilder() {
-  const selected = lbOwnedRows.filter(r => r.selected && r.unit).map(r => ({
-    ...r.unit,
-    _ownedLabel: r.displayName,
-    _ownedRowId: r.id,
-  }));
+  const selected = lbOwnedRows.filter(r => r.selected && r.unit).map(r => r.unit);
   if (!selected.length) { alert('Select matched owned units first.'); return; }
-  lbPoolUnits = selected.map(u => ({ query: u._ownedLabel || u.Name, unit: u }));
-  lbCurrentLances = [];
-  lbLanceTypes = [];
-  lbFormationDirty = false;
-  lbCmdState = {};
-  lbUnitBonuses = {};
-  lbSwitchMode('csv');
-  lbRenderPool(lbPoolUnits);
-  document.getElementById('lb-build-btn').disabled = false;
-  document.getElementById('lb-formation-out').innerHTML = '';
-  const status = document.getElementById('lb-csv-status');
+  const room = 500 - sbForce.length;
+  selected.slice(0, Math.max(0, room)).forEach(u => {
+    if (sbForce.some(f => f.unit.Id === u.Id)) return;
+    sbForce.push({ unit: u, skill: 4 });
+  });
+  lbSwitchMode('skirmish');
+  sbRenderForce();
+  sbRenderBrowse();
+  const status = document.getElementById('sb-status');
   if (status) {
-    status.textContent = `${selected.length} selected owned unit${selected.length !== 1 ? 's' : ''} ready. Choose a formation type and click Build Formation.`;
+    status.textContent = `${selected.length} selected owned unit${selected.length !== 1 ? 's' : ''} added to the Tournament Force. Choose a formation type below and click Build Formation.`;
     status.className = 'lb-status';
   }
-  document.getElementById('lb-mode-csv')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function lbOwnedRenderBuildPool() {
-  const el = document.getElementById('lb-owned-unassigned');
-  if (!el) return;
-  if (!lbOwnedBuildPool.length) {
-    el.style.display = 'none';
-    el.innerHTML = '';
-    return;
-  }
-  el.style.display = 'block';
-  el.innerHTML = `<div class="lb-owned-pool-head">
-    <span class="lb-owned-pool-title">Unassigned Owned Pool (${lbOwnedBuildPool.length})</span>
-    <div style="display:flex;gap:6px">
-      <button class="lb-btn-sm" onclick="lbOwnedAddAllToRoster()">Add All That Fit</button>
-      <button class="lb-btn-sm lb-btn-rm" onclick="lbOwnedClearBuildPool()">Clear Pool</button>
-    </div>
-  </div>` + lbOwnedBuildPool.map((u, i) => `<div class="lb-owned-pool-row">
-    <div class="lb-rname">${lbEsc(u._ownedLabel || u.Name)}<small>${lbEsc(u.Name)} · ${lbEsc(u.Role?.Name || 'No role')} · MV ${lbEsc(u.BFMove || '?')}</small></div>
-    <span class="lb-rpv">${lbEsc(u.BFPointValue || '?')} PV</span>
-    <button class="lb-btn-sm" onclick="lbOwnedAddPoolUnit(${i})">Add</button>
-  </div>`).join('');
-}
-
-function lbOwnedAddPoolUnit(idx) {
-  const unit = lbOwnedBuildPool[idx];
-  if (!unit) return;
-  let placed = false;
-  outer: for (let li = 0; li < lbSearchLances.length; li++) {
-    for (let si = 0; si < lbSearchLances[li].length; si++) {
-      if (lbSearchLances[li][si] === null) {
-        lbSearchLances[li][si] = unit;
-        placed = true;
-        break outer;
-      }
-    }
-  }
-  if (!placed) {
-    alert('The current formation is full. Change formation size or remove a unit first.');
-    return;
-  }
-  lbOwnedBuildPool.splice(idx, 1);
-  lbRenderLance();
-  lbOwnedRenderBuildPool();
-}
-
-function lbOwnedAddAllToRoster() {
-  for (let i = 0; i < lbOwnedBuildPool.length;) {
-    const before = lbOwnedBuildPool.length;
-    lbOwnedAddPoolUnit(i);
-    if (lbOwnedBuildPool.length === before) break;
-  }
-}
-
-function lbOwnedClearBuildPool() {
-  lbOwnedBuildPool = [];
-  lbOwnedRenderBuildPool();
-}
-
-function lbLoadCSV(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => lbParseCSV(e.target.result);
-  reader.readAsText(file);
-}
-
-function lbParseCSV(text) {
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  // Skip header rows (non-unit lines like "Mech Units")
-  const unitNames = lines.filter(l => {
-    const lower = l.toLowerCase();
-    return !lower.startsWith('mech unit') && !lower.startsWith('unit') && !lower.startsWith('#') && l.length > 1;
-  });
-  if (unitNames.length === 0) {
-    document.getElementById('lb-csv-status').textContent = 'No unit names found in file.';
-    return;
-  }
-  document.getElementById('lb-csv-status').textContent = `Found ${unitNames.length} unit names. Looking up on Master Unit List…`;
-  document.getElementById('lb-csv-pool').style.display = 'none';
-  document.getElementById('lb-formation-out').innerHTML = '';
-  document.getElementById('lb-build-btn').disabled = true;
-  lbBatchLookup(unitNames);
-}
-
-async function lbBatchLookup(names) {
-  const status = document.getElementById('lb-csv-status');
-  const resolved = [];
-  const failed = [];
-  const csvFaction = document.getElementById('lb-csv-faction')?.value || '';
-
-  for (let i = 0; i < names.length; i++) {
-    status.textContent = `Looking up ${i + 1} / ${names.length}: ${names[i]}…`;
-    try {
-      const params = new URLSearchParams({ Name: names[i] });
-      if (csvFaction) params.set('Factions', csvFaction);
-      const res = await fetch(`${MUL_API}?${params}`);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      const units = data.Units || data;
-      if (units && units.length > 0) {
-        // Pick best match: exact name first, otherwise first result
-        const exact = units.find(u => u.Name.toLowerCase() === names[i].toLowerCase());
-        resolved.push({ query: names[i], unit: exact || units[0] });
-      } else {
-        failed.push(names[i]);
-        resolved.push({ query: names[i], unit: null });
-      }
-    } catch(e) {
-      failed.push(names[i]);
-      resolved.push({ query: names[i], unit: null });
-    }
-    // Small delay to be polite to the API
-    if (i < names.length - 1) await new Promise(r => setTimeout(r, 120));
-  }
-
-  lbPoolUnits = resolved;
-  const okCount = resolved.filter(r => r.unit).length;
-  status.textContent = `Resolved ${okCount} of ${names.length} units. ${failed.length > 0 ? failed.length + ' not found.' : 'All found!'} Select a formation type and click Build.`;
-  status.className = failed.length > 0 ? 'lb-status err' : 'lb-status';
-  document.getElementById('lb-build-btn').disabled = false;
-  lbRenderPool(resolved);
-}
-
-function lbRenderPool(resolved) {
-  const el = document.getElementById('lb-pool-list');
-  el.innerHTML = resolved.map(r => {
-    if (!r.unit) {
-      return `<div class="lb-result-row">
-        <div class="lb-rname">${r.query} <small style="color:var(--red)">Not found in MUL</small></div>
-      </div>`;
-    }
-    const u = r.unit;
-    const sz = u.BFSize || 0;
-    const role = u.Role ? u.Role.Name : '—';
-    return `<div class="lb-result-row">
-      <div class="lb-rname">${u.Name}<small>${u.Tonnage||'?'}t · ${role} · MV ${u.BFMove||'?'}</small></div>
-      <span class="lb-rpill ${LB_SZ_CLS[sz]}">${LB_SZ[sz]||'?'}</span>
-      <span class="lb-rpv">${u.BFPointValue||'?'} PV</span>
-    </div>`;
-  }).join('');
-  document.getElementById('lb-csv-pool').style.display = 'block';
-}
-
-// Saved CSV lists persist the resolved MUL lookups (query + matched unit),
-// same shape lbBatchLookup already builds, so loading skips re-querying the
-// MUL API for names already resolved — same approach as the Owned Units
-// saved-roster and Skirmish Force Builder saved-lance features.
-function lbCsvStoredLists() {
-  try {
-    return JSON.parse(localStorage.getItem(LB_CSV_STORAGE_KEY) || '{}');
-  } catch (_) {
-    return {};
-  }
-}
-
-function lbCsvSetStoredLists(lists) {
-  localStorage.setItem(LB_CSV_STORAGE_KEY, JSON.stringify(lists));
-}
-
-function lbCsvSaveListPrompt() {
-  if (!lbPoolUnits.length) { alert('Upload a CSV before saving a list.'); return; }
-  const defaultName = localStorage.getItem('bmtSavedCsvLists.lastName') || '';
-  const name = prompt('Save list as:', defaultName);
-  if (!name) return;
-  const key = name.trim();
-  if (!key) return;
-  const lists = lbCsvStoredLists();
-  lists[key] = {
-    name: key,
-    updatedAt: new Date().toISOString(),
-    unitCount: lbPoolUnits.length,
-    matchedCount: lbPoolUnits.filter(r => r.unit).length,
-    pool: lbPoolUnits,
-  };
-  lbCsvSetStoredLists(lists);
-  localStorage.setItem('bmtSavedCsvLists.lastName', key);
-  lbCsvRefreshSavedSelect(key);
-  alert(`Saved "${key}" with ${lbPoolUnits.length} units.`);
-}
-
-// Populates the saved-list <select> from storage, keeping the given name
-// selected if provided (otherwise keeps whatever was already selected).
-function lbCsvRefreshSavedSelect(selectName) {
-  const el = document.getElementById('lb-csv-saved-select');
-  if (!el) return;
-  const lists = lbCsvStoredLists();
-  const names = Object.keys(lists).sort((a, b) => a.localeCompare(b));
-  const want = selectName ?? el.value;
-  el.innerHTML = names.length
-    ? names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${lists[n].unitCount || 0} units)</option>`).join('')
-    : '<option value="">No saved lists</option>';
-  if (names.includes(want)) el.value = want;
-}
-
-function lbCsvLoadSelected() {
-  const name = document.getElementById('lb-csv-saved-select')?.value;
-  if (!name) { alert('No saved list selected.'); return; }
-  const saved = lbCsvStoredLists()[name];
-  if (!saved?.pool?.length) { alert('That saved list has no units.'); return; }
-  lbPoolUnits = saved.pool;
-  const okCount = lbPoolUnits.filter(r => r.unit).length;
-  const status = document.getElementById('lb-csv-status');
-  status.textContent = `Loaded "${name}": ${okCount} of ${lbPoolUnits.length} units matched. Select a formation type and click Build.`;
-  status.className = okCount < lbPoolUnits.length ? 'lb-status err' : 'lb-status';
-  document.getElementById('lb-build-btn').disabled = false;
-  lbRenderPool(lbPoolUnits);
-  localStorage.setItem('bmtSavedCsvLists.lastName', name);
-}
-
-function lbCsvDeleteSelected() {
-  const name = document.getElementById('lb-csv-saved-select')?.value;
-  if (!name) { alert('No saved list selected.'); return; }
-  if (!confirm(`Delete saved list "${name}"?`)) return;
-  const lists = lbCsvStoredLists();
-  delete lists[name];
-  lbCsvSetStoredLists(lists);
-  lbCsvRefreshSavedSelect();
+  document.getElementById('lb-mode-skirmish')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function lbAssignToTypes(pool, typeKeys, upl) {
@@ -7218,41 +6146,35 @@ function lbAssignToTypes(pool, typeKeys, upl) {
   return { lances, remaining };
 }
 
-function lbBuildFormation() {
-  const fKey    = document.getElementById('lb-formation-type').value;
-  const specKey = document.getElementById('lb-special-type').value;
+// ── Organizes the current Tournament Force (sbForce) into lances using the
+// shared formation engine (lbAssignToTypes / lbRenderLanceOutput). ──────────
+function sbBuildFormation() {
+  const fKey    = lbFTypeEl().value;
+  const specKey = lbSTypeEl().value;
   const fDef    = LB_FORMATIONS[fKey];
   if (!fDef) return;
+  if (!sbForce.length) { alert('Add units to your Tournament Force first.'); return; }
 
-  const eraRange   = lbParseEraVal(document.getElementById('lb-csv-era')?.value);
-  const csvFacId   = document.getElementById('lb-csv-faction')?.value || '';
-  const csvIsClan  = lbIsClanFaction(csvFacId);
-  let available    = lbPoolUnits.filter(r => r.unit).map(r => r.unit);
-  if (eraRange) {
-    // Keep units introduced UP TO the era end — older units remain in service
-    available = available.filter(u => {
-      const y = parseInt(u.DateIntroduced) || 0;
-      return y <= eraRange.max;
-    });
-  }
+  const isClan  = lbFormationIsClan();
+  const facId   = lbFFactionEl()?.value || '';
+  let available = sbForce.map(f => f.unit);
+
   // Faction tech filter: Clans don't field IS-only mechs; IS factions don't field Clan-only mechs
   const techFiltered = [];
-  if (csvIsClan) {
+  if (isClan) {
     available = available.filter(u => {
       const tech = u.Technology?.Name || '';
       if (tech === 'Inner Sphere') { techFiltered.push(u.Name); return false; }
       return true;
     });
-  } else if (csvFacId) {
+  } else if (facId) {
     available = available.filter(u => {
       const tech = u.Technology?.Name || '';
       if (tech === 'Clan') { techFiltered.push(u.Name); return false; }
       return true;
     });
   }
-  const unresolved = lbPoolUnits.filter(r => !r.unit).map(r => r.query);
 
-  // Build type list — all lances get the global type initially
   const typeKeys = Array(fDef.lances).fill(specKey);
   const { lances, remaining } = lbAssignToTypes(available, typeKeys, fDef.unitsPerLance);
 
@@ -7262,7 +6184,7 @@ function lbBuildFormation() {
   lbCmdState       = {};
   lbUnitBonuses    = {};
 
-  lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered);
+  lbRenderLanceOutput(fDef, [], remaining, techFiltered);
 }
 
 function lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered) {
@@ -7280,7 +6202,7 @@ function lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered) {
     <div class="lb-formation-header">
       <span class="lb-formation-title">${fDef.name}</span>
       <span class="lb-formation-meta">
-        ${lances.length} ${lbGroupWord(lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||''), lances.length)} &nbsp;·&nbsp;
+        ${lances.length} ${lbGroupWord(lbFormationIsClan(), lances.length)} &nbsp;·&nbsp;
         Total PV: <span style="color:var(--accent)" id="lb-total-pv">${totalPV}</span> &nbsp;·&nbsp;
         Supply: <span style="color:var(--green)" id="lb-total-sp">${supply}</span>
         &nbsp;·&nbsp; <button class="lb-btn-sm" onclick="lbPrintLances()" style="padding:2px 10px">🖨 Print</button>
@@ -7297,9 +6219,8 @@ function lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered) {
   html += `</div></div>`;
 
   if (techFiltered && techFiltered.length > 0) {
-    const csvFacName = LB_FACTIONS.find(f => f.id === (document.getElementById('lb-csv-faction')?.value||''))?.name || 'selected faction';
     html += `<div class="lb-unresolved" style="margin-top:10px;color:var(--red)">
-      ⚠ Wrong tech excluded for ${csvFacName}: ${techFiltered.join(', ')}</div>`;
+      ⚠ Wrong tech excluded for ${lbFormationFactionName()}: ${techFiltered.join(', ')}</div>`;
   }
   if (unresolved && unresolved.length > 0) {
     html += `<div class="lb-unresolved" style="margin-top:10px">
@@ -7310,14 +6231,14 @@ function lbRenderLanceOutput(fDef, unresolved, remaining, techFiltered) {
       ${remaining.length} unit${remaining.length!==1?'s':''} in pool not used by this formation size.</div>`;
   }
 
-  document.getElementById('lb-formation-out').innerHTML = html;
+  document.getElementById(lbFOutId()).innerHTML = html;
   // Apply skill multipliers after render (skill selects now exist in DOM)
   lbCurrentLances.forEach((_, li) => lbSkillChanged(li));
   lbUpdateTotalPV();
 }
 
 function lbPrintLances() {
-  const fKey = document.getElementById('lb-formation-type').value;
+  const fKey = lbFTypeEl().value;
   const fDef = LB_FORMATIONS[fKey] || {};
   const totalPV = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
 
@@ -7363,7 +6284,7 @@ function lbPrintLances() {
     const lanceWide = (LB_TYPE_ABILITIES[lanceType] || {}).lanceWide || [];
 
     const pvLabel = skill === 4 ? `${rawPV} PV` : `${lancePV} PV (×${mult.toFixed(2)})`;
-    const isClanPrintCsv = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+    const isClanPrintCsv = lbFormationIsClan();
     html += `<div class="lance">
       <div class="lance-hdr"><span>${lbGroupLabel(isClanPrintCsv, li)} — ${typeLabel}</span><span>${pvLabel}</span></div>`;
 
@@ -7404,7 +6325,7 @@ function lbPrintLances() {
 function lbDownloadCards() {
   const units = lbCurrentLances.flat().filter(u => u && u.Id);
   if (!units.length) return;
-  const fKey    = document.getElementById('lb-formation-type').value;
+  const fKey    = lbFTypeEl().value;
   const fDef    = LB_FORMATIONS[fKey] || {};
   const totalPV = lbCurrentLances.reduce((s, _, li) => s + lbGetAdjLancePV(li), 0);
   const MUL_CARD = 'https://masterunitlist.azurewebsites.net/Unit/Card/';
@@ -7420,7 +6341,7 @@ function lbDownloadCards() {
     const lanceWide  = (LB_TYPE_ABILITIES[lanceType] || {}).lanceWide || [];
 
     // Lance/Star header row
-    const isClanDlCards = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+    const isClanDlCards = lbFormationIsClan();
     cardRows += `<div class="lance-hdr">
       <span class="lhdr-title">${lbGroupLabel(isClanDlCards, li)} — ${typeLabel}</span>
       <span class="lhdr-meta">${lancePV} PV &nbsp;·&nbsp; ${skillTxt}</span>
@@ -7826,12 +6747,11 @@ async function lbOpenSheetsCore(cfg) {
   if (w) { w.document.write(html); w.document.close(); }
 }
 
-// ── CSV tab wrapper ──────────────────────────────────────────────────────────
 async function lbOpenSheets() {
   if (!lbCurrentLances.flat().filter(Boolean).length) return;
-  const fKey   = document.getElementById('lb-formation-type').value;
+  const fKey   = lbFTypeEl().value;
   const fDef   = LB_FORMATIONS[fKey] || {};
-  const isClan = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+  const isClan = lbFormationIsClan();
   await lbOpenSheetsCore({
     lances:      lbCurrentLances,
     lanceTypes:  lbLanceTypes,
@@ -7851,28 +6771,6 @@ async function lbOpenSheets() {
       const el = document.getElementById(`lb-skill-${li}`);
       return el ? parseInt(el.value, 10) + 1 : 4;
     },
-  });
-}
-
-// ── Search tab wrapper ───────────────────────────────────────────────────────
-async function lbSearchOpenSheets() {
-  if (!lbSearchLances.flat().filter(Boolean).length) {
-    alert('Add units to the roster first.'); return;
-  }
-  const skillLabels = ['Legendary','Elite','Veteran','Regular','Green'];
-  const fDef   = LB_FORMATIONS[lbSearchFormKey] || {};
-  const isClan = lbIsClanFaction(document.getElementById('lb-faction')?.value||'');
-  await lbOpenSheetsCore({
-    lances:      lbSearchLances,
-    lanceTypes:  lbSearchLanceTypes,
-    cmdState:    lbSearchCmdState,
-    unitBonuses: lbSearchUnitBonuses,
-    fDef,
-    totalPV:     lbSearchLances.reduce((s,_,li)=>s+lbSearchGetAdjPV(li),0),
-    isClan,
-    getLancePV:  li => lbSearchGetAdjPV(li),
-    getSkillText: li => skillLabels[lbSearchLanceSkills[li]??3] || 'Regular',
-    getUnitSkill: li => (lbSearchLanceSkills[li] ?? 3) + 1,
   });
 }
 
@@ -7967,15 +6865,15 @@ function lbLanceStatsHtml(units, li) {
     ? Math.round(units.reduce((s,u) => s + lbCalcTMM(u), 0) / units.length)
     : '—';
   const curType   = lbLanceTypes[li] || '';
-  const factionId = document.getElementById('lb-csv-faction')?.value || '';
+  const factionId = lbFFactionEl()?.value || '';
   let typeOpts = '';
   let lastFac = false;
   lbGetFactionTypeOpts(factionId, units, curType).forEach(({ v, t, disabled, faction }) => {
     if (faction && !lastFac) {
-      typeOpts += `<optgroup label="— ${LB_FACTIONS.find(f=>f.id===factionId)?.name||'Faction'} —">`;
+      typeOpts += `<optgroup label="— ${lbFormationFactionName()} —">`;
       lastFac = true;
     }
-    // For CSV tab keep current selection even if no longer qualifies; hide others that don't qualify
+    // Keep current selection even if no longer qualifies; hide others that don't qualify
     if (disabled && v !== curType) return;
     const noLongerQual = v && v === curType && disabled;
     typeOpts += `<option value="${v}" ${v===curType?'selected':''}>${t}${noLongerQual?' (no longer qualifies)':''}</option>`;
@@ -8043,7 +6941,7 @@ function lbRenderLanceBlock(units, li, specKey) {
   const compStr  = [1,2,3,4].filter(s=>counts[s]>0).map(s=>`${counts[s]}× ${LB_SZ[s]}`).join(' · ');
   const eligible = lbCheckLanceTypes(counts, units.length);
 
-  const isClanBlock = lbIsClanFaction(document.getElementById('lb-csv-faction')?.value||'');
+  const isClanBlock = lbFormationIsClan();
   let html = `<div class="lb-lance-block" id="lb-block-${li}">
     <div class="lb-lance-title">
       ${lbGroupLabel(isClanBlock, li)}
@@ -8068,8 +6966,8 @@ async function lbLoadVariants(selectEl) {
   const chassis   = selectEl.dataset.chassis;
   const currentId = selectEl.options[0].value;
 
-  const varFaction  = document.getElementById('lb-csv-faction')?.value || '';
-  const varEraRange = lbParseEraVal(document.getElementById('lb-csv-era')?.value);
+  const varFaction  = lbFFactionEl()?.value || '';
+  const varEraRange = null; // Skirmish's era filter already narrowed the catalog before the pool was built
   const cacheKey    = `${chassis}__${varFaction}__${varEraRange?.max||''}`;
   let variants = lbVariantsCache[cacheKey];
   if (!variants) {
@@ -8142,7 +7040,7 @@ function lbSwapUnit(li, si, selectEl) {
 }
 
 function lbReplanLances() {
-  const fKey = document.getElementById('lb-formation-type').value;
+  const fKey = lbFTypeEl().value;
   const fDef = LB_FORMATIONS[fKey];
   if (!fDef) return;
 
