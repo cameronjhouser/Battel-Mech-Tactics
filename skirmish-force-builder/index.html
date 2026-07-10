@@ -7,7 +7,18 @@
 <meta name="description" content="Build an Alpha Strike force from the Master Unit List, organize it into lances, and print cards or record sheets.">
 <link rel="stylesheet" href="../lance-builder-shared.css">
 <style>
-  main { max-width: 1400px; margin: 0 auto; padding: 20px 24px 60px; }
+  main { max-width: 1700px; margin: 0 auto; padding: 20px 24px 60px; }
+  /* Give the Tournament Force column enough room for two lance cards side
+     by side instead of the embedded tab's fixed 320px sidebar. Scoped to
+     the same min-width the shared CSS uses to stack .sb-layout on mobile,
+     so narrow-viewport behavior is untouched. */
+  @media(min-width:901px) {
+    #lb-mode-skirmish .sb-layout { grid-template-columns: minmax(420px, 1fr) minmax(620px, 700px); }
+  }
+  #lb-mode-skirmish .sb-force-list {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    align-content: start; align-items: start; gap: 8px;
+  }
   .sfb-back { font-size: 12px; color: var(--text2); margin-left: auto; white-space: nowrap; }
   .sfb-back a { color: var(--accent); text-decoration: none; }
   .sfb-back a:hover { text-decoration: underline; }
