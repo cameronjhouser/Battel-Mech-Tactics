@@ -1705,59 +1705,78 @@ function sbCardSVG(u, skill) {
   return svg;
 }
 
+// Builds the roster/summary page + paginated card grid HTML shared by the
+// card-print flows. rows: [{ unit, skill }]. title: doc title. groupOf(idx):
+// optional — returns a group label to insert as a break before that card
+// (e.g. "Lance 1"); omit for a flat, ungrouped grid.
+function sbCardsDocHtml(rows, title, groupOf) {
+  const totalPV = rows.reduce((s, r) => s + sbAdjPV(r.unit, r.skill), 0);
+  const totalTon = rows.reduce((s, r) => s + (parseInt(r.unit.Tonnage, 10) || 0), 0);
+
+  const rosterRows = rows.map(r => `<tr>
+    <td>${lbEsc(r.unit.Name)}</td>
+    <td>${lbEsc(r.unit.Type?.Name || r.unit.BFType || '—')}</td>
+    <td class="num">${r.skill}</td>
+    <td class="num">${sbAdjPV(r.unit, r.skill)}</td>
+    <td class="num">${r.unit.Tonnage || '—'}</td>
+  </tr>`).join('');
+
+  let cardCells = '';
+  let lastGroup = undefined;
+  rows.forEach((r, i) => {
+    const group = groupOf ? groupOf(i) : undefined;
+    if (group !== undefined && group !== lastGroup) {
+      cardCells += `<div class="card-group-hdr">${lbEsc(group)}</div>`;
+      lastGroup = group;
+    }
+    cardCells += `<div class="card-wrap">${sbCardSVG(r.unit, r.skill)}</div>`;
+  });
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>${lbEsc(title)}</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    @page { size:letter; margin:0.4in; }
+    body { font-family:Arial,sans-serif; background:#fff; color:#111; }
+    h1 { font-size:20px; margin-bottom:4px; }
+    .meta { font-size:11px; color:#555; margin-bottom:14px; }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th, td { border:1px solid #999; padding:5px 8px; text-align:left; }
+    th { background:#ddd; font-weight:700; }
+    td.num, th.num { text-align:right; }
+    tfoot td { font-weight:700; background:#eee; }
+    .roster-page { page-break-after:always; }
+    .card-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.25in; align-content:start; }
+    .card-group-hdr { grid-column:1/-1; font-size:13px; font-weight:700; padding:6px 0 2px;
+      border-top:2px solid #333; break-after:avoid; page-break-after:avoid; }
+    .card-group-hdr:first-child { border-top:none; }
+    .card-wrap { break-inside:avoid; page-break-inside:avoid; }
+    .card-wrap svg { width:100%; height:auto; display:block; border:1px solid #bbb; border-radius:4px; }
+    @media print { .no-print { display:none; } }
+  </style></head><body>
+  <div class="roster-page">
+    <h1>${lbEsc(title)}</h1>
+    <p class="meta">${rows.length} unit${rows.length !== 1 ? 's' : ''} &nbsp;·&nbsp; Total PV: ${totalPV} &nbsp;·&nbsp; Total Tonnage: ${totalTon}
+      <span class="no-print">&nbsp;·&nbsp; Use <strong>Print → Save as PDF</strong> to download</span></p>
+    <table>
+      <thead><tr><th>Unit</th><th>Type</th><th class="num">Skill</th><th class="num">PV</th><th class="num">Tonnage</th></tr></thead>
+      <tbody>${rosterRows}</tbody>
+      <tfoot><tr><td colspan="3">${rows.length} Unit${rows.length !== 1 ? 's' : ''}</td><td class="num">${totalPV}</td><td class="num">${totalTon}</td></tr></tfoot>
+    </table>
+  </div>
+  <div class="card-grid">${cardCells}</div>
+  </body></html>`;
+}
+
 function sbDownloadCards() {
   if (!sbForce.length) { alert('Add units to your force first.'); return; }
   const { groups, isClan } = sbForceGroups();
-  const totalPV  = sbForce.reduce((s, f) => s + sbAdjPV(f.unit, f.skill), 0);
+  const rows = groups.flat();
+  // Map each flat-row index back to its lance's label for the card-grid group headers
+  const groupLabelForRow = [];
+  groups.forEach((members, li) => members.forEach(() => groupLabelForRow.push(lbGroupLabel(isClan, li))));
 
-  let cardRows = '';
-  groups.forEach((members, li) => {
-    const groupPV  = members.reduce((s, m) => s + sbAdjPV(m.unit, m.skill), 0);
-    const skillTxt = sbSkillTextForGroup(members);
-
-    cardRows += `<div class="lance-hdr">
-      <span class="lhdr-title">${lbGroupLabel(isClan, li)}</span>
-      <span class="lhdr-meta">${groupPV} PV &nbsp;·&nbsp; ${lbEsc(skillTxt)}</span>
-    </div><div class="card-row">`;
-
-    members.forEach(m => {
-      const u = m.unit;
-      cardRows += `<div class="card-wrap">
-        ${sbCardSVG(u, m.skill)}
-      </div>`;
-    });
-    cardRows += `</div>`;
-  });
-
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>Tournament Force — Alpha Strike Cards</title>
-  <style>
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:Arial,sans-serif; background:#fff; }
-    .header { padding:12px 16px; border-bottom:2px solid #333; margin-bottom:10px; }
-    .header h1 { font-size:16px; }
-    .header p  { font-size:11px; color:#555; margin-top:3px; }
-    .lance-hdr { display:flex; justify-content:space-between; align-items:baseline;
-                 padding:8px 14px 4px; margin-top:14px;
-                 border-top:2px solid #333; background:#f0f0f0; }
-    .lhdr-title { font-size:13px; font-weight:700; }
-    .lhdr-meta  { font-size:10px; color:#555; }
-    .card-row  { display:flex; flex-wrap:wrap; gap:12px; padding:10px 14px 6px; }
-    .card-wrap { display:flex; flex-direction:column; align-items:center; width:340px; }
-    .card-wrap svg { border:1px solid #bbb; border-radius:4px; }
-    @media print {
-      body { margin:0; }
-      .lance-hdr { page-break-before:auto; }
-      .card-wrap { page-break-inside:avoid; }
-    }
-  </style></head><body>
-  <div class="header">
-    <h1>Tournament Force — Alpha Strike Cards</h1>
-    <p>Total PV: ${totalPV} &nbsp;·&nbsp; ${sbForce.length} units &nbsp;·&nbsp; Use <strong>Print → Save as PDF</strong> to download</p>
-  </div>
-  ${cardRows}
-  </body></html>`;
-
+  const html = sbCardsDocHtml(rows, 'Tournament Force — Alpha Strike Cards', i => groupLabelForRow[i]);
   const w = window.open('', '_blank');
   if (w) {
     w.document.write(html);
