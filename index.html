@@ -3336,6 +3336,11 @@ function sbInit() {
   });
   sbPopulateFactions(LB_FACTIONS.filter(f => f.id).map(f => ({ value: f.id, label: f.name })));
   sbLoadFactions();
+  // Populate the formation-type dropdown up front — it otherwise only
+  // refreshes on the faction select's onchange, which never fires if the
+  // tab is opened with a faction already selected (e.g. a loaded saved
+  // force) and left untouched, leaving it permanently empty.
+  lbBuildFormationDropdowns(!!sbFactionMeta[sel.value]?.isClan);
   // Close the abilities multi-select when clicking outside it
   document.addEventListener('click', (e) => {
     const grp = document.getElementById('sb-abil-menu')?.parentElement;
