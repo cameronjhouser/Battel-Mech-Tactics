@@ -15,14 +15,19 @@
   @media(min-width:901px) {
     #lb-mode-skirmish .sb-layout { grid-template-columns: minmax(420px, 1fr) minmax(620px, 700px); }
   }
+  /* Lance cards grow the page instead of scrolling inside a fixed box —
+     min-height keeps ~2 rows of cards reserved by default so the panel
+     doesn't look empty/tiny, but it's not a cap: more lances just push
+     the box taller. */
   #lb-mode-skirmish .sb-force-list {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     align-content: start; align-items: start; gap: 8px;
-    max-height: calc(100vh - 220px);
+    min-height: 560px; max-height: none; overflow-y: visible;
   }
-  /* Taller scroll areas for the catalog and lance lists — this page has the
-     vertical room, and the embedded tab's shorter boxes meant more
-     scrolling than necessary. */
+  /* Taller scroll area for the catalog — this page has the vertical room,
+     and the embedded tab's shorter box meant more scrolling than necessary.
+     (It stays a bounded, scrollable list since it can hold hundreds of
+     units — unlike the lance cards above, which grow instead.) */
   #lb-mode-skirmish .sb-table-wrap { max-height: calc(100vh - 220px); }
   .sfb-back { font-size: 12px; color: var(--text2); margin-left: auto; white-space: nowrap; }
   .sfb-back a { color: var(--accent); text-decoration: none; }
