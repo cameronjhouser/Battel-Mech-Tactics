@@ -912,6 +912,8 @@
     color:var(--teal); background:rgba(58,184,160,.12); border:1px solid var(--teal); border-radius:3px; padding:1px 6px; }
   .sb-force-list { display:flex; flex-direction:column; gap:3px; max-height:52vh; overflow-y:auto; }
   .sb-force-unit { background:var(--bg2); border:1px solid var(--border); border-radius:4px; padding:5px 8px; display:flex; align-items:center; gap:5px; }
+  .sb-force-unit.lb-drag-over { outline:2px dashed var(--accent); background:var(--bg3); }
+  .sb-force-unit.lb-dragging  { opacity:.35; }
   .sb-force-name { flex:1; min-width:0; font-size:11px; font-weight:600; }
   .sb-force-name small { display:block; font-size:9px; color:var(--teal); font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .sb-force-pv { font-family:var(--mono); font-size:11px; color:var(--accent); white-space:nowrap; flex-shrink:0; }
@@ -3131,6 +3133,8 @@ const SB_COLLECTION_STORAGE_KEY = 'bmtSavedCollections.v1';
 let sbCatalog    = [];   // all MUL units for current faction/era
 let sbForce      = [];   // array of { unit, skill }
 let sbLanceSpecs = [];   // per-lance-group index -> chosen specialty key ('' = Standard)
+let sbUnitBonuses = {};  // sbForce index -> chosen per-unit ability string (Command Lance etc.)
+let sbDragSrc    = null; // sbForce index currently being dragged
 let sbInited     = false;
 let sbSortKey    = 'BFPointValue';
 let sbSortDir    = 1;    // 1=asc, -1=desc
@@ -3907,6 +3911,15 @@ function sbAddUnit(id) {
 
 function sbRemoveUnit(idx) {
   sbForce.splice(idx, 1);
+  // Shift per-unit ability bonuses down so they stay attached to the units
+  // that kept their position after the removed one.
+  const shifted = {};
+  Object.keys(sbUnitBonuses).forEach(k => {
+    const i = parseInt(k, 10);
+    if (i < idx) shifted[i] = sbUnitBonuses[k];
+    else if (i > idx) shifted[i - 1] = sbUnitBonuses[k];
+  });
+  sbUnitBonuses = shifted;
   sbRenderForce();
   sbRenderBrowse();
 }
@@ -3921,12 +3934,76 @@ function sbSetSkill(idx, val) {
 function sbClearForce() {
   sbForce = [];
   sbLanceSpecs = [];
+  sbUnitBonuses = {};
   sbRenderForce();
   sbRenderBrowse();
 }
 
 function sbSetLanceSpec(groupIdx, val) {
   sbLanceSpecs[groupIdx] = val;
+  sbRenderForce();
+}
+
+function sbSetUnitBonus(idx, ability) {
+  if (ability) sbUnitBonuses[idx] = ability;
+  else delete sbUnitBonuses[idx];
+  sbRenderForce();
+}
+
+// Which per-unit abilities are already taken by other units in the same
+// lance group (group membership is derived positionally — see sbRenderForce).
+function sbGetLanceTaken(groupStart, groupEnd, excludeIdx) {
+  const s = new Set();
+  for (let i = groupStart; i < groupEnd; i++) {
+    if (i === excludeIdx) continue;
+    const b = sbUnitBonuses[i];
+    if (b) s.add(b);
+  }
+  return s;
+}
+
+/* ── Drag-and-drop between lance groups (swaps position in sbForce, which
+   also moves the unit into/out of whichever lance group that position
+   belongs to; its ability bonus, if any, travels with it) ─────────────── */
+function sbDragStart(e, idx) {
+  sbDragSrc = idx;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', String(idx));
+  setTimeout(() => {
+    const el = document.getElementById(`sb-funit-${idx}`);
+    if (el) el.classList.add('lb-dragging');
+  }, 0);
+}
+
+function sbDragEnd() {
+  document.querySelectorAll('.sb-force-unit.lb-dragging, .sb-force-unit.lb-drag-over')
+    .forEach(el => { el.classList.remove('lb-dragging'); el.classList.remove('lb-drag-over'); });
+}
+
+function sbDragOver(e, idx) {
+  e.preventDefault();
+  if (sbDragSrc === null || sbDragSrc === idx) return;
+  document.querySelectorAll('.sb-force-unit.lb-drag-over')
+    .forEach(el => el.classList.remove('lb-drag-over'));
+  const el = document.getElementById(`sb-funit-${idx}`);
+  if (el) el.classList.add('lb-drag-over');
+}
+
+function sbDrop(e, idx) {
+  e.preventDefault();
+  const src = sbDragSrc;
+  sbDragEnd();
+  if (src === null || src === idx) return;
+
+  const tmp = sbForce[idx];
+  sbForce[idx] = sbForce[src];
+  sbForce[src] = tmp;
+
+  const bonA = sbUnitBonuses[idx], bonB = sbUnitBonuses[src];
+  delete sbUnitBonuses[idx]; delete sbUnitBonuses[src];
+  if (bonA !== undefined) sbUnitBonuses[src] = bonA;
+  if (bonB !== undefined) sbUnitBonuses[idx] = bonB;
+
   sbRenderForce();
 }
 
@@ -4022,6 +4099,7 @@ function sbLoadSelected() {
   if (!saved?.force?.length) { alert('That saved force has no units.'); return; }
   sbForce = saved.force;
   sbLanceSpecs = [];
+  sbUnitBonuses = {};
   sbRenderForce();
   sbRenderBrowse();
   localStorage.setItem('bmtSavedLances.lastName', name);
@@ -4426,16 +4504,37 @@ function sbRenderForce() {
     return;
   }
 
-  const unitRow = (f, idx) => {
+  const unitRow = (f, idx, perUnitList, taken) => {
     const adjPV  = sbAdjPV(f.unit, f.skill);
     const abil   = (f.unit.BFAbilities || '').trim();
     const opts   = SB_SKILL_LEVELS.map(s =>
       `<option value="${s}"${f.skill===s?' selected':''}>Sk${s}</option>`
     ).join('');
-    return `<div class="sb-force-unit">
+    const unitBonus = sbUnitBonuses[idx] || '';
+    let perUnitHtml = '';
+    if (perUnitList && perUnitList.length > 0) {
+      const available = perUnitList.filter(a => !taken.has(a) || a === unitBonus);
+      const bOpts = available.map(a =>
+        `<option value="${a}" ${a===unitBonus?'selected':''}>${a}</option>`).join('');
+      perUnitHtml = `<div class="lb-cmd-pick">
+        <select onchange="sbSetUnitBonus(${idx},this.value)">
+          <option value="">— pick ability —</option>${bOpts}
+        </select>
+      </div>`;
+      if (unitBonus) perUnitHtml +=
+        `<div class="lb-unit-abil" style="color:var(--orange)">★ ${unitBonus}</div>` +
+        `<div class="lb-unit-abil" style="color:var(--text3)">${LB_ABILITY_DESC[unitBonus]||''}</div>`;
+    }
+    return `<div class="sb-force-unit" id="sb-funit-${idx}"
+      draggable="true"
+      ondragstart="sbDragStart(event,${idx})"
+      ondragend="sbDragEnd(event)"
+      ondragover="sbDragOver(event,${idx})"
+      ondrop="sbDrop(event,${idx})">
       <div class="sb-force-name">
         ${lbEsc(f.unit.Name)}
         ${abil?`<small>${lbEsc(abil)}</small>`:''}
+        ${perUnitHtml}
       </div>
       <select class="sb-skill-sel" onchange="sbSetSkill(${idx},this.value)">${opts}</select>
       <span class="sb-force-pv">${adjPV}</span>
@@ -4446,7 +4545,9 @@ function sbRenderForce() {
   // Group the force into lances (IS, 4 units) or stars (Clan, 5 units) in
   // add order, each with an editable Lance Specialty picker (reuses the
   // formation engine's own qualification check — lbGetFactionTypeOpts —
-  // to disable specialties this group's unit mix doesn't qualify for).
+  // to disable specialties this group's unit mix doesn't qualify for) and,
+  // where the specialty allows it, a per-unit ability picker or lance-wide
+  // ability note (reuses LB_TYPE_ABILITIES/LB_ABILITY_DESC).
   const factionId = sbCurrentFactionId();
   const isClan    = !!sbFactionMeta[factionId]?.isClan;
   const groupSize = isClan ? 5 : 4;
@@ -4454,7 +4555,8 @@ function sbRenderForce() {
 
   let html = '';
   for (let start = 0, g = 0; start < sbForce.length; start += groupSize, g++) {
-    const members  = sbForce.slice(start, start + groupSize);
+    const end      = Math.min(start + groupSize, sbForce.length);
+    const members  = sbForce.slice(start, end);
     const groupPV  = members.reduce((s, m) => s + sbAdjPV(m.unit, m.skill), 0);
     const full     = members.length === groupSize;
     const subNote  = full ? '' : `<span class="sb-lance-sub">${members.length}/${groupSize}</span>`;
@@ -4462,13 +4564,21 @@ function sbRenderForce() {
     const specOpts = lbGetFactionTypeOpts(factionId, members.map(m => m.unit), curSpec)
       .map(o => `<option value="${o.v}"${o.v===curSpec?' selected':''}${o.disabled&&o.v!==curSpec?' disabled':''}>${lbEsc(o.t)}${o.disabled&&o.v===curSpec?' (no longer qualifies)':''}</option>`)
       .join('');
+    const typeInfo    = LB_TYPE_ABILITIES[curSpec] || {};
+    const lanceWideHtml = (typeInfo.lanceWide || []).map(a =>
+      `<div style="margin:4px 0">
+        <span class="lb-unit-abil" style="color:var(--orange)">★ ${a}</span>
+        <div class="lb-unit-abil">${LB_ABILITY_DESC[a]||''}</div>
+      </div>`
+    ).join('');
     html += `<div class="sb-lance-group">
       <div class="sb-lance-head">
         <span class="sb-lance-title">${groupWord} ${g+1}${subNote}</span>
         <span class="sb-lance-pv">${groupPV} PV</span>
       </div>
       <select class="sb-lance-spec-sel" onchange="sbSetLanceSpec(${g},this.value)" title="Lance specialty">${specOpts}</select>
-      ${members.map((f, mi) => unitRow(f, start + mi)).join('')}
+      ${lanceWideHtml}
+      ${members.map((f, mi) => unitRow(f, start + mi, typeInfo.perUnit, sbGetLanceTaken(start, end, start + mi))).join('')}
     </div>`;
   }
   listEl.innerHTML = html;
