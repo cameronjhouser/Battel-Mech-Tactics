@@ -501,11 +501,6 @@
   .lb-mode-btn.on { color:var(--accent); border-bottom-color:var(--accent); }
   .lb-mode-btn:hover:not(.on) { color:var(--text); }
 
-  .lb-csv-controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:flex-end; }
-  .lb-csv-controls select {
-    background:var(--bg3); border:1px solid var(--border2); color:var(--text);
-    font-family:var(--sans); font-size:13px; padding:7px 10px; border-radius:4px; width:100%;
-  }
   .lb-file-label {
     display:inline-flex; align-items:center; gap:8px; background:var(--bg3);
     border:1px solid var(--border2); border-radius:4px; padding:7px 12px;
@@ -924,18 +919,6 @@
   .sb-force-remove:hover { color:#ff6666; }
   .sb-skill-sel { font-size:10px; background:var(--bg3); color:var(--text); border:1px solid var(--border); border-radius:3px; padding:2px 3px; flex-shrink:0; }
   .sb-empty-hint { font-size:11px; color:var(--text3); text-align:center; padding:18px 0; }
-  /* Lance / Star grouping in the force panel */
-  .sb-lance-group { border:1px solid var(--border); border-radius:5px; padding:6px; margin-bottom:8px; background:var(--bg1); }
-  .sb-lance-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:4px; }
-  .sb-lance-title { font-family:var(--cond); font-weight:700; font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:var(--text); }
-  .sb-lance-title .sb-lance-sub { font-size:9px; color:var(--text3); font-weight:400; margin-left:5px; letter-spacing:0; text-transform:none; }
-  .sb-lance-pv { font-family:var(--mono); font-size:11px; color:var(--accent); }
-  .sb-lance-specs { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:5px; }
-  .sb-spec-badge { font-size:9px; font-family:var(--cond); font-weight:700; letter-spacing:.03em;
-    color:var(--green); background:rgba(70,170,90,.12); border:1px solid var(--green); border-radius:3px; padding:1px 6px; }
-  .sb-spec-none { font-size:9px; color:var(--text3); font-style:italic; }
-  .sb-lance-group .sb-force-unit { margin-bottom:3px; }
-  .sb-lance-group .sb-force-unit:last-child { margin-bottom:0; }
   @media(max-width:900px) { .sb-layout { grid-template-columns:1fr; } .sb-force-panel { position:static; } }
 </style>
 </head>
@@ -2469,6 +2452,23 @@
           <button class="lb-btn-sm" onclick="sbOpenSheets()" style="padding:2px 10px">📋 Sheets</button>
         </div>
         <div class="card" style="padding:8px 10px;margin-bottom:0">
+          <div class="card-title" style="font-size:12px;margin-bottom:6px">Build Formation</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <select id="sb-formation-type" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:4px 6px"></select>
+            <select id="sb-special-type" title="Optionally group lances by special type" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:4px 6px">
+              <option value="">Standard (sort by weight)</option>
+              <option value="recon">Recon / Scout Lance</option>
+              <option value="strike">Strike / Striker Lance</option>
+              <option value="fire">Fire Lance</option>
+              <option value="battle">Battle / Line Lance</option>
+              <option value="assault-sp">Assault Lance (Special)</option>
+              <option value="command">Command Lance</option>
+              <option value="pursuit">Pursuit Lance</option>
+            </select>
+            <button class="lb-btn" onclick="sbBuildFormation()" style="width:100%">⚔ Build Formation</button>
+          </div>
+        </div>
+        <div class="card" style="padding:8px 10px;margin-bottom:0">
           <div class="card-title" style="font-size:12px;margin-bottom:6px">Saved Lances</div>
           <div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap">
             <button class="lb-btn-sm" onclick="sbSaveForcePrompt()" style="padding:2px 7px;flex-shrink:0" title="Save current force">💾</button>
@@ -2496,28 +2496,7 @@
       </div>
     </div>
 
-    <!-- ── FORMATION ORGANIZER ────────────────── -->
-    <div class="lb-csv-controls" style="margin-top:14px">
-      <div class="sb-fgroup sb-fgroup-grow">
-        <label class="sb-fg-label">Formation type</label>
-        <select id="sb-formation-type"></select>
-      </div>
-      <div class="sb-fgroup sb-fgroup-grow">
-        <label class="sb-fg-label">Lance specialty</label>
-        <select id="sb-special-type" title="Optionally group lances by special type">
-          <option value="">Standard (sort by weight)</option>
-          <option value="recon">Recon / Scout Lance</option>
-          <option value="strike">Strike / Striker Lance</option>
-          <option value="fire">Fire Lance</option>
-          <option value="battle">Battle / Line Lance</option>
-          <option value="assault-sp">Assault Lance (Special)</option>
-          <option value="command">Command Lance</option>
-          <option value="pursuit">Pursuit Lance</option>
-        </select>
-      </div>
-      <button class="lb-btn" onclick="sbBuildFormation()">⚔ Build Formation</button>
-    </div>
-    <div id="sb-formation-out"></div>
+    <div id="sb-formation-out" style="margin-top:14px"></div>
   </div>
 </div>
 
@@ -4439,33 +4418,10 @@ function sbRenderForce() {
     </div>`;
   };
 
-  // Group the force into lances (IS, 4 units) or stars (Clan, 5 units) and
-  // show the lance specialties each grouping qualifies for.
-  const factionId = sbCurrentFactionId();
-  const isClan    = !!sbFactionMeta[factionId]?.isClan;
-  const groupSize = isClan ? 5 : 4;
-  const groupWord = isClan ? 'Star' : 'Lance';
-
-  let html = '';
-  for (let start = 0, g = 1; start < sbForce.length; start += groupSize, g++) {
-    const members  = sbForce.slice(start, start + groupSize);
-    const groupPV  = members.reduce((s, m) => s + sbAdjPV(m.unit, m.skill), 0);
-    const specs    = sbGroupSpecialties(members.map(m => m.unit), factionId);
-    const full     = members.length === groupSize;
-    const subNote  = full ? '' : `<span class="sb-lance-sub">${members.length}/${groupSize}</span>`;
-    const specHtml = specs.length
-      ? specs.map(s => `<span class="sb-spec-badge">${lbEsc(s)}</span>`).join('')
-      : `<span class="sb-spec-none">${full ? 'No lance specialty (mixed roles)' : 'Incomplete — add more units'}</span>`;
-    html += `<div class="sb-lance-group">
-      <div class="sb-lance-head">
-        <span class="sb-lance-title">${groupWord} ${g}${subNote}</span>
-        <span class="sb-lance-pv">${groupPV} PV</span>
-      </div>
-      <div class="sb-lance-specs">${specHtml}</div>
-      ${members.map((f, mi) => unitRow(f, start + mi)).join('')}
-    </div>`;
-  }
-  listEl.innerHTML = html;
+  // Plain flat list while the force is being assembled — once you're ready,
+  // "Build Formation" (above) organizes it into real lances with drag-and-
+  // drop, commander picks, and per-unit abilities.
+  listEl.innerHTML = sbForce.map((f, idx) => unitRow(f, idx)).join('');
 }
 
 // Count how many units in the force carry each Alpha Strike special ability
@@ -4488,21 +4444,6 @@ function sbSpecialCounts(force) {
     });
   });
   return Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-}
-
-// Which lance specialties does this group of units qualify for?
-// Reuses the CSV-builder's lbLanceQualifies + LB_SPECIAL_TYPES definitions.
-function sbGroupSpecialties(unitObjs, factionId) {
-  if (!unitObjs.length) return [];
-  const factionKeys = LB_FACTION_TYPES[String(factionId || '')] || [];
-  const allFactionKeys = new Set(Object.values(LB_FACTION_TYPES).flat());
-  const out = [];
-  Object.keys(LB_SPECIAL_TYPES).forEach(k => {
-    // Skip faction-specific specialties that belong to a different faction
-    if (allFactionKeys.has(k) && !factionKeys.includes(k)) return;
-    if (lbLanceQualifies(unitObjs, k)) out.push(LB_SPECIAL_TYPES[k].name);
-  });
-  return out;
 }
 
 /* ── SELF-DRAWN CLASSIC BATTLETECH RECORD SHEET ─────────────────────────────
@@ -6126,7 +6067,7 @@ function lbOwnedSendToBuilder() {
   sbRenderBrowse();
   const status = document.getElementById('sb-status');
   if (status) {
-    status.textContent = `${selected.length} selected owned unit${selected.length !== 1 ? 's' : ''} added to the Tournament Force. Choose a formation type below and click Build Formation.`;
+    status.textContent = `${selected.length} selected owned unit${selected.length !== 1 ? 's' : ''} added to the Tournament Force. Choose a formation type above and click Build Formation.`;
     status.className = 'lb-status';
   }
   document.getElementById('lb-mode-skirmish')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
