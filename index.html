@@ -2160,6 +2160,62 @@
   <div class="ip-row neg"><div><div class="ip-name">Unauthorized retreat</div><div class="ip-note">Not declared in Phase 1</div></div><div class="ip-val ip-neg-c">−2 IP</div><div class="ip-cond">Davion: −3 IP.</div></div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ PAGE: SPECIAL UNIT ABILITIES -->
+<div class="page" id="page-specials">
+  <div class="page-title">Special Unit Abilities</div>
+  <div class="page-sub">The codes shown in a unit's Abilities column and on its Alpha Strike card, in plain language.</div>
+
+  <div class="callout info">
+    This is a quick-reference gloss, not a rules replacement — it covers the common abilities you'll actually see on units in this tool. For exact numbers and edge cases, defer to the <strong>Alpha Strike Companion</strong> (Alpha Strike column) and <strong>Total Warfare</strong> (Classic column).
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+    <input type="text" id="specials-search" oninput="specialsFilter()" placeholder="Filter by code or name…"
+      style="flex:1 1 260px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:8px 10px;font-size:13px">
+    <span id="specials-count" style="font-size:11px;color:var(--text2)"></span>
+  </div>
+
+  <div class="tbl-wrap">
+    <table id="specials-table">
+      <thead>
+        <tr><th>Code</th><th>Name</th><th>Alpha Strike</th><th>Classic BattleTech</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>AECM</strong></td><td>Angel ECM</td><td>A stronger version of ECM that's harder for the enemy to counter or see through.</td><td>Angel ECM Suite — jams enemy C3/Narc/Artemis/Streak like standard ECM, and also partially disrupts enemy Active Probes and BAP.</td></tr>
+        <tr><td><strong>AMS</strong></td><td>Anti-Missile System</td><td>Can knock down some incoming missiles, reducing the damage of one missile-based attack against this unit each turn.</td><td>Automatically fires at incoming missile volleys, destroying a number of missiles before they hit (resolved with its own attack roll).</td></tr>
+        <tr><td><strong>ARM</strong></td><td>Armored (Component)</td><td>A key internal component has extra protection, making it harder to knock out with a critical hit.</td><td>Represents Reinforced/Armored internal structure on that component from the optional Total Warfare construction rules.</td></tr>
+        <tr><td><strong>C</strong></td><td>Cargo</td><td>Can carry cargo; the number is capacity in tons.</td><td>Cargo bay space tracked on the record sheet, same as Classic.</td></tr>
+        <tr><td><strong>CASE</strong></td><td>Cellular Ammunition Storage Equipment</td><td>Softens the effect of losing an ammo bin — the unit is less likely to be destroyed outright by an ammo explosion.</td><td>Vents an ammunition explosion out a blowout panel instead of letting the excess damage spread to other locations.</td></tr>
+        <tr><td><strong>CASEII</strong></td><td>Improved CASE</td><td>Same idea as CASE, but even better protection against ammo explosions.</td><td>Improved version of CASE — even the exploding location itself takes no extra internal structure damage.</td></tr>
+        <tr><td><strong>DUN</strong></td><td>Dune Buggy</td><td>This vehicle is built for desert/sand terrain and handles it better than most.</td><td>Desert-specialized chassis — reduced or no movement penalty crossing sand terrain.</td></tr>
+        <tr><td><strong>ECM</strong></td><td>Electronic Countermeasures</td><td>Jams enemy guidance/communication systems nearby, and can help hide friendly units from enemy sensors.</td><td>Guardian ECM Suite — disrupts enemy C3, Narc, Artemis, and Streak targeting in its bubble, and can blind BAP-equipped units.</td></tr>
+        <tr><td><strong>ENE</strong></td><td>Energy Weapons Only</td><td>All of this unit's weapons are energy-based (lasers, PPCs, flamers) — matters for a few rules that key off an all-energy loadout.</td><td>No ammunition to track or explode — every weapon draws from the unit's heat/power systems instead.</td></tr>
+        <tr><td><strong>FLK</strong></td><td>Flak</td><td>Bonus to-hit when firing at airborne targets (VTOLs, aerospace units, flying ProtoMechs).</td><td>Certain flak-capable autocannons and AMS-type weapons get a to-hit bonus against airborne targets.</td></tr>
+        <tr><td><strong>HT</strong></td><td>Extra Heat Damage</td><td>This weapon adds heat to the target in addition to (or instead of) normal damage.</td><td>Represents flamers, plasma weapons, and other heat-based systems that raise the target's heat.</td></tr>
+        <tr><td><strong>IF</strong></td><td>Indirect Fire</td><td>Can fire at a target it can't see directly, as long as a friendly unit is spotting for it.</td><td>Indirect LRM fire — a spotter with line of sight relays the target so the firer can shoot blind, at a to-hit penalty.</td></tr>
+        <tr><td><strong>JMPS</strong></td><td>Jump Jets</td><td>Can jump the listed distance each turn, largely ignoring terrain movement penalties.</td><td>Standard jump jets — move through the air over terrain and gaps per the normal jumping rules, generating heat.</td></tr>
+        <tr><td><strong>JMPW</strong></td><td>Jump Jets (UMU)</td><td>Underwater equivalent of jump movement, for naval/amphibious units.</td><td>UMU (underwater maneuvering unit) jump jets, used to move while submerged.</td></tr>
+        <tr><td><strong>LRM</strong></td><td>Long Range Missiles</td><td>Carries LRM-type launchers; the number is the weapon's base damage value. Works with Artemis and indirect fire.</td><td>Long Range Missile launchers — resolved on the cluster-hits table, with Artemis IV/V improving accuracy if equipped.</td></tr>
+        <tr><td><strong>MEL</strong></td><td>Melee</td><td>Can make a physical/melee attack in addition to shooting.</td><td>Punches, kicks, and melee weapon strikes — each resolved with its own to-hit and damage rules.</td></tr>
+        <tr><td><strong>MHQ</strong></td><td>Mobile Headquarters</td><td>Improves command, control, and communication for the force; the number is its quality rating.</td><td>Mobile HQ equipment used for the Force Command & Control rules (Campaign Operations).</td></tr>
+        <tr><td><strong>NARC</strong></td><td>Narc Missile Beacon</td><td>Tags a target with a homing beacon — friendly missile attacks against it get a to-hit bonus for the rest of the game.</td><td>Fires a pod that sticks to the target, giving compatible missile systems (Narc-capable) a to-hit bonus.</td></tr>
+        <tr><td><strong>OMNI</strong></td><td>Omni Configuration</td><td>An OmniMech/OmniVehicle — its weapons loadout can be swapped between official alternate configurations.</td><td>Pod-mounted equipment can be swapped between configurations without a full refit, per the OmniMech construction rules.</td></tr>
+        <tr><td><strong>PRB</strong></td><td>Active Probe</td><td>Can detect hidden or stealthed units nearby, and cancels out some enemy ECM/stealth benefits in range.</td><td>Beagle/Active Probe — extends sensor range and counters some ECM and stealth-armor effects.</td></tr>
+        <tr><td><strong>RCN</strong></td><td>Reconnaissance</td><td>Especially good at scouting and spotting for indirect fire.</td><td>No single Classic system — abstracts a scout-role chassis (light, fast, sensor-heavy).</td></tr>
+        <tr><td><strong>REAR</strong></td><td>Rear-Firing Weapon</td><td>Has a weapon that fires out the back arc instead of the front.</td><td>A weapon mounted in a rear-facing location, usable only against targets in the rear firing arc.</td></tr>
+        <tr><td><strong>SRCH</strong></td><td>Searchlight</td><td>Can illuminate a target at night — helps land hits, but also reveals the searcher's own position.</td><td>Searchlight equipment, same trade-off as Alpha Strike: better night targeting at the cost of being easier to spot.</td></tr>
+        <tr><td><strong>SRM</strong></td><td>Short Range Missiles</td><td>Carries SRM-type launchers; the number is the weapon's base damage value. Works with Artemis.</td><td>Short Range Missile launchers — resolved on the cluster-hits table, with Artemis IV/V improving accuracy if equipped.</td></tr>
+        <tr><td><strong>STL</strong></td><td>Stealth (Armor)</td><td>Harder to hit at range, and can defeat certain targeting/tracking systems.</td><td>Stealth Armor — requires an active ECM suite to function, and imposes extra to-hit penalties against the wearer.</td></tr>
+        <tr><td><strong>TAG</strong></td><td>Target Acquisition Gear</td><td>Paints a target so other units can make semi-guided attacks with a to-hit bonus against it.</td><td>Designates a target for Arrow IV, Semi-Guided LRMs, and other TAG-guided munitions.</td></tr>
+        <tr><td><strong>TUR</strong></td><td>Turret</td><td>Has a turret-mounted weapon that can fire in a different facing than the rest of the unit.</td><td>A turret-mounted weapon that traverses independently of the hull's facing.</td></tr>
+        <tr><td><strong>UMU</strong></td><td>Underwater Maneuvering Unit</td><td>Can move and operate while fully submerged.</td><td>UMU equipment lets the unit dive and move underwater instead of on the surface.</td></tr>
+        <tr><td><strong>VTOL</strong></td><td>Vertical Take-Off/Landing</td><td>Flies like a helicopter at low altitude, mostly ignoring ground terrain.</td><td>VTOL movement — flies over terrain, but is vulnerable to certain anti-aircraft and ground attacks at low altitude.</td></tr>
+        <tr><td><strong>WAT</strong></td><td>Amphibious / Naval</td><td>Can travel through or operate in water terrain at normal or near-normal speed.</td><td>Naval/amphibious movement rules — can enter and cross water hexes without the penalties a normal unit would take.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════ PAGE 11: HEX MAP -->
 <div class="page" id="page-hexmap">
   <div class="page-title">Hex Map — Worked Example</div>
@@ -2534,6 +2590,7 @@ const pages = [
   { id: 'political',    label: 'Political Victory' },
   { id: 'movement',     label: 'Movement' },
   { id: 'lancecombat',  label: 'Lance Combat' },
+  { id: 'specials',     label: 'Specials' },
   { id: 'hexmap',       label: 'Hex Map Example' },
   { id: 'lance',        label: 'Lance Builder' },
 ];
@@ -2686,6 +2743,18 @@ function hMapInit() {
   hDrawBase();
   hRefresh();
   hUpdateInfo();
+}
+
+function specialsFilter() {
+  const q = (document.getElementById('specials-search')?.value || '').toLowerCase().trim();
+  let shown = 0;
+  document.querySelectorAll('#specials-table tbody tr').forEach(tr => {
+    const match = !q || tr.textContent.toLowerCase().includes(q);
+    tr.style.display = match ? '' : 'none';
+    if (match) shown++;
+  });
+  const countEl = document.getElementById('specials-count');
+  if (countEl) countEl.textContent = `${shown} shown`;
 }
 
 </script>
