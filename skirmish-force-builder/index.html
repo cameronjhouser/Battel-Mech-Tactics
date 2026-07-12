@@ -89,6 +89,25 @@
           <button class="lb-btn-sm" onclick="sbDeleteCollectionSelected()" style="padding:4px 12px;background:var(--red);color:#fff">Delete</button>
           <a href="../collection-template.csv" download="collection-template.csv" style="font-size:11px;color:var(--accent);align-self:center" title="Columns: Name (required), Unit Type, Base Number, Owned Count">⬇ CSV template</a>
         </div>
+        <div class="sb-browse-controls" style="margin:10px 0 0">
+          <div class="sb-fgroup sb-fgroup-grow" style="position:relative">
+            <label class="sb-fg-label">Add unit manually</label>
+            <input type="text" id="sb-manual-name" placeholder="Unit name (e.g. Atlas AS7-D)…" onkeydown="if(event.key==='Enter')sbManualSearch()"
+              style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px">
+            <div id="sb-manual-results" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:30;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;max-height:230px;overflow-y:auto"></div>
+          </div>
+          <div class="sb-fgroup">
+            <label class="sb-fg-label">Count</label>
+            <input type="number" id="sb-manual-count" value="1" min="1" max="99"
+              style="width:52px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 6px;font-size:12px;text-align:center">
+          </div>
+          <button class="lb-btn-sm" onclick="sbManualSearch()" style="padding:4px 12px">Search</button>
+          <div class="sb-fgroup sb-fgroup-grow">
+            <label class="sb-fg-label">Add pack / box set</label>
+            <select id="sb-pack-select"><option value="">Loading packs…</option></select>
+          </div>
+          <button class="lb-btn-sm" onclick="sbAddPack()" style="padding:4px 12px">Add Pack</button>
+        </div>
       </div>
       <div class="card" style="padding:12px 14px;margin-bottom:0">
         <div class="card-title">Catalog</div>
