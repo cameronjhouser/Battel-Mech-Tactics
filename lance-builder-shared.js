@@ -530,7 +530,7 @@ function sbNormalizeCollection(map) {
 // into data/sarna-minis.json. Maps a mini's stamped base number to its Sarna
 // entry (name, catalog numbers, box set). Purely additive: until the file
 // exists (404) or while it loads, everything below no-ops.
-let sbMinisByBase = null; // base-number string -> entry; {} once load settles
+let sbMinisByBase = null; // base-number string -> [entries]; {} once load settles
 function sbLoadMinisData() {
   if (sbMinisByBase !== null) return;
   sbMinisByBase = {};
@@ -538,10 +538,29 @@ function sbLoadMinisData() {
     .then(r => r.ok ? r.json() : null)
     .then(j => {
       if (!j?.entries) return;
-      j.entries.forEach(e => (e.baseNumbers || []).forEach(b => { sbMinisByBase[b] = e; }));
+      // Base numbers are NOT globally unique — early production waves each
+      // restart at 1 (base "1" is simultaneously a Griffin, a Commando, and
+      // an Alpha Strike mini), so every base keys a list of candidates.
+      j.entries.forEach(e => (e.baseNumbers || []).forEach(b => {
+        (sbMinisByBase[b] = sbMinisByBase[b] || []).push(e);
+      }));
       sbRenderBrowse(); // refresh owned dots now that base lookups can resolve
     })
     .catch(() => {});
+}
+
+// Resolve a collection record's base number to its Sarna entry in the
+// context of a specific unit: a name-verified candidate wins; otherwise an
+// uncontested (single-candidate) base is accepted for display purposes.
+function sbMiniFor(unit, rec) {
+  const list = rec?.base && sbMinisByBase ? sbMinisByBase[rec.base] : null;
+  if (!list || !list.length) return null;
+  const mn = sbNorm(unit.Name);
+  const match = list.find(e => {
+    const en = sbNorm(e.name);
+    return !!en && (mn === en || mn.includes(en) || en.includes(mn));
+  });
+  return match || (list.length === 1 ? list[0] : null);
 }
 
 function sbOwnedRecords(unit) {
@@ -554,15 +573,17 @@ function sbOwnedRecords(unit) {
     return !t || !ut || t === ut;
   };
   // A row's Base Number can vouch for a unit its name doesn't quite match:
-  // resolve the base through the Sarna dataset and compare that entry's
-  // chassis name instead (e.g. row named "Rifleman IIC" with base 3-53
-  // matching Sarna's "Rieman IIC" typo, or vice versa).
+  // resolve the base through the Sarna dataset and require a name-verified
+  // candidate (never the single-candidate display fallback — a colliding or
+  // mistyped base must not mark unrelated units as owned).
   const baseOk = c => {
     const b = sbCollection[c].base;
-    const e = b && sbMinisByBase ? sbMinisByBase[b] : null;
-    if (!e) return false;
-    const en = sbNorm(e.name);
-    return !!en && (mn === en || mn.includes(en) || en.includes(mn));
+    const list = b && sbMinisByBase ? sbMinisByBase[b] : null;
+    if (!list) return false;
+    return list.some(e => {
+      const en = sbNorm(e.name);
+      return !!en && (mn === en || mn.includes(en) || en.includes(mn));
+    });
   };
   // An exact name match wins outright — without this, "Warhammer WHM-6R"
   // would also soak up "Warhammer WHM-6Rb"'s record via the substring
@@ -1272,9 +1293,10 @@ function sbRenderBrowse() {
     const ownedN  = owned ? sbOwnedCount(u) : 0;
     // When an owned record carries a base number the Sarna dataset knows,
     // surface the physical mini's identity in the dot's tooltip.
-    const mini = ownedRecs.map(r => r.base && sbMinisByBase ? sbMinisByBase[r.base] : null).find(Boolean);
+    const miniRec = ownedRecs.find(r => sbMiniFor(u, r));
+    const mini = miniRec ? sbMiniFor(u, miniRec) : null;
     const miniTxt = mini
-      ? ` · Base ${ownedRecs.find(r => r.base && sbMinisByBase?.[r.base]).base}`
+      ? ` · Base ${miniRec.base}`
         + (mini.catalogNumbers?.length ? ` · Cat ${mini.catalogNumbers.join('/')}` : '')
         + (mini.boxSet ? ` · ${mini.boxSet}` : '')
       : '';
