@@ -531,6 +531,7 @@ function sbNormalizeCollection(map) {
 // entry (name, catalog numbers, box set). Purely additive: until the file
 // exists (404) or while it loads, everything below no-ops.
 let sbMinisByBase = null; // base-number string -> [entries]; {} once load settles
+let sbMinisEntries = [];  // raw dataset entries (pack-add source)
 function sbLoadMinisData() {
   if (sbMinisByBase !== null) return;
   sbMinisByBase = {};
@@ -538,15 +539,108 @@ function sbLoadMinisData() {
     .then(r => r.ok ? r.json() : null)
     .then(j => {
       if (!j?.entries) return;
+      sbMinisEntries = j.entries;
       // Base numbers are NOT globally unique — early production waves each
       // restart at 1 (base "1" is simultaneously a Griffin, a Commando, and
       // an Alpha Strike mini), so every base keys a list of candidates.
       j.entries.forEach(e => (e.baseNumbers || []).forEach(b => {
         (sbMinisByBase[b] = sbMinisByBase[b] || []).push(e);
       }));
+      sbPopulatePacks();
       sbRenderBrowse(); // refresh owned dots now that base lookups can resolve
     })
     .catch(() => {});
+}
+
+/* ── Manual collection building (Unit Source card) ──────────────────────────
+   Two ways to grow the collection without uploading a CSV: search the MUL
+   by name and add a unit with an owned count, or add every mini in a
+   pack / box set from the Sarna dataset. Both feed the same sbCollection
+   records the CSV path builds, so "Save List" persists them with counts. */
+let sbManualResults = []; // last MUL search results
+
+function sbCollectionChanged(msg) {
+  const n = Object.keys(sbCollection).length;
+  const status = document.getElementById('sb-status');
+  if (status) status.textContent =
+    `${msg} Collection now has ${n} entr${n === 1 ? 'y' : 'ies'} — use "Save List" to keep it.`;
+  sbRenderBrowse();
+}
+
+async function sbManualSearch() {
+  const q = document.getElementById('sb-manual-name')?.value.trim();
+  const box = document.getElementById('sb-manual-results');
+  if (!q || !box) return;
+  box.style.display = 'block';
+  box.innerHTML = '<div style="padding:6px 10px;font-size:11px;color:var(--text3)">Searching MUL…</div>';
+  try {
+    const res = await fetch(`${MUL_API}?${new URLSearchParams({ Name: q, minPV: '1', maxPV: '999' })}`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    sbManualResults = (data.Units || data || []).slice(0, 12);
+    box.innerHTML = sbManualResults.length
+      ? sbManualResults.map((u, i) =>
+        `<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 10px;border-bottom:1px solid var(--border);align-items:center">
+          <span style="font-size:12px;min-width:0">${lbEsc(u.Name)}
+            <span style="color:var(--text3);font-size:10px">${lbEsc(u.Type?.Name || '')} · ${u.BFPointValue || '?'} PV</span></span>
+          <button class="lb-btn-sm" style="padding:1px 10px;flex-shrink:0" onclick="sbManualAdd(${i})">Add</button>
+        </div>`).join('')
+      : '<div style="padding:6px 10px;font-size:11px;color:var(--text3)">No MUL matches.</div>';
+  } catch (_) {
+    box.innerHTML = '<div style="padding:6px 10px;font-size:11px;color:var(--red)">Search failed — MUL unreachable.</div>';
+  }
+}
+
+function sbManualAdd(i) {
+  const u = sbManualResults[i];
+  if (!u) return;
+  const n = Math.max(1, parseInt(document.getElementById('sb-manual-count')?.value, 10) || 1);
+  const key = sbNorm(u.Name);
+  if (!key) return;
+  const rec = sbCollection[key];
+  if (rec) rec.count = (rec.count || 1) + n;
+  else sbCollection[key] = { type: u.Type?.Name || '', base: '', count: n };
+  const resultsEl = document.getElementById('sb-manual-results');
+  if (resultsEl) resultsEl.style.display = 'none';
+  sbCollectionChanged(`Added ${u.Name}${n > 1 ? ' ×' + n : ''} (owned ×${sbCollection[key].count}).`);
+}
+
+function sbPackList() {
+  const packs = {};
+  sbMinisEntries.forEach(e => {
+    const p = e.boxSet || e.section || '';
+    if (p) (packs[p] = packs[p] || []).push(e);
+  });
+  return packs;
+}
+
+function sbPopulatePacks() {
+  const sel = document.getElementById('sb-pack-select');
+  if (!sel) return;
+  const packs = sbPackList();
+  const names = Object.keys(packs).sort((a, b) => a.localeCompare(b));
+  sel.innerHTML = '<option value="">Select pack / box set…</option>'
+    + names.map(p => `<option value="${lbEsc(p)}">${lbEsc(p)} (${packs[p].length})</option>`).join('');
+}
+
+function sbAddPack() {
+  const pack = document.getElementById('sb-pack-select')?.value;
+  if (!pack) { alert('Select a pack / box set first.'); return; }
+  const entries = sbPackList()[pack] || [];
+  let added = 0;
+  entries.forEach(e => {
+    const key = sbNorm(e.name);
+    if (!key) return;
+    const rec = sbCollection[key];
+    if (rec) {
+      rec.count = (rec.count || 1) + 1;
+      if (!rec.base && e.baseNumbers?.length) rec.base = e.baseNumbers[0];
+    } else {
+      sbCollection[key] = { type: '', base: e.baseNumbers?.[0] || '', count: 1 };
+    }
+    added++;
+  });
+  sbCollectionChanged(`Added ${added} mini${added !== 1 ? 's' : ''} from "${pack}".`);
 }
 
 // Resolve a collection record's base number to its Sarna entry in the
@@ -843,10 +937,19 @@ function sbInit() {
   // tab is opened with a faction already selected (e.g. a loaded saved
   // force) and left untouched, leaving it permanently empty.
   lbBuildFormationDropdowns(!!sbFactionMeta[sel.value]?.isClan);
-  // Close the abilities multi-select when clicking outside it
+  // Close the abilities multi-select / manual-search results when clicking
+  // outside them
   document.addEventListener('click', (e) => {
     const grp = document.getElementById('sb-abil-menu')?.parentElement;
     if (grp && !grp.contains(e.target)) sbCloseAbilMenu();
+    // Exclusion zone is the whole manual-add row, not just the input's
+    // fgroup — the Search button lives outside it, and the click that
+    // opens the results must not instantly close them again.
+    const man = document.getElementById('sb-manual-results');
+    const manRow = man?.closest('.sb-browse-controls');
+    if (man && man.style.display !== 'none' && manRow && !manRow.contains(e.target)) {
+      man.style.display = 'none';
+    }
   });
   sbRenderForce();
 }
