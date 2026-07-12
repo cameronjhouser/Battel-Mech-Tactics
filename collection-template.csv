@@ -1,4 +1,4 @@
-Name,Unit Type,Base Number,Owned Count,Variant
-Warhammer WHM-6R,BattleMech,4-27,2,
-Scorpion Light Tank,Combat Vehicle,,1,
-Elemental Battle Armor,Battle Armor,3-14,4,[Laser]
+Name,Unit Type,Base Number,Owned Count
+Warhammer WHM-6R,BattleMech,19,2
+Scorpion Light Tank,Combat Vehicle,,1
+Elemental Battle Armor,Battle Armor,16,4

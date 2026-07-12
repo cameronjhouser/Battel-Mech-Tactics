@@ -1,0 +1,5929 @@
+{
+ "source": "https://www.sarna.net/wiki/Miniatures_-_Catalyst_Game_Labs",
+ "attribution": "Data from Sarna BattleTechWiki (CC BY-NC-SA); miniatures by Catalyst Game Labs.",
+ "note": "Interim dataset extracted from a July 2026 page capture; replaced by scrape_sarna_minis.py once the monthly cron runs. Box sets are section-level only.",
+ "fetched": "2026-07-12T18:53:50+00:00",
+ "entries": [
+  {
+   "name": "Commando",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "COM-2D"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Spider",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "SDR-5V"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Jenner",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "JR7-D"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Panther",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "PNT-9R"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Assassin",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "ASN-21"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Cicada",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "CDA-2A"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Clint",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "CLNT-2-3T"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Hermes II",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "HER-2S"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Whitworth",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "WTH-1"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Vindicator",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "VND-1R"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Enforcer",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "ENF-4R"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Hunchback",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "HBK-4G"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Trebuchet",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "TBT-5N"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Dervish",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "DV-6M"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Dragon",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "DRG-1N"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Quickdraw",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "QKD-4G"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Catapult",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "CPLT-C1"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "JagerMech",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "JM6-S"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Grasshopper",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "GHR-5H"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Awesome",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "AWS-8Q"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Zeus",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "ZEU-6S"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Cyclops",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "CP-10-Z"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Banshee",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "BNC-3E"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Atlas",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000"
+   ],
+   "models": [
+    "AS7-D"
+   ],
+   "boxSet": "Classic BattleTech Introductory Box Set",
+   "section": "Classic BattleTech Introductory Box Set"
+  },
+  {
+   "name": "Commando",
+   "baseNumbers": [
+    "1"
+   ],
+   "catalogNumbers": [
+    "3500B"
+   ],
+   "models": [
+    "COM-2D"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Spider",
+   "baseNumbers": [
+    "2"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35713"
+   ],
+   "models": [
+    "SDR-5V"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Jenner",
+   "baseNumbers": [
+    "3"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35715"
+   ],
+   "models": [
+    "JR7-D"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Panther",
+   "baseNumbers": [
+    "4"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35717"
+   ],
+   "models": [
+    "PNT-9R"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Assassin",
+   "baseNumbers": [
+    "5"
+   ],
+   "catalogNumbers": [
+    "3500B"
+   ],
+   "models": [
+    "ASN-21"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Cicada",
+   "baseNumbers": [
+    "6"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35713"
+   ],
+   "models": [
+    "CDA-2A"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Clint",
+   "baseNumbers": [
+    "7"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35715"
+   ],
+   "models": [
+    "CLNT-2-3T"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Hermes II",
+   "baseNumbers": [
+    "8"
+   ],
+   "catalogNumbers": [
+    "3500B"
+   ],
+   "models": [
+    "HER-2S"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Whitworth",
+   "baseNumbers": [
+    "9"
+   ],
+   "catalogNumbers": [
+    "3500B"
+   ],
+   "models": [
+    "WTH-1"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Vindicator",
+   "baseNumbers": [
+    "10"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35711"
+   ],
+   "models": [
+    "VND-1R"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Enforcer",
+   "baseNumbers": [
+    "11"
+   ],
+   "catalogNumbers": [
+    "3500B"
+   ],
+   "models": [
+    "ENF-4R"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Hunchback",
+   "baseNumbers": [
+    "12"
+   ],
+   "catalogNumbers": [
+    "3500B"
+   ],
+   "models": [
+    "HBK-4G"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Trebuchet",
+   "baseNumbers": [
+    "13"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35716"
+   ],
+   "models": [
+    "TBT-5N"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Dervish",
+   "baseNumbers": [
+    "14"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35716"
+   ],
+   "models": [
+    "DV-6M"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Dragon",
+   "baseNumbers": [
+    "15"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35717"
+   ],
+   "models": [
+    "DRG-1N"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Quickdraw",
+   "baseNumbers": [
+    "16"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35000"
+   ],
+   "models": [
+    "QKD-4G"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Catapult",
+   "baseNumbers": [
+    "17"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35714"
+   ],
+   "models": [
+    "CPLT-C1"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Grasshopper",
+   "baseNumbers": [
+    "19"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35710"
+   ],
+   "models": [
+    "GHR-5H"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Awesome",
+   "baseNumbers": [
+    "20"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35711"
+   ],
+   "models": [
+    "AWS-8Q"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Zeus",
+   "baseNumbers": [
+    "21"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35712"
+   ],
+   "models": [
+    "ZEU-6S"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Cyclops",
+   "baseNumbers": [
+    "22"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35714"
+   ],
+   "models": [
+    "CP-10-Z"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Banshee",
+   "baseNumbers": [
+    "23"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35712"
+   ],
+   "models": [
+    "BNC-3E"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "'Atlas'",
+   "baseNumbers": [
+    "24"
+   ],
+   "catalogNumbers": [
+    "3500B",
+    "35710"
+   ],
+   "models": [
+    "AS7-D"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Flea",
+   "baseNumbers": [
+    "25"
+   ],
+   "catalogNumbers": [
+    "35713"
+   ],
+   "models": [
+    "FLE-15"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Firestarter",
+   "baseNumbers": [
+    "26"
+   ],
+   "catalogNumbers": [
+    "35711"
+   ],
+   "models": [
+    "FS9-H"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Raven",
+   "baseNumbers": [
+    "27"
+   ],
+   "catalogNumbers": [
+    "35714"
+   ],
+   "models": [
+    "RVN-3L"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Wolfhound",
+   "baseNumbers": [
+    "28"
+   ],
+   "catalogNumbers": [
+    "35715"
+   ],
+   "models": [
+    "WLF-1"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Vulcan",
+   "baseNumbers": [
+    "29"
+   ],
+   "catalogNumbers": [
+    "35713"
+   ],
+   "models": [
+    "VL-2T"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Blackjack",
+   "baseNumbers": [
+    "30"
+   ],
+   "catalogNumbers": [
+    "35710"
+   ],
+   "models": [
+    "BJ-1"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Hatchetman",
+   "baseNumbers": [
+    "31"
+   ],
+   "catalogNumbers": [
+    "35712"
+   ],
+   "models": [
+    "HCT-3F"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Centurion",
+   "baseNumbers": [
+    "32"
+   ],
+   "catalogNumbers": [
+    "35715"
+   ],
+   "models": [
+    "CN9-A"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Cataphract",
+   "baseNumbers": [
+    "33"
+   ],
+   "catalogNumbers": [
+    "35714"
+   ],
+   "models": [
+    "CTF-2X"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Guillotine",
+   "baseNumbers": [
+    "34"
+   ],
+   "catalogNumbers": [
+    "35717"
+   ],
+   "models": [
+    "GLT-3N"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Orion",
+   "baseNumbers": [
+    "35"
+   ],
+   "catalogNumbers": [
+    "35712"
+   ],
+   "models": [
+    "ON1-K"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Charger",
+   "baseNumbers": [
+    "36"
+   ],
+   "catalogNumbers": [
+    "35711"
+   ],
+   "models": [
+    "CGR-1A1"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Victor",
+   "baseNumbers": [
+    "37"
+   ],
+   "catalogNumbers": [
+    "35710"
+   ],
+   "models": [
+    "VTR-9B"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Shogun",
+   "baseNumbers": [
+    "38"
+   ],
+   "catalogNumbers": [
+    "35716"
+   ],
+   "models": [
+    "SHG-2E"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Stalker",
+   "baseNumbers": [
+    "39"
+   ],
+   "catalogNumbers": [
+    "35716"
+   ],
+   "models": [
+    "STK-3F"
+   ],
+   "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+  },
+  {
+   "name": "Hellbringer (Loki) x2",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "CAT-LOKI"
+   ],
+   "models": [],
+   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+  },
+  {
+   "name": "Summoner (Thor) x2",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "CAT-THOR"
+   ],
+   "models": [],
+   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+  },
+  {
+   "name": "Hellbringer (Loki)",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000A"
+   ],
+   "models": [],
+   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+  },
+  {
+   "name": "Summoner (Thor)",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000A"
+   ],
+   "models": [],
+   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+  },
+  {
+   "name": "BattleMaster",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000B"
+   ],
+   "models": [
+    "BLR-4S"
+   ],
+   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+  },
+  {
+   "name": "Timber Wolf (Mad Cat)",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "35000B"
+   ],
+   "models": [],
+   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+  },
+  {
+   "name": "Griffin",
+   "baseNumbers": [
+    "1"
+   ],
+   "catalogNumbers": [
+    "35020"
+   ],
+   "models": [
+    "GRF-1N",
+    "-3N",
+    "C"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Wolverine",
+   "baseNumbers": [
+    "2"
+   ],
+   "catalogNumbers": [
+    "35020 3500D"
+   ],
+   "models": [
+    "WVR-6R",
+    "-3R",
+    "-9R",
+    "-10R"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Awesome",
+   "baseNumbers": [
+    "3"
+   ],
+   "catalogNumbers": [
+    "3500D"
+   ],
+   "models": [
+    "AWS-8Q",
+    "-11H"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Catapult",
+   "baseNumbers": [
+    "4"
+   ],
+   "catalogNumbers": [
+    "3500D"
+   ],
+   "models": [
+    "CPLT-C1",
+    "-C1b",
+    "- C5A"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Thunderbolt",
+   "baseNumbers": [
+    "5"
+   ],
+   "catalogNumbers": [
+    "3500D"
+   ],
+   "models": [
+    "TDR-5S",
+    "-5Sb",
+    "-5Sb2 TDR-7M",
+    "-7S",
+    "-12R"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Commando",
+   "baseNumbers": [
+    "6"
+   ],
+   "catalogNumbers": [
+    "3500D"
+   ],
+   "models": [
+    "COM-2D",
+    "-9S"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "BattleMaster",
+   "baseNumbers": [
+    "7"
+   ],
+   "catalogNumbers": [
+    "3500D"
+   ],
+   "models": [
+    "BLR-1G",
+    "-6G",
+    "C 3"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Shadow Hawk",
+   "baseNumbers": [
+    "8"
+   ],
+   "catalogNumbers": [
+    "3500D"
+   ],
+   "models": [
+    "SHD-2H",
+    "-5R",
+    "-7H",
+    "C"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Locust",
+   "baseNumbers": [
+    "9"
+   ],
+   "catalogNumbers": [
+    "3500D"
+   ],
+   "models": [
+    "LCT-1V",
+    "-5M2",
+    "-5M3",
+    "-6M LCT-7S",
+    "-7V",
+    "7V2"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Griffin",
+   "baseNumbers": [
+    "1A-2"
+   ],
+   "catalogNumbers": [
+    "35020M"
+   ],
+   "models": [
+    "GRF-1N",
+    "-3N",
+    "-C"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Vindicator",
+   "baseNumbers": [
+    "3-8A"
+   ],
+   "catalogNumbers": [
+    "35020M"
+   ],
+   "models": [
+    "VND-1R",
+    "-1AA",
+    "-1X",
+    "-7L"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Centurion",
+   "baseNumbers": [
+    "4-25"
+   ],
+   "catalogNumbers": [
+    "35020E"
+   ],
+   "models": [
+    "Yen-Lo- Wang"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Rifleman",
+   "baseNumbers": [
+    "4-26"
+   ],
+   "catalogNumbers": [
+    "35202E"
+   ],
+   "models": [
+    "RFL-3N",
+    "-5M",
+    "-7N",
+    "-9T",
+    "C 3 Legend Killer",
+    "Legend Killer 2"
+   ],
+   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+  },
+  {
+   "name": "Dire Wolf",
+   "baseNumbers": [
+    "1"
+   ],
+   "catalogNumbers": [
+    "35720 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "E Config T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Mist Lynx",
+   "baseNumbers": [
+    "2"
+   ],
+   "catalogNumbers": [
+    "35720 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Shadow Cat",
+   "baseNumbers": [
+    "3"
+   ],
+   "catalogNumbers": [
+    "35720 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Stormcrow",
+   "baseNumbers": [
+    "4"
+   ],
+   "catalogNumbers": [
+    "35720 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "H Config T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Summoner",
+   "baseNumbers": [
+    "5"
+   ],
+   "catalogNumbers": [
+    "35720 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config U Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Gargoyle",
+   "baseNumbers": [
+    "6"
+   ],
+   "catalogNumbers": [
+    "35722 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Hellbringer",
+   "baseNumbers": [
+    "7"
+   ],
+   "catalogNumbers": [
+    "35722 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Ice Ferret",
+   "baseNumbers": [
+    "8"
+   ],
+   "catalogNumbers": [
+    "35722 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Mad Dog",
+   "baseNumbers": [
+    "9"
+   ],
+   "catalogNumbers": [
+    "35722 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Viper",
+   "baseNumbers": [
+    "10"
+   ],
+   "catalogNumbers": [
+    "35722 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Adder",
+   "baseNumbers": [
+    "11"
+   ],
+   "catalogNumbers": [
+    "35030 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "H Config T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Mongrel",
+   "baseNumbers": [
+    "12"
+   ],
+   "catalogNumbers": [
+    "35030 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Nova",
+   "baseNumbers": [
+    "13"
+   ],
+   "catalogNumbers": [
+    "35030 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Timber Wolf",
+   "baseNumbers": [
+    "14"
+   ],
+   "catalogNumbers": [
+    "35030 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Executioner",
+   "baseNumbers": [
+    "15"
+   ],
+   "catalogNumbers": [
+    "35030 36001"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Elemental Battle Armor",
+   "baseNumbers": [
+    "16"
+   ],
+   "catalogNumbers": [
+    "35030 35739"
+   ],
+   "models": [
+    "Standard",
+    "Fire Elemental III"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Phoenix Hawk",
+   "baseNumbers": [
+    "17"
+   ],
+   "catalogNumbers": [
+    "35723"
+   ],
+   "models": [
+    "PHX-1",
+    "-9",
+    "-99",
+    "C 2"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Rifleman",
+   "baseNumbers": [
+    "18"
+   ],
+   "catalogNumbers": [
+    "35723"
+   ],
+   "models": [
+    "RFL-3N",
+    "-5M",
+    "-7N",
+    "-9T",
+    "C 3"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Warhammer",
+   "baseNumbers": [
+    "19"
+   ],
+   "catalogNumbers": [
+    "35723"
+   ],
+   "models": [
+    "WHM-6R",
+    "-6Rb",
+    "-6Rk WHM-8R",
+    "-10K",
+    "C",
+    "C 2"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Wasp",
+   "baseNumbers": [
+    "20"
+   ],
+   "catalogNumbers": [
+    "35723"
+   ],
+   "models": [
+    "WSP-1A",
+    "-5A",
+    "C"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Archer",
+   "baseNumbers": [
+    "21"
+   ],
+   "catalogNumbers": [
+    "35721"
+   ],
+   "models": [
+    "ARC-2R",
+    "-4M",
+    "-4M2",
+    "-7C Archer C",
+    "ARC-2R Morgan"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Marauder",
+   "baseNumbers": [
+    "22"
+   ],
+   "catalogNumbers": [
+    "35721"
+   ],
+   "models": [
+    "MAD-3R",
+    "-1R",
+    "-2R",
+    "-2T MAD-3L",
+    "-3M",
+    "-7C",
+    "-7R",
+    "C"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Stinger",
+   "baseNumbers": [
+    "23"
+   ],
+   "catalogNumbers": [
+    "35721"
+   ],
+   "models": [
+    "STG-3R",
+    "-6G",
+    "-6R",
+    "-6S"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Valkyrie",
+   "baseNumbers": [
+    "24"
+   ],
+   "catalogNumbers": [
+    "35721"
+   ],
+   "models": [
+    "VLK-QA",
+    "- QD",
+    "-QDD VLK-QD6",
+    "- QD8",
+    "C"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Archer ll",
+   "baseNumbers": [
+    "25"
+   ],
+   "catalogNumbers": [
+    "35740 36003"
+   ],
+   "models": [
+    "ARC-2R",
+    "4M",
+    "4M2"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Morgan Kell",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "36003"
+   ],
+   "models": [
+    "-4M",
+    "-4M2"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Dire Wolf Natasha Kerensky",
+   "baseNumbers": [
+    "26"
+   ],
+   "catalogNumbers": [
+    "35740 36003"
+   ],
+   "models": [
+    "Widowmaker"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Marauder Grayson Death Carlyle",
+   "baseNumbers": [
+    "27"
+   ],
+   "catalogNumbers": [
+    "35740 36003"
+   ],
+   "models": [
+    "MAD-3R",
+    "-1R",
+    "-2R",
+    "-2T MAD-3L",
+    "-3M",
+    "-7C",
+    "-7R",
+    "C"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Timber Wolf Aidan Pryde",
+   "baseNumbers": [
+    "28"
+   ],
+   "catalogNumbers": [
+    "35740 36003"
+   ],
+   "models": [
+    "Pryde"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "UrbanMech",
+   "baseNumbers": [
+    "29"
+   ],
+   "catalogNumbers": [
+    "36002"
+   ],
+   "models": [
+    "UM-R60",
+    "- R69",
+    "-R80"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Fire Falcon",
+   "baseNumbers": [
+    "94"
+   ],
+   "catalogNumbers": [
+    "35734"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Hellion",
+   "baseNumbers": [
+    "95"
+   ],
+   "catalogNumbers": [
+    "35734"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Howler",
+   "baseNumbers": [
+    "78"
+   ],
+   "catalogNumbers": [
+    "35734"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Kodiak",
+   "baseNumbers": [
+    "96"
+   ],
+   "catalogNumbers": [
+    "35734"
+   ],
+   "models": [
+    "1",
+    "6"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Pack Hunter",
+   "baseNumbers": [
+    "97"
+   ],
+   "catalogNumbers": [
+    "35734"
+   ],
+   "models": [
+    "1",
+    "4",
+    "5"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Cougar",
+   "baseNumbers": [
+    "30"
+   ],
+   "catalogNumbers": [
+    "35724"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Fire Moth",
+   "baseNumbers": [
+    "31"
+   ],
+   "catalogNumbers": [
+    "35724"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Kit Fox",
+   "baseNumbers": [
+    "32"
+   ],
+   "catalogNumbers": [
+    "35724"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Nova Cat",
+   "baseNumbers": [
+    "33"
+   ],
+   "catalogNumbers": [
+    "35724"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Warhawk",
+   "baseNumbers": [
+    "34"
+   ],
+   "catalogNumbers": [
+    "35724"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Crossbow",
+   "baseNumbers": [
+    "86"
+   ],
+   "catalogNumbers": [
+    "35728"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Ebon Jaguar",
+   "baseNumbers": [
+    "87"
+   ],
+   "catalogNumbers": [
+    "35728"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Huntsman",
+   "baseNumbers": [
+    "88"
+   ],
+   "catalogNumbers": [
+    "35728"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Kingfisher",
+   "baseNumbers": [
+    "89"
+   ],
+   "catalogNumbers": [
+    "35728"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Turkina",
+   "baseNumbers": [
+    "72"
+   ],
+   "catalogNumbers": [
+    "35728"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Behemoth",
+   "baseNumbers": [
+    "50"
+   ],
+   "catalogNumbers": [
+    "35730"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Hunchback IIC",
+   "baseNumbers": [
+    "48"
+   ],
+   "catalogNumbers": [
+    "35730"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Marauder IIC",
+   "baseNumbers": [
+    "49"
+   ],
+   "catalogNumbers": [
+    "35730"
+   ],
+   "models": [
+    "1",
+    "10"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Supernova",
+   "baseNumbers": [
+    "51"
+   ],
+   "catalogNumbers": [
+    "35730"
+   ],
+   "models": [
+    "1",
+    "5"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Warhammer IIC",
+   "baseNumbers": [
+    "52"
+   ],
+   "catalogNumbers": [
+    "35730"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Conjurer",
+   "baseNumbers": [
+    "73"
+   ],
+   "catalogNumbers": [
+    "35732"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Horned Owl",
+   "baseNumbers": [
+    "74"
+   ],
+   "catalogNumbers": [
+    "35732"
+   ],
+   "models": [
+    "1",
+    "5"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Incubus",
+   "baseNumbers": [
+    "75"
+   ],
+   "catalogNumbers": [
+    "35732"
+   ],
+   "models": [
+    "1",
+    "9"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Piranha",
+   "baseNumbers": [
+    "76"
+   ],
+   "catalogNumbers": [
+    "35732"
+   ],
+   "models": [
+    "1",
+    "2",
+    "5"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Vapor Eagle",
+   "baseNumbers": [
+    "77"
+   ],
+   "catalogNumbers": [
+    "35732"
+   ],
+   "models": [
+    "1",
+    "3"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Arctic Cheetah",
+   "baseNumbers": [
+    "39"
+   ],
+   "catalogNumbers": [
+    "35726"
+   ],
+   "models": [
+    "Prime Config",
+    "F Config T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Battle Cobra",
+   "baseNumbers": [
+    "40"
+   ],
+   "catalogNumbers": [
+    "35726"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Black Lanner",
+   "baseNumbers": [
+    "41"
+   ],
+   "catalogNumbers": [
+    "35726"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Linebacker",
+   "baseNumbers": [
+    "42"
+   ],
+   "catalogNumbers": [
+    "35726"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Night Gyr",
+   "baseNumbers": [
+    "43"
+   ],
+   "catalogNumbers": [
+    "35726"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Atlas",
+   "baseNumbers": [
+    "35"
+   ],
+   "catalogNumbers": [
+    "35725"
+   ],
+   "models": [
+    "AS7-D",
+    "AS8-K",
+    "C"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Crusader",
+   "baseNumbers": [
+    "36"
+   ],
+   "catalogNumbers": [
+    "35725"
+   ],
+   "models": [
+    "CRD-3R",
+    "-8R",
+    "-9R",
+    "-10S"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Marauder II",
+   "baseNumbers": [
+    "37"
+   ],
+   "catalogNumbers": [
+    "35725"
+   ],
+   "models": [
+    "MAD-5A",
+    "-6A",
+    "C"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Orion",
+   "baseNumbers": [
+    "38"
+   ],
+   "catalogNumbers": [
+    "35725"
+   ],
+   "models": [
+    "ON1-K",
+    "-Kb",
+    "C 2"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Longbow",
+   "baseNumbers": [
+    "53"
+   ],
+   "catalogNumbers": [
+    "35731"
+   ],
+   "models": [
+    "LGB-7Q",
+    "-10C",
+    "-14Q"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Stalker",
+   "baseNumbers": [
+    "54"
+   ],
+   "catalogNumbers": [
+    "35731"
+   ],
+   "models": [
+    "STK-3F",
+    "-9F"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Trebuchet",
+   "baseNumbers": [
+    "55"
+   ],
+   "catalogNumbers": [
+    "35731"
+   ],
+   "models": [
+    "TBT-5N",
+    "-9N"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Zeus",
+   "baseNumbers": [
+    "56"
+   ],
+   "catalogNumbers": [
+    "35731"
+   ],
+   "models": [
+    "ZEU-5S"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Axman",
+   "baseNumbers": [
+    "90"
+   ],
+   "catalogNumbers": [
+    "35733"
+   ],
+   "models": [
+    "AXM-1N",
+    "-5N"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Bushwacker",
+   "baseNumbers": [
+    "91"
+   ],
+   "catalogNumbers": [
+    "35733"
+   ],
+   "models": [
+    "BSW-X1",
+    "- X4"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Cataphract",
+   "baseNumbers": [
+    "92"
+   ],
+   "catalogNumbers": [
+    "35733"
+   ],
+   "models": [
+    "CTF-3D",
+    "-5LL"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "NightStar",
+   "baseNumbers": [
+    "93"
+   ],
+   "catalogNumbers": [
+    "35733"
+   ],
+   "models": [
+    "NSR-9J",
+    "-10D"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Banshee",
+   "baseNumbers": [
+    "44"
+   ],
+   "catalogNumbers": [
+    "35727"
+   ],
+   "models": [
+    "BNC-3S",
+    "-12S"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Centurion",
+   "baseNumbers": [
+    "45"
+   ],
+   "catalogNumbers": [
+    "35727"
+   ],
+   "models": [
+    "CN9-A",
+    "CN9-D",
+    "CN9-D3 CN10-B",
+    "CN10-D"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Grasshopper",
+   "baseNumbers": [
+    "46"
+   ],
+   "catalogNumbers": [
+    "35727"
+   ],
+   "models": [
+    "GHR-5H",
+    "-8K"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Blackjack",
+   "baseNumbers": [
+    "58"
+   ],
+   "catalogNumbers": [
+    "35729"
+   ],
+   "models": [
+    "BJ-1",
+    "-5"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Jenner",
+   "baseNumbers": [
+    "63"
+   ],
+   "catalogNumbers": [
+    "35729"
+   ],
+   "models": [
+    "JR7-D",
+    "-K",
+    "-N"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Panther",
+   "baseNumbers": [
+    "66"
+   ],
+   "catalogNumbers": [
+    "35729"
+   ],
+   "models": [
+    "PNT-9R",
+    "-10K",
+    "-10KA PNT-14R",
+    "- C",
+    "-CA"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Wolfhound",
+   "baseNumbers": [
+    "70"
+   ],
+   "catalogNumbers": [
+    "35729"
+   ],
+   "models": [
+    "WLF-1",
+    "-2",
+    "-3S",
+    "-6S",
+    "-1 Allard"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Cyclops",
+   "baseNumbers": [
+    "98"
+   ],
+   "catalogNumbers": [
+    "35736"
+   ],
+   "models": [
+    "CP-10-Z",
+    "-11-A",
+    "-11- A-DC CP-11-G",
+    "C"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Dragon",
+   "baseNumbers": [
+    "99"
+   ],
+   "catalogNumbers": [
+    "35736"
+   ],
+   "models": [
+    "DRG-1N",
+    "-12K"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Spider",
+   "baseNumbers": [
+    "100"
+   ],
+   "catalogNumbers": [
+    "35736"
+   ],
+   "models": [
+    "SDR-5V",
+    "-7M",
+    "-8M",
+    "-9M"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Thug",
+   "baseNumbers": [
+    "79"
+   ],
+   "catalogNumbers": [
+    "35736"
+   ],
+   "models": [
+    "THG-11E",
+    "-11Eb",
+    "-13U THG-11E Marita"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Enforcer",
+   "baseNumbers": [
+    "59"
+   ],
+   "catalogNumbers": [
+    "35735"
+   ],
+   "models": [
+    "ENF-4R",
+    "-5R"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Hunchback",
+   "baseNumbers": [
+    "62"
+   ],
+   "catalogNumbers": [
+    "35735"
+   ],
+   "models": [
+    "HBK-4G",
+    "-5M",
+    "-5N",
+    "-6N",
+    "-7S",
+    "C HBK-4G Shakir",
+    "-4G Hohiro"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Raven",
+   "baseNumbers": [
+    "67"
+   ],
+   "catalogNumbers": [
+    "35735"
+   ],
+   "models": [
+    "RVN-3L",
+    "-4L",
+    "-5L"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Victor",
+   "baseNumbers": [
+    "69"
+   ],
+   "catalogNumbers": [
+    "35735"
+   ],
+   "models": [
+    "VTR-9B",
+    "-9D",
+    "-9K",
+    "-10D",
+    "-12D",
+    "C"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Crab",
+   "baseNumbers": [
+    "80"
+   ],
+   "catalogNumbers": [
+    "35738"
+   ],
+   "models": [
+    "CRB-27",
+    "-27b",
+    "-20",
+    "-30",
+    "-54"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Crockett",
+   "baseNumbers": [
+    "81"
+   ],
+   "catalogNumbers": [
+    "35738"
+   ],
+   "models": [
+    "CRK-5003-1",
+    "-5003-0",
+    "-5003-2 CRK-5003-3",
+    "-5003-CJ",
+    "-5006-1"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Flashman",
+   "baseNumbers": [
+    "82"
+   ],
+   "catalogNumbers": [
+    "35738"
+   ],
+   "models": [
+    "FLS-8K",
+    "-10E"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Guillotine",
+   "baseNumbers": [
+    "83"
+   ],
+   "catalogNumbers": [
+    "35738"
+   ],
+   "models": [
+    "GLT-3N",
+    "-4L",
+    "-4P",
+    "-5M",
+    "-7M"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Lancelot",
+   "baseNumbers": [
+    "84"
+   ],
+   "catalogNumbers": [
+    "35738"
+   ],
+   "models": [
+    "LNC25-01",
+    "-01sl",
+    "-01X",
+    "-02 LNC25-03",
+    "-07",
+    "-08",
+    "-09"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Mongoose",
+   "baseNumbers": [
+    "85"
+   ],
+   "catalogNumbers": [
+    "35738"
+   ],
+   "models": [
+    "MON-66",
+    "-66b",
+    "-67 MON-76",
+    "-96",
+    "C",
+    "C 2"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Black Knight",
+   "baseNumbers": [
+    "57"
+   ],
+   "catalogNumbers": [
+    "35737"
+   ],
+   "models": [
+    "BL-6-KNT",
+    "BL-6b-KNT BL-7-KNT",
+    "BL-18-KNT"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Exterminator",
+   "baseNumbers": [
+    "60"
+   ],
+   "catalogNumbers": [
+    "35737"
+   ],
+   "models": [
+    "EXT-4D",
+    "-4C",
+    "-7X"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Highlander",
+   "baseNumbers": [
+    "61"
+   ],
+   "catalogNumbers": [
+    "35737"
+   ],
+   "models": [
+    "HGN-732",
+    "-733",
+    "-733C HGN-733P",
+    "-740"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "King Crab",
+   "baseNumbers": [
+    "64"
+   ],
+   "catalogNumbers": [
+    "35737"
+   ],
+   "models": [
+    "KGC-000",
+    "-000b",
+    "-0000",
+    "-011"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Mercury",
+   "baseNumbers": [
+    "65"
+   ],
+   "catalogNumbers": [
+    "35737"
+   ],
+   "models": [
+    "MCY-99",
+    "-98",
+    "-97",
+    "-105"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Sentinel",
+   "baseNumbers": [
+    "68"
+   ],
+   "catalogNumbers": [
+    "35737"
+   ],
+   "models": [
+    "STN-3L",
+    "-3K",
+    "-3M",
+    "-6S"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Shilone",
+   "baseNumbers": [
+    "71-4"
+   ],
+   "catalogNumbers": [
+    "36004"
+   ],
+   "models": [
+    "SL-17",
+    "-17R"
+   ],
+   "boxSet": "BattleTech Clan Invasion",
+   "section": "BattleTech Clan Invasion"
+  },
+  {
+   "name": "Archer",
+   "baseNumbers": [
+    "3-2"
+   ],
+   "catalogNumbers": [
+    "35739"
+   ],
+   "models": [
+    "ARC-2W",
+    "C 2"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Blackjack",
+   "baseNumbers": [
+    "3-3"
+   ],
+   "catalogNumbers": [
+    "35739"
+   ],
+   "models": [
+    "BJ-2",
+    "C"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Rifleman",
+   "baseNumbers": [
+    "3-4"
+   ],
+   "catalogNumbers": [
+    "35739"
+   ],
+   "models": [
+    "RFL-3N",
+    "-5M",
+    "-7N",
+    "-9T",
+    "C 3"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Timber Wolf",
+   "baseNumbers": [
+    "3-5"
+   ],
+   "catalogNumbers": [
+    "35739"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Sagittaire",
+   "baseNumbers": [
+    "4-7"
+   ],
+   "catalogNumbers": [
+    "35763"
+   ],
+   "models": [
+    "SGT-8R",
+    "-9D",
+    "-14R"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Banshee",
+   "baseNumbers": [
+    "4-5"
+   ],
+   "catalogNumbers": [
+    "35763"
+   ],
+   "models": [
+    "BNC-3S",
+    "-12S"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Cyclops",
+   "baseNumbers": [
+    "4-6"
+   ],
+   "catalogNumbers": [
+    "35763"
+   ],
+   "models": [
+    "CP-11-A",
+    "-11-A-DC",
+    "-11-G",
+    "C"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Thunderbolt",
+   "baseNumbers": [
+    "4-8"
+   ],
+   "catalogNumbers": [
+    "35763"
+   ],
+   "models": [
+    "TDR-5SE",
+    "-9SE",
+    "-10SE"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Penetrator",
+   "baseNumbers": [
+    "4-3"
+   ],
+   "catalogNumbers": [
+    "35764"
+   ],
+   "models": [
+    "PTR-4D",
+    "-6S",
+    "-6T PTR-8D",
+    "-4D Christifori"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Atlas",
+   "baseNumbers": [
+    "4-1"
+   ],
+   "catalogNumbers": [
+    "35764"
+   ],
+   "models": [
+    "AS7-D",
+    "AS8-K",
+    "C"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Enforcer",
+   "baseNumbers": [
+    "4-2"
+   ],
+   "catalogNumbers": [
+    "35764"
+   ],
+   "models": [
+    "ENF-5D"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Hatchetman",
+   "baseNumbers": [
+    "4-4"
+   ],
+   "catalogNumbers": [
+    "35764"
+   ],
+   "models": [
+    "HCT-6D"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Gunslinger",
+   "baseNumbers": [
+    "4-14"
+   ],
+   "catalogNumbers": [
+    "35767"
+   ],
+   "models": [
+    "GUN-1ERD",
+    "-3ERD"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Highlander",
+   "baseNumbers": [
+    "4-16"
+   ],
+   "catalogNumbers": [
+    "35767"
+   ],
+   "models": [
+    "HGN-732",
+    "-733",
+    "-733C HGN-733P",
+    "-740"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Grasshopper",
+   "baseNumbers": [
+    "4-15"
+   ],
+   "catalogNumbers": [
+    "35767"
+   ],
+   "models": [
+    "GHR-5J"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Warhammer",
+   "baseNumbers": [
+    "4-13"
+   ],
+   "catalogNumbers": [
+    "35767"
+   ],
+   "models": [
+    "WHM-7S"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Nightsky",
+   "baseNumbers": [
+    "4-10"
+   ],
+   "catalogNumbers": [
+    "35766"
+   ],
+   "models": [
+    "NGS-4S",
+    "-5T",
+    "-7S"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Wolfhound",
+   "baseNumbers": [
+    "4-9"
+   ],
+   "catalogNumbers": [
+    "35766"
+   ],
+   "models": [
+    "WLF-1",
+    "-2",
+    "-3S",
+    "-6S",
+    "-1 Allard"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Griffin",
+   "baseNumbers": [
+    "4-11"
+   ],
+   "catalogNumbers": [
+    "35766"
+   ],
+   "models": [
+    "GRF-3M"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Crusader",
+   "baseNumbers": [
+    "4-12"
+   ],
+   "catalogNumbers": [
+    "35766"
+   ],
+   "models": [
+    "CRD-5M"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Regent",
+   "baseNumbers": [
+    "4-18"
+   ],
+   "catalogNumbers": [
+    "35765"
+   ],
+   "models": [
+    "Prime Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Shadow Hawk",
+   "baseNumbers": [
+    "4-20"
+   ],
+   "catalogNumbers": [
+    "35765"
+   ],
+   "models": [
+    "SHD-2H",
+    "-5R",
+    "-7H",
+    "C"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Gargoyle",
+   "baseNumbers": [
+    "4-19"
+   ],
+   "catalogNumbers": [
+    "35765"
+   ],
+   "models": [
+    "C Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Catapult",
+   "baseNumbers": [
+    "4-17"
+   ],
+   "catalogNumbers": [
+    "35765"
+   ],
+   "models": [
+    "CPLT-K2K",
+    "-K4"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Spartan",
+   "baseNumbers": [
+    "4-27"
+   ],
+   "catalogNumbers": [
+    "35770"
+   ],
+   "models": [
+    "SPT-N2",
+    "- N1",
+    "-N4"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Rifleman",
+   "baseNumbers": [
+    "4-28"
+   ],
+   "catalogNumbers": [
+    "35770"
+   ],
+   "models": [
+    "RFL-3N Rifleman Sneede"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Highlander",
+   "baseNumbers": [
+    "4-29"
+   ],
+   "catalogNumbers": [
+    "35770"
+   ],
+   "models": [
+    "HGN-694"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Guillotine",
+   "baseNumbers": [
+    "4-30"
+   ],
+   "catalogNumbers": [
+    "35770"
+   ],
+   "models": [
+    "GLT-3N",
+    "-4L",
+    "-4P",
+    "-5M",
+    "-7M"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Battleaxe",
+   "baseNumbers": [
+    "4-35"
+   ],
+   "catalogNumbers": [
+    "35775"
+   ],
+   "models": [
+    "BKX-7K",
+    "- RISC"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Ymir",
+   "baseNumbers": [
+    "4-37"
+   ],
+   "catalogNumbers": [
+    "35775"
+   ],
+   "models": [
+    "BWP-2B"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Coyotl",
+   "baseNumbers": [
+    "4-31"
+   ],
+   "catalogNumbers": [
+    "35775"
+   ],
+   "models": [
+    "Prime Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Firebee",
+   "baseNumbers": [
+    "4-33"
+   ],
+   "catalogNumbers": [
+    "35775"
+   ],
+   "models": [
+    "FRB-2E"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Gladiator",
+   "baseNumbers": [
+    "4-34"
+   ],
+   "catalogNumbers": [
+    "35775"
+   ],
+   "models": [
+    "GLD-4R",
+    "-7R",
+    "SF"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Icarus II",
+   "baseNumbers": [
+    "4-32"
+   ],
+   "catalogNumbers": [
+    "35775"
+   ],
+   "models": [
+    "ICR-1S",
+    "-2X"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Mackie",
+   "baseNumbers": [
+    "4-36"
+   ],
+   "catalogNumbers": [
+    "35775"
+   ],
+   "models": [
+    "MSK-6S"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "UrbanMech",
+   "baseNumbers": [
+    "4-21"
+   ],
+   "catalogNumbers": [
+    "35776"
+   ],
+   "models": [
+    "UM-R60L"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "UrbanMech",
+   "baseNumbers": [
+    "4-22"
+   ],
+   "catalogNumbers": [
+    "35776"
+   ],
+   "models": [
+    "UM-R60",
+    "- R69",
+    "-R80"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "UrbanMech",
+   "baseNumbers": [
+    "4-23"
+   ],
+   "catalogNumbers": [
+    "35776"
+   ],
+   "models": [
+    "UM-R27"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "UrbanMech",
+   "baseNumbers": [
+    "4-24"
+   ],
+   "catalogNumbers": [
+    "35776"
+   ],
+   "models": [
+    "UM-R68"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Atlas II",
+   "baseNumbers": [
+    "3-97"
+   ],
+   "catalogNumbers": [
+    "35780"
+   ],
+   "models": [
+    "AS7-D-H",
+    "- DK-H",
+    "-D- H Kerensky"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Phoenix Hawk",
+   "baseNumbers": [
+    "3-96"
+   ],
+   "catalogNumbers": [
+    "35780"
+   ],
+   "models": [
+    "PXH-1b \"Special\" PXH-1c \"Special\""
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Thunder Hawk",
+   "baseNumbers": [
+    "3-98"
+   ],
+   "catalogNumbers": [
+    "35780"
+   ],
+   "models": [
+    "TDK-7X",
+    "-7Z"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Orion",
+   "baseNumbers": [
+    "3-99"
+   ],
+   "catalogNumbers": [
+    "35780"
+   ],
+   "models": [
+    "ON1-Kb Kerensky"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Urbanmech LAM (Mech Mode)",
+   "baseNumbers": [
+    "3-91"
+   ],
+   "catalogNumbers": [
+    "36012"
+   ],
+   "models": [],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Urbanmech LAM (AirMech Mode)",
+   "baseNumbers": [
+    "3-92"
+   ],
+   "catalogNumbers": [
+    "36012"
+   ],
+   "models": [],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Urbanmech LAM (Aerospace Mode)",
+   "baseNumbers": [
+    "3-90"
+   ],
+   "catalogNumbers": [
+    "36012"
+   ],
+   "models": [],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Coolant Truck",
+   "baseNumbers": [
+    "4-17"
+   ],
+   "catalogNumbers": [
+    "35781"
+   ],
+   "models": [
+    "135-K Lifesaver"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Helios",
+   "baseNumbers": [
+    "4-18"
+   ],
+   "catalogNumbers": [
+    "35781"
+   ],
+   "models": [
+    "HEL-3D",
+    "-6RISC"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Argus",
+   "baseNumbers": [
+    "4-19"
+   ],
+   "catalogNumbers": [
+    "35781"
+   ],
+   "models": [
+    "AGS-4D"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Dire Wolf",
+   "baseNumbers": [
+    "4-20"
+   ],
+   "catalogNumbers": [
+    "35781"
+   ],
+   "models": [
+    "Prometheus"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Emperor",
+   "baseNumbers": [
+    "4-21"
+   ],
+   "catalogNumbers": [
+    "35781"
+   ],
+   "models": [
+    "EMP-6A",
+    "-6X"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Starslayer",
+   "baseNumbers": [
+    "4-22"
+   ],
+   "catalogNumbers": [
+    "35771"
+   ],
+   "models": [
+    "STY-3C",
+    "-2C",
+    "-4C"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Awesome",
+   "baseNumbers": [
+    "4-23"
+   ],
+   "catalogNumbers": [
+    "35771"
+   ],
+   "models": [
+    "AWS-9Q"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Black Knight",
+   "baseNumbers": [
+    "4-24"
+   ],
+   "catalogNumbers": [
+    "35771"
+   ],
+   "models": [
+    "BL-6-KNT",
+    "BL-6b-KNT BL-7-KNT",
+    "BL-18-KNT"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Tian-Zong",
+   "baseNumbers": [
+    "4-25"
+   ],
+   "catalogNumbers": [
+    "35771"
+   ],
+   "models": [
+    "TNZ-N1",
+    "- N2",
+    "-N3"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Blood Asp",
+   "baseNumbers": [
+    "4-26A"
+   ],
+   "catalogNumbers": [
+    "35788"
+   ],
+   "models": [
+    "I Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Cyclops",
+   "baseNumbers": [
+    "4-27A"
+   ],
+   "catalogNumbers": [
+    "35788"
+   ],
+   "models": [
+    "CP-11-H"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Flashman",
+   "baseNumbers": [
+    "4-28A"
+   ],
+   "catalogNumbers": [
+    "35788"
+   ],
+   "models": [
+    "FLS-8K",
+    "-10E"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Dragon Fire",
+   "baseNumbers": [
+    "4-29A"
+   ],
+   "catalogNumbers": [
+    "35788"
+   ],
+   "models": [
+    "DGR-3F",
+    "-4F",
+    "-4F",
+    "6N DGR-5F",
+    "-6FC",
+    "-7K",
+    "-9D"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Hammerhead",
+   "baseNumbers": [
+    "4-38"
+   ],
+   "catalogNumbers": [
+    "35784"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Havoc",
+   "baseNumbers": [
+    "4-39"
+   ],
+   "catalogNumbers": [
+    "35784"
+   ],
+   "models": [
+    "HVC-P6",
+    "- P7"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Jackalope",
+   "baseNumbers": [
+    "4-40"
+   ],
+   "catalogNumbers": [
+    "35784"
+   ],
+   "models": [
+    "JLP-BD",
+    "-C",
+    "-IC",
+    "-NH",
+    "-KA"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Kintaro",
+   "baseNumbers": [
+    "4-41"
+   ],
+   "catalogNumbers": [
+    "35784"
+   ],
+   "models": [
+    "KTO-19",
+    "-20",
+    "-22"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Lament",
+   "baseNumbers": [
+    "4-42"
+   ],
+   "catalogNumbers": [
+    "35784"
+   ],
+   "models": [
+    "LMT-2R"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "J-27 Ordnance Transport",
+   "baseNumbers": [
+    "4-43"
+   ],
+   "catalogNumbers": [
+    "35784"
+   ],
+   "models": [
+    "Standard",
+    "Fusion Armor",
+    "RISC"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Excalibur",
+   "baseNumbers": [
+    "4-44"
+   ],
+   "catalogNumbers": [
+    "35787"
+   ],
+   "models": [
+    "EXC-B2",
+    "- B2b",
+    "-B2- RISC"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Malice",
+   "baseNumbers": [
+    "4-45"
+   ],
+   "catalogNumbers": [
+    "35787"
+   ],
+   "models": [
+    "MAL-XT",
+    "- XV",
+    "-Y-SH- LAZR"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Peacekeeper",
+   "baseNumbers": [
+    "4-46"
+   ],
+   "catalogNumbers": [
+    "35787"
+   ],
+   "models": [
+    "PKP-1A"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Savage Wolf",
+   "baseNumbers": [
+    "4-47"
+   ],
+   "catalogNumbers": [
+    "35787"
+   ],
+   "models": [
+    "A Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Savior Repair Vehicle",
+   "baseNumbers": [
+    "4-48"
+   ],
+   "catalogNumbers": [
+    "35787"
+   ],
+   "models": [
+    "Standard"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Wendigo",
+   "baseNumbers": [
+    "4-49"
+   ],
+   "catalogNumbers": [
+    "35787"
+   ],
+   "models": [
+    "Prime Config",
+    "Wendigo- XR"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Shadow Cat",
+   "baseNumbers": [
+    "4-64"
+   ],
+   "catalogNumbers": [
+    "35795"
+   ],
+   "models": [
+    "I Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Shockwave",
+   "baseNumbers": [
+    "4-65"
+   ],
+   "catalogNumbers": [
+    "35795"
+   ],
+   "models": [
+    "SKW-2F",
+    "SKW-6H"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Stalker",
+   "baseNumbers": [
+    "4-66"
+   ],
+   "catalogNumbers": [
+    "35795"
+   ],
+   "models": [
+    "STK-8S"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Jade Hawk",
+   "baseNumbers": [
+    "4-63"
+   ],
+   "catalogNumbers": [
+    "35795"
+   ],
+   "models": [
+    "1",
+    "JHK-03"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Scarabus",
+   "baseNumbers": [
+    "4-78"
+   ],
+   "catalogNumbers": [
+    "38002"
+   ],
+   "models": [
+    "SCB-9A",
+    "-9T"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Ostroc",
+   "baseNumbers": [
+    "4-75"
+   ],
+   "catalogNumbers": [
+    "38002"
+   ],
+   "models": [
+    "OSR-2C",
+    "-2D",
+    "-3M",
+    "-6R"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Ostsol",
+   "baseNumbers": [
+    "4-77"
+   ],
+   "catalogNumbers": [
+    "38002"
+   ],
+   "models": [
+    "OTL-9R"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Ostwar",
+   "baseNumbers": [
+    "4-76"
+   ],
+   "catalogNumbers": [
+    "38002"
+   ],
+   "models": [
+    "OWR-2M",
+    "-3M"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Archer",
+   "baseNumbers": [
+    "a2"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "ARC-2K",
+    "-5R",
+    "-9R",
+    "-9W"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Atlas",
+   "baseNumbers": [
+    "a1"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "AS7-S"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Blackjack",
+   "baseNumbers": [
+    "a9"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "BJ-3"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Fire Moth",
+   "baseNumbers": [
+    "a7"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "D Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Nova",
+   "baseNumbers": [
+    "13"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "Independent Release ForcePacks",
+   "section": "Independent Release ForcePacks"
+  },
+  {
+   "name": "Locust",
+   "baseNumbers": [
+    "a4"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "LCT-3M"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Phoenix Hawk",
+   "baseNumbers": [
+    "17"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "PXH-1",
+    "-9",
+    "-99",
+    "C 2"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Pouncer",
+   "baseNumbers": [
+    "a8"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config W Config"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Timber Wolf",
+   "baseNumbers": [
+    "14"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Warhammer",
+   "baseNumbers": [
+    "19"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "WHM-6R",
+    "-6Rb",
+    "-6Rk WHM-8R",
+    "-10K",
+    "C",
+    "C 2"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Warhawk",
+   "baseNumbers": [
+    "a5"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "C Config"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Wasp",
+   "baseNumbers": [
+    "a3"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "WSP-3W"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Wraith",
+   "baseNumbers": [
+    "a6"
+   ],
+   "catalogNumbers": [
+    "35690"
+   ],
+   "models": [
+    "TR1",
+    "TR2",
+    "TR5"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Bane",
+   "baseNumbers": [
+    "4-55"
+   ],
+   "catalogNumbers": [
+    "35490"
+   ],
+   "models": [
+    "3"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Fulcrum Hovertank",
+   "baseNumbers": [
+    "4-56"
+   ],
+   "catalogNumbers": [
+    "35490"
+   ],
+   "models": [
+    "Standard"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Howler",
+   "baseNumbers": [
+    "4-57"
+   ],
+   "catalogNumbers": [
+    "35490"
+   ],
+   "models": [
+    "6"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Locust IIC",
+   "baseNumbers": [
+    "4-58"
+   ],
+   "catalogNumbers": [
+    "35490"
+   ],
+   "models": [
+    "4"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Marauder IIC",
+   "baseNumbers": [
+    "4-59"
+   ],
+   "catalogNumbers": [
+    "35490"
+   ],
+   "models": [
+    "6"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Rifleman",
+   "baseNumbers": [
+    "4-60"
+   ],
+   "catalogNumbers": [
+    "35490"
+   ],
+   "models": [
+    "C 2"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Summoner",
+   "baseNumbers": [
+    "4-61"
+   ],
+   "catalogNumbers": [
+    "35490"
+   ],
+   "models": [
+    "H Config"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Thunderbolt IIC",
+   "baseNumbers": [
+    "4-62"
+   ],
+   "catalogNumbers": [
+    "35490"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Timber Wolf (Mad Cat)",
+   "baseNumbers": [
+    "1-1"
+   ],
+   "catalogNumbers": [
+    "35MTF4"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Devastator",
+   "baseNumbers": [
+    "3-13"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "DVS-2",
+    "-2-EC",
+    "-11"
+   ],
+   "boxSet": "Alpha Strike",
+   "section": "Alpha Strike"
+  },
+  {
+   "name": "Flea",
+   "baseNumbers": [
+    "3-6"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "FLE-16",
+    "-20",
+    "-21"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Firefly",
+   "baseNumbers": [
+    "3-7"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "FFL-4B",
+    "-4C",
+    "-4D",
+    "-5A"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Caesar",
+   "baseNumbers": [
+    "3-12"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "CES-3R",
+    "-5R"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Quickdraw",
+   "baseNumbers": [
+    "3-11"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "QKD-4G",
+    "-5M",
+    "-9G"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Starslayer",
+   "baseNumbers": [
+    "3-9"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "STY-3C",
+    "-2C",
+    "-4C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Ostsol",
+   "baseNumbers": [
+    "3-10"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "OTL-4D",
+    "-8E",
+    "-8E3",
+    "-8F",
+    "C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Chameleon",
+   "baseNumbers": [
+    "3-8"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "CLN-7V",
+    "-8V",
+    "-9V"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Maxim",
+   "baseNumbers": [
+    "3-15"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "Standard",
+    "Escort"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Galleon",
+   "baseNumbers": [
+    "3-14"
+   ],
+   "catalogNumbers": [
+    "35050"
+   ],
+   "models": [
+    "GAL-100",
+    "-102",
+    "-103",
+    "-106 GAL-200",
+    "-201",
+    "C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Firestarter",
+   "baseNumbers": [
+    "3-18"
+   ],
+   "catalogNumbers": [
+    "35751"
+   ],
+   "models": [
+    "FS9-H",
+    "-A",
+    "-N \"Mirage II\""
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Javelin",
+   "baseNumbers": [
+    "3-17"
+   ],
+   "catalogNumbers": [
+    "35751"
+   ],
+   "models": [
+    "JVN-10N",
+    "-12N"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Ostscout",
+   "baseNumbers": [
+    "3-16"
+   ],
+   "catalogNumbers": [
+    "35751"
+   ],
+   "models": [
+    "OTT-7J",
+    "-7Jb",
+    "-7K",
+    "-8J",
+    "-12R"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Spector",
+   "baseNumbers": [
+    "3-19"
+   ],
+   "catalogNumbers": [
+    "35751"
+   ],
+   "models": [
+    "SPR-5F",
+    "-6F"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Cicada",
+   "baseNumbers": [
+    "3-20"
+   ],
+   "catalogNumbers": [
+    "35752"
+   ],
+   "models": [
+    "CDA-2A",
+    "-4A"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Clint",
+   "baseNumbers": [
+    "3-21"
+   ],
+   "catalogNumbers": [
+    "35752"
+   ],
+   "models": [
+    "CLNT-2-3T",
+    "-2-3U",
+    "-2-3UL CLNT-3-3T",
+    "-3-4T"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Dervish",
+   "baseNumbers": [
+    "3-23"
+   ],
+   "catalogNumbers": [
+    "35752"
+   ],
+   "models": [
+    "DV-6M",
+    "-7D",
+    "-11DK"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Hermes II",
+   "baseNumbers": [
+    "3-22"
+   ],
+   "catalogNumbers": [
+    "35752"
+   ],
+   "models": [
+    "HER-2S",
+    "-5S",
+    "-5SA",
+    "-5Sr",
+    "-7A"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Skulker",
+   "baseNumbers": [
+    "3-24"
+   ],
+   "catalogNumbers": [
+    "35753"
+   ],
+   "models": [
+    "Standard",
+    "X-5",
+    "Mk. II",
+    "C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Warrior",
+   "baseNumbers": [
+    "3-25"
+   ],
+   "catalogNumbers": [
+    "35753"
+   ],
+   "models": [
+    "H-7",
+    "-7F"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Behemoth",
+   "baseNumbers": [
+    "3-27"
+   ],
+   "catalogNumbers": [
+    "35753"
+   ],
+   "models": [
+    "Standard",
+    "Refit",
+    "Davion"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Ontos",
+   "baseNumbers": [
+    "3-26"
+   ],
+   "catalogNumbers": [
+    "35753"
+   ],
+   "models": [
+    "Standard",
+    "Chemical Laser"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "JagerMech",
+   "baseNumbers": [
+    "3-31"
+   ],
+   "catalogNumbers": [
+    "35754"
+   ],
+   "models": [
+    "JM6-S",
+    "- DD",
+    "-DDa JM7-D",
+    "- DD"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Scorpion",
+   "baseNumbers": [
+    "3-30"
+   ],
+   "catalogNumbers": [
+    "35754"
+   ],
+   "models": [
+    "SCP-1N",
+    "-1BR",
+    "-1O SCP-2N",
+    "-12S",
+    "C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Vulcan",
+   "baseNumbers": [
+    "3-28"
+   ],
+   "catalogNumbers": [
+    "35754"
+   ],
+   "models": [
+    "VT-2T",
+    "-5M",
+    "-5S VT-5Sr",
+    "-6M",
+    "-7T"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Whitworth",
+   "baseNumbers": [
+    "3-29"
+   ],
+   "catalogNumbers": [
+    "35754"
+   ],
+   "models": [
+    "WTH-1",
+    "-2H"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Black Python White Raven",
+   "baseNumbers": [
+    "3-36"
+   ],
+   "catalogNumbers": [
+    "35755"
+   ],
+   "models": [
+    "(Black Python) 1 (White Raven) 1"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Shadow Hawk IIC",
+   "baseNumbers": [
+    "3-35"
+   ],
+   "catalogNumbers": [
+    "35755"
+   ],
+   "models": [
+    "1",
+    "11"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Griffin IIC",
+   "baseNumbers": [
+    "3-34"
+   ],
+   "catalogNumbers": [
+    "35755"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Jenner IIC",
+   "baseNumbers": [
+    "3-33"
+   ],
+   "catalogNumbers": [
+    "35755"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Locust IIC",
+   "baseNumbers": [
+    "3-32"
+   ],
+   "catalogNumbers": [
+    "35755"
+   ],
+   "models": [
+    "1",
+    "10"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Demolisher",
+   "baseNumbers": [
+    "3-39"
+   ],
+   "catalogNumbers": [
+    "35756"
+   ],
+   "models": [
+    "Standard",
+    "Mk I",
+    "Mk II Fuel Cell",
+    "Reinforced"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Schrek",
+   "baseNumbers": [
+    "3-40"
+   ],
+   "catalogNumbers": [
+    "35756"
+   ],
+   "models": [
+    "Standard",
+    "XL"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Condor",
+   "baseNumbers": [
+    "3-38"
+   ],
+   "catalogNumbers": [
+    "35756"
+   ],
+   "models": [
+    "Standard",
+    "LAC",
+    "Ultra"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Pegasus",
+   "baseNumbers": [
+    "3-37"
+   ],
+   "catalogNumbers": [
+    "35756"
+   ],
+   "models": [
+    "Standard",
+    "3058 Upgrade Sealed",
+    "MML"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Pillager",
+   "baseNumbers": [
+    "3-44"
+   ],
+   "catalogNumbers": [
+    "35757"
+   ],
+   "models": [
+    "PLG-3Z",
+    "-6Z"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Goliath",
+   "baseNumbers": [
+    "3-42"
+   ],
+   "catalogNumbers": [
+    "35757"
+   ],
+   "models": [
+    "GOL-1H",
+    "-3M"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Shogun",
+   "baseNumbers": [
+    "3-43"
+   ],
+   "catalogNumbers": [
+    "35757"
+   ],
+   "models": [
+    "SHG-2F",
+    "-2E",
+    "-3E",
+    "C 2",
+    "C 3"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Hoplite",
+   "baseNumbers": [
+    "3-41"
+   ],
+   "catalogNumbers": [
+    "35757"
+   ],
+   "models": [
+    "HOP-4D",
+    "-4C",
+    "-5C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Charger",
+   "baseNumbers": [
+    "3-48"
+   ],
+   "catalogNumbers": [
+    "35758"
+   ],
+   "models": [
+    "CGR-1A1",
+    "C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Ostroc",
+   "baseNumbers": [
+    "3-47"
+   ],
+   "catalogNumbers": [
+    "35758"
+   ],
+   "models": [
+    "OSR-2C",
+    "-2D",
+    "-3M",
+    "-6R"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Merlin",
+   "baseNumbers": [
+    "3-46"
+   ],
+   "catalogNumbers": [
+    "35758"
+   ],
+   "models": [
+    "MLN-1A",
+    "-1D",
+    "C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Assassin",
+   "baseNumbers": [
+    "3-45"
+   ],
+   "catalogNumbers": [
+    "35758"
+   ],
+   "models": [
+    "ASN-21",
+    "-109"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Manticore",
+   "baseNumbers": [
+    "3-52"
+   ],
+   "catalogNumbers": [
+    "35759"
+   ],
+   "models": [
+    "Standard",
+    "XL"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Vedette",
+   "baseNumbers": [
+    "3-51"
+   ],
+   "catalogNumbers": [
+    "35759"
+   ],
+   "models": [
+    "Standard",
+    "NETC",
+    "LB-X",
+    "Armor"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "LRM Carrier -or- SRM Carrier",
+   "baseNumbers": [
+    "3-50",
+    "3-49"
+   ],
+   "catalogNumbers": [
+    "35759"
+   ],
+   "models": [
+    "Standard",
+    "3055 Upgrade",
+    "C -or- Standard",
+    "C"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Bane",
+   "baseNumbers": [
+    "3-57"
+   ],
+   "catalogNumbers": [
+    "35760"
+   ],
+   "models": [
+    "1",
+    "6"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Highlander IIC",
+   "baseNumbers": [
+    "3-56"
+   ],
+   "catalogNumbers": [
+    "35760"
+   ],
+   "models": [
+    "1",
+    "3",
+    "4"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Phoenix Hawk IIC",
+   "baseNumbers": [
+    "3-55"
+   ],
+   "catalogNumbers": [
+    "35760"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Grizzly",
+   "baseNumbers": [
+    "3-54"
+   ],
+   "catalogNumbers": [
+    "35760"
+   ],
+   "models": [
+    "1",
+    "3"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Rifleman IIC",
+   "baseNumbers": [
+    "3-53"
+   ],
+   "catalogNumbers": [
+    "35760"
+   ],
+   "models": [
+    "1",
+    "10"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Inner Sphere Standard Battle Armor",
+   "baseNumbers": [
+    "3-58"
+   ],
+   "catalogNumbers": [
+    "35761"
+   ],
+   "models": [
+    "Standard",
+    "Magnetic"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Mobile Long Tom",
+   "baseNumbers": [
+    "3-61",
+    "3-62"
+   ],
+   "catalogNumbers": [
+    "35762"
+   ],
+   "models": [
+    "LT- MOB-25",
+    "-25F"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Mobile HQ",
+   "baseNumbers": [
+    "3-59"
+   ],
+   "catalogNumbers": [
+    "35762"
+   ],
+   "models": [
+    "Standard",
+    "ICE",
+    "Browning"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "MASH Truck",
+   "baseNumbers": [
+    "3-60"
+   ],
+   "catalogNumbers": [
+    "35762"
+   ],
+   "models": [
+    "Standard",
+    "ICE",
+    "AMS"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Devastator",
+   "baseNumbers": [
+    "3-65"
+   ],
+   "catalogNumbers": [
+    "35768"
+   ],
+   "models": [
+    "DVS-2",
+    "-2-EC",
+    "-11"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Charger",
+   "baseNumbers": [
+    "3-66"
+   ],
+   "catalogNumbers": [
+    "35768"
+   ],
+   "models": [
+    "CGR-3K",
+    "-1A9"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Marauder",
+   "baseNumbers": [
+    "3-67"
+   ],
+   "catalogNumbers": [
+    "35768"
+   ],
+   "models": [
+    "MAD-3R",
+    "-1R",
+    "-2R",
+    "-2T MAD-3L",
+    "-3M",
+    "-7C",
+    "-7R",
+    "C Red Hunter (3146)"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Caesar",
+   "baseNumbers": [
+    "3-64"
+   ],
+   "catalogNumbers": [
+    "35768"
+   ],
+   "models": [
+    "CSR-3R Archangel"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "SM1 Tank Destroyer",
+   "baseNumbers": [
+    "3-63"
+   ],
+   "catalogNumbers": [
+    "35768"
+   ],
+   "models": [
+    "SM1",
+    "SM1B"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Marauder",
+   "baseNumbers": [
+    "3-68"
+   ],
+   "catalogNumbers": [
+    "35769"
+   ],
+   "models": [
+    "Bounty Hunter (3015) Bounty H t"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Warhammer",
+   "baseNumbers": [
+    "3-69"
+   ],
+   "catalogNumbers": [
+    "35769"
+   ],
+   "models": [
+    "WHM-9K"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Griffin",
+   "baseNumbers": [
+    "3-70"
+   ],
+   "catalogNumbers": [
+    "35769"
+   ],
+   "models": [
+    "GRF-2N",
+    "-2N2"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Timber Wolf",
+   "baseNumbers": [
+    "3-71"
+   ],
+   "catalogNumbers": [
+    "35769"
+   ],
+   "models": [
+    "Bounty Hunter",
+    "S Config"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Loki Mk II",
+   "baseNumbers": [
+    "3-72"
+   ],
+   "catalogNumbers": [
+    "35769"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Marauder II",
+   "baseNumbers": [
+    "3-73"
+   ],
+   "catalogNumbers": [
+    "35769"
+   ],
+   "models": [
+    "Bounty Hunter"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Hetzer",
+   "baseNumbers": [
+    "3-76"
+   ],
+   "catalogNumbers": [
+    "35777"
+   ],
+   "models": [
+    "Standard",
+    "AC",
+    "10",
+    "LB-X Fuel Cell",
+    "Clan"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Bulldog",
+   "baseNumbers": [
+    "3-77"
+   ],
+   "catalogNumbers": [
+    "35777"
+   ],
+   "models": [
+    "Standard",
+    "ERLL Plasma",
+    "Chemical"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "SturmFeur",
+   "baseNumbers": [
+    "3-78"
+   ],
+   "catalogNumbers": [
+    "35777"
+   ],
+   "models": [
+    "Standard",
+    "Cell"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Von Luckner",
+   "baseNumbers": [
+    "3-79"
+   ],
+   "catalogNumbers": [
+    "35777"
+   ],
+   "models": [
+    "VNL-K65N",
+    "-K90"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Patton",
+   "baseNumbers": [
+    "3-80"
+   ],
+   "catalogNumbers": [
+    "35778"
+   ],
+   "models": [
+    "Standard",
+    "Taurian",
+    "XL"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Pike",
+   "baseNumbers": [
+    "3-81"
+   ],
+   "catalogNumbers": [
+    "35778"
+   ],
+   "models": [
+    "Standard",
+    "LB-X"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "J. Edgar",
+   "baseNumbers": [
+    "3-82"
+   ],
+   "catalogNumbers": [
+    "35778"
+   ],
+   "models": [
+    "Standard",
+    "Chemical",
+    "ICE Light PPC",
+    "Machine Gun X-Pulse"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Drillson",
+   "baseNumbers": [
+    "3-83"
+   ],
+   "catalogNumbers": [
+    "35778"
+   ],
+   "models": [
+    "Standard",
+    "ICE",
+    "C",
+    "MML"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Axman",
+   "baseNumbers": [
+    "3-84"
+   ],
+   "catalogNumbers": [
+    "35779"
+   ],
+   "models": [
+    "AXM-2N"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Mauler",
+   "baseNumbers": [
+    "3-85"
+   ],
+   "catalogNumbers": [
+    "35779"
+   ],
+   "models": [
+    "MAL-1R",
+    "-1K",
+    "-1KX",
+    "-1PT5 MAL-1Y",
+    "-3K",
+    "-4R",
+    "-C LMN-1PT5",
+    "DCMS- MX90-D"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Bushwacker",
+   "baseNumbers": [
+    "3-86"
+   ],
+   "catalogNumbers": [
+    "35779"
+   ],
+   "models": [
+    "BSW-X1",
+    "-X4"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Hatamoto- Chi",
+   "baseNumbers": [
+    "3-87"
+   ],
+   "catalogNumbers": [
+    "35779"
+   ],
+   "models": [
+    "HTM-27T",
+    "-26T",
+    "-30T"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Wolfhound",
+   "baseNumbers": [
+    "3-88"
+   ],
+   "catalogNumbers": [
+    "35779"
+   ],
+   "models": [
+    "WLF-1B"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Visigoth",
+   "baseNumbers": [
+    "3-74"
+   ],
+   "catalogNumbers": [
+    "36010"
+   ],
+   "models": [
+    "Prime Config"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Savannah Master",
+   "baseNumbers": [
+    "3-75"
+   ],
+   "catalogNumbers": [
+    "36011"
+   ],
+   "models": [
+    "Standard",
+    "Reflective"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Blood Asp",
+   "baseNumbers": [
+    "3-89"
+   ],
+   "catalogNumbers": [
+    "36013"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Enforcer",
+   "baseNumbers": [
+    "4-30A"
+   ],
+   "catalogNumbers": [
+    "35783"
+   ],
+   "models": [
+    "ENF-5R"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Gunsmith",
+   "baseNumbers": [
+    "4-31A"
+   ],
+   "catalogNumbers": [
+    "35783"
+   ],
+   "models": [
+    "CH11-NG"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Hellspawn",
+   "baseNumbers": [
+    "4-32A"
+   ],
+   "catalogNumbers": [
+    "35783"
+   ],
+   "models": [
+    "HSN-7D",
+    "-8E"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Legionnaire",
+   "baseNumbers": [
+    "4-33A"
+   ],
+   "catalogNumbers": [
+    "35783"
+   ],
+   "models": [
+    "LGN-2D",
+    "-2K",
+    "-2K- RISC"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Thanatos",
+   "baseNumbers": [
+    "4-34A"
+   ],
+   "catalogNumbers": [
+    "35782"
+   ],
+   "models": [
+    "TNS-4S",
+    "-7D",
+    "-7D2"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Falconer",
+   "baseNumbers": [
+    "4-35A"
+   ],
+   "catalogNumbers": [
+    "35782"
+   ],
+   "models": [
+    "FLC-8R"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Templar",
+   "baseNumbers": [
+    "4-36A"
+   ],
+   "catalogNumbers": [
+    "35782"
+   ],
+   "models": [
+    "TLR1-O",
+    "- ORISC"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Thunderbolt",
+   "baseNumbers": [
+    "4-37A"
+   ],
+   "catalogNumbers": [
+    "35782"
+   ],
+   "models": [
+    "TDR-9NAIS"
+   ],
+   "boxSet": "Mercenaries",
+   "section": "Mercenaries"
+  },
+  {
+   "name": "Avatar",
+   "baseNumbers": [
+    "4-67"
+   ],
+   "catalogNumbers": [
+    "35785"
+   ],
+   "models": [
+    "AV1-O"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Chimera",
+   "baseNumbers": [
+    "4-68"
+   ],
+   "catalogNumbers": [
+    "35785"
+   ],
+   "models": [
+    "CMA-1S"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Panther",
+   "baseNumbers": [
+    "4-69"
+   ],
+   "catalogNumbers": [
+    "35785"
+   ],
+   "models": [
+    "PNT-9R",
+    "-10K",
+    "-10KA PNT-14R",
+    "-C",
+    "-CA"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Venom",
+   "baseNumbers": [
+    "4-70"
+   ],
+   "catalogNumbers": [
+    "35785"
+   ],
+   "models": [
+    "SDR-9K"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Akuma",
+   "baseNumbers": [
+    "4-71"
+   ],
+   "catalogNumbers": [
+    "35786"
+   ],
+   "models": [
+    "AKU-2XC"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Grand Dragon",
+   "baseNumbers": [
+    "4-72"
+   ],
+   "catalogNumbers": [
+    "35786"
+   ],
+   "models": [
+    "DRG-10K"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Rokurokubi",
+   "baseNumbers": [
+    "4-73"
+   ],
+   "catalogNumbers": [
+    "35786"
+   ],
+   "models": [
+    "RK-4T"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Shiro",
+   "baseNumbers": [
+    "4-74"
+   ],
+   "catalogNumbers": [
+    "35786"
+   ],
+   "models": [
+    "SH-1V"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Black Knight",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "36000"
+   ],
+   "models": [
+    "BL-9-KNT \"Clanbuster\""
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Stormcrow",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "36001"
+   ],
+   "models": [
+    "B Config",
+    "K Config TC Config"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Wolfhound IIC",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37009M"
+   ],
+   "models": [
+    "\"Grinner\""
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Timber Wolf",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37010M"
+   ],
+   "models": [
+    "TC Config"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Hammerhead",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37011M"
+   ],
+   "models": [
+    "1"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Eris",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37012M"
+   ],
+   "models": [
+    "ERS-2N"
+   ],
+   "boxSet": "Faction Force Packs",
+   "section": "Faction Force Packs"
+  },
+  {
+   "name": "Phoenix Hawk",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37013M"
+   ],
+   "models": [
+    "PHX-1",
+    "-9",
+    "-99",
+    "C 2"
+   ],
+   "boxSet": "Premium Miniatures",
+   "section": "Premium Miniatures"
+  },
+  {
+   "name": "Rifleman",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37014M"
+   ],
+   "models": [
+    "RFL-3N",
+    "-5M",
+    "-7N",
+    "-9T",
+    "C 3"
+   ],
+   "boxSet": "Premium Miniatures",
+   "section": "Premium Miniatures"
+  },
+  {
+   "name": "Mad Dog",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37015M"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "Premium Miniatures",
+   "section": "Premium Miniatures"
+  },
+  {
+   "name": "Wolverine",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37016M"
+   ],
+   "models": [
+    "WVR-6R",
+    "-3R",
+    "-9R",
+    "-10R"
+   ],
+   "boxSet": "Premium Miniatures",
+   "section": "Premium Miniatures"
+  },
+  {
+   "name": "BattleMaster",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37017M"
+   ],
+   "models": [
+    "BLR-1G",
+    "-6G",
+    "C 3"
+   ],
+   "boxSet": "Premium Miniatures",
+   "section": "Premium Miniatures"
+  },
+  {
+   "name": "Nova Cat",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37018M"
+   ],
+   "models": [
+    "Prime Config",
+    "T Config"
+   ],
+   "boxSet": "Premium Miniatures",
+   "section": "Premium Miniatures"
+  },
+  {
+   "name": "Black Knight",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37020M"
+   ],
+   "models": [
+    "BL-9-KNT \"Clanbuster\""
+   ],
+   "boxSet": "Premium Miniatures",
+   "section": "Premium Miniatures"
+  },
+  {
+   "name": "Stormcrow",
+   "baseNumbers": [],
+   "catalogNumbers": [
+    "37021M"
+   ],
+   "models": [
+    "B Config",
+    "K Config TC Config"
+   ],
+   "boxSet": "Premium Miniatures",
+   "section": "Premium Miniatures"
+  }
+ ]
+}
