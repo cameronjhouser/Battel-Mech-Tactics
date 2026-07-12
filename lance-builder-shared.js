@@ -461,7 +461,7 @@ function lbSwitchMode(mode) {
 }
 
 /* ── SKIRMISH FORCE BUILDER ─────────────────────────── */
-let sbCollection = {};   // normalized name -> true (from uploaded CSV)
+let sbCollection = {};   // normalized name -> { type, base, count } (from uploaded CSV)
 const SB_COLLECTION_STORAGE_KEY = 'bmtSavedCollections.v1';
 let sbCatalog    = [];   // all MUL units for current faction/era
 let sbForce      = [];   // array of { unit, skill }
@@ -508,10 +508,140 @@ function sbNorm(name) {
     .replace(/\s+/g, ' ').trim();
 }
 
-function sbIsOwned(unit) {
-  if (!Object.keys(sbCollection).length) return false;
+// Older saved collections stored `normName -> true`; current shape is
+// `normName -> { type, base, count }`. Normalize in place so every consumer
+// can assume the record form.
+function sbNormalizeCollection(map) {
+  const out = {};
+  Object.keys(map || {}).forEach(k => {
+    const v = map[k];
+    out[k] = (v && typeof v === 'object') ? { type: v.type || '', base: v.base || '', count: v.count || 1 }
+                                          : { type: '', base: '', count: 1 };
+  });
+  return out;
+}
+
+// Collection records whose name fuzzy-matches this unit. When a record
+// carries a Unit Type it must also match the unit's API type — that's the
+// whole point of the column: "Longbow" the BattleMech shouldn't light up
+// because you own a different unit type with a similar name.
+// ── Sarna miniatures dataset (optional) ─────────────────────────────────────
+// Built monthly by scrape_sarna_minis.py (run from the maintainer's server)
+// into data/sarna-minis.json. Maps a mini's stamped base number to its Sarna
+// entry (name, catalog numbers, box set). Purely additive: until the file
+// exists (404) or while it loads, everything below no-ops.
+let sbMinisByBase = null; // base-number string -> entry; {} once load settles
+function sbLoadMinisData() {
+  if (sbMinisByBase !== null) return;
+  sbMinisByBase = {};
+  fetch(new URL('data/sarna-minis.json', LB_SHARED_BASE).href)
+    .then(r => r.ok ? r.json() : null)
+    .then(j => {
+      if (!j?.entries) return;
+      j.entries.forEach(e => (e.baseNumbers || []).forEach(b => { sbMinisByBase[b] = e; }));
+      sbRenderBrowse(); // refresh owned dots now that base lookups can resolve
+    })
+    .catch(() => {});
+}
+
+function sbOwnedRecords(unit) {
+  const keys = Object.keys(sbCollection);
+  if (!keys.length) return [];
   const mn = sbNorm(unit.Name);
-  return Object.keys(sbCollection).some(c => mn === c || mn.includes(c) || c.includes(mn));
+  const ut = (unit.Type?.Name || '').toLowerCase();
+  const typeOk = c => {
+    const t = (sbCollection[c].type || '').toLowerCase();
+    return !t || !ut || t === ut;
+  };
+  // A row's Base Number can vouch for a unit its name doesn't quite match:
+  // resolve the base through the Sarna dataset and compare that entry's
+  // chassis name instead (e.g. row named "Rifleman IIC" with base 3-53
+  // matching Sarna's "Rieman IIC" typo, or vice versa).
+  const baseOk = c => {
+    const b = sbCollection[c].base;
+    const e = b && sbMinisByBase ? sbMinisByBase[b] : null;
+    if (!e) return false;
+    const en = sbNorm(e.name);
+    return !!en && (mn === en || mn.includes(en) || en.includes(mn));
+  };
+  // An exact name match wins outright — without this, "Warhammer WHM-6R"
+  // would also soak up "Warhammer WHM-6Rb"'s record via the substring
+  // fallback and misreport its owned count.
+  const exact = keys.filter(c => mn === c && typeOk(c));
+  if (exact.length) return exact.map(c => sbCollection[c]);
+  return keys.filter(c => (mn.includes(c) || c.includes(mn) || baseOk(c)) && typeOk(c)).map(c => sbCollection[c]);
+}
+
+function sbIsOwned(unit) {
+  return sbOwnedRecords(unit).length > 0;
+}
+
+// How many copies of this unit the collection says you own (max across
+// matching records — the same physical mini list shouldn't sum through
+// both its "name" and "name + variant" keys).
+function sbOwnedCount(unit) {
+  const recs = sbOwnedRecords(unit);
+  return recs.length ? Math.max(...recs.map(r => r.count || 1)) : 0;
+}
+
+// Parse a collection CSV. Header-aware: columns may be in any order,
+// matched case-insensitively by name (Name, Unit Type, Base Number,
+// Owned Count, Variant); unknown columns are ignored. Falls back to the
+// legacy positional format (Name, Variant) when there's no header row.
+// Handles quoted cells with embedded commas.
+function sbParseCollectionCsv(text) {
+  const splitCsvLine = (line) => {
+    const cells = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inQ) {
+        if (ch === '"' && line[i+1] === '"') { cur += '"'; i++; }
+        else if (ch === '"') inQ = false;
+        else cur += ch;
+      } else if (ch === '"') inQ = true;
+      else if (ch === ',') { cells.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    cells.push(cur);
+    return cells.map(c => c.trim());
+  };
+
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (!lines.length) return { collection: {}, rows: 0, warnings: [] };
+
+  const headerCells = splitCsvLine(lines[0]).map(c => c.toLowerCase());
+  const hasHeader = headerCells.some(c => c.includes('name'));
+  const colIdx = (...names) => headerCells.findIndex(c => names.some(n => c.includes(n)));
+  const cols = hasHeader ? {
+    name:    colIdx('name'),
+    type:    colIdx('unit type', 'type'),
+    base:    colIdx('base'),
+    count:   colIdx('owned count', 'count', 'quantity', 'qty', 'owned'),
+    variant: colIdx('variant'),
+  } : { name: 0, type: -1, base: -1, count: -1, variant: 1 };
+
+  const collection = {};
+  const warnings = [];
+  let rows = 0;
+  lines.slice(hasHeader ? 1 : 0).forEach((line, li) => {
+    const cells = splitCsvLine(line);
+    const name = cells[cols.name] || '';
+    if (!name) return;
+    rows++;
+    const rec = {
+      type:  cols.type  >= 0 ? (cells[cols.type]  || '') : '',
+      base:  cols.base  >= 0 ? (cells[cols.base]  || '') : '',
+      count: cols.count >= 0 ? Math.max(1, parseInt(cells[cols.count], 10) || 1) : 1,
+    };
+    if (hasHeader && cols.type >= 0 && !rec.type) {
+      warnings.push(`Row ${li + 2}: "${name}" has no Unit Type — matched by name only.`);
+    }
+    collection[sbNorm(name)] = rec;
+    const variant = cols.variant >= 0 ? (cells[cols.variant] || '') : '';
+    if (variant) collection[sbNorm(name + ' ' + variant)] = { ...rec };
+  });
+  return { collection, rows, warnings };
 }
 
 function sbIsJump(unit) {
@@ -679,6 +809,7 @@ function sbInit() {
   sbInited = true;
   const sel = document.getElementById('sb-faction');
   if (!sel) return;
+  sbLoadMinisData();
   // Seed the curated list immediately (fallback + instant render), then try
   // to replace it with the complete list loaded live from the MUL.
   LB_FACTIONS.filter(f => f.id).forEach(f => {
@@ -833,22 +964,13 @@ function sbLoadCSV(input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    sbCollection = {};
-    const lines = e.target.result.split('\n');
-    // Detect if first line is a header (Name, Variant, …)
-    const firstLow = lines[0].toLowerCase();
-    const start = firstLow.includes('name') ? 1 : 0;
-    lines.slice(start).forEach(line => {
-      const parts = line.split(',');
-      const name = (parts[0] || '').trim().replace(/^"|"$/g,'');
-      const variant = (parts[1] || '').trim().replace(/^"|"$/g,'');
-      if (!name) return;
-      sbCollection[sbNorm(name)] = true;
-      if (variant) sbCollection[sbNorm(name + ' ' + variant)] = true;
-    });
-    const n = Object.keys(sbCollection).length;
+    const { collection, rows, warnings } = sbParseCollectionCsv(e.target.result);
+    sbCollection = collection;
+    const warnTxt = warnings.length
+      ? ` ⚠ ${warnings.length} row${warnings.length !== 1 ? 's' : ''} missing Unit Type (matched by name only).`
+      : '';
     document.getElementById('sb-status').textContent =
-      `Collection loaded: ${n} unit names from ${file.name}. Click Load Catalog to browse.`;
+      `Collection loaded: ${rows} unit${rows !== 1 ? 's' : ''} from ${file.name}.${warnTxt} Click Load Catalog to browse.`;
     sbRenderBrowse();
   };
   reader.readAsText(file);
@@ -908,7 +1030,7 @@ function sbLoadCollectionSelected() {
   if (!name) { alert('No saved list selected.'); return; }
   const saved = sbStoredCollections()[name];
   if (!saved?.collection || !Object.keys(saved.collection).length) { alert('That saved list has no units.'); return; }
-  sbCollection = saved.collection;
+  sbCollection = sbNormalizeCollection(saved.collection);
   document.getElementById('sb-status').textContent =
     `Collection loaded: ${Object.keys(sbCollection).length} unit names from "${name}". Click Load Catalog to browse.`;
   sbRenderBrowse();
@@ -1062,7 +1184,8 @@ function sbRenderBrowse() {
   const introMin     = parseInt(document.getElementById('sb-filter-intro-min')?.value) || 0;
   const introMax     = parseInt(document.getElementById('sb-filter-intro-max')?.value) || 9999;
   const hasCol       = Object.keys(sbCollection).length > 0;
-  const inForceIds   = new Set(sbForce.map(f => f.unit.Id));
+  const inForceCopies = {};
+  sbForce.forEach(f => { inForceCopies[f.unit.Id] = (inForceCopies[f.unit.Id] || 0) + 1; });
 
   const abilSel = [...sbAbilSel];
 
@@ -1144,8 +1267,19 @@ function sbRenderBrowse() {
   }
 
   const unitRow = (u) => {
-    const owned   = hasCol && sbIsOwned(u);
-    const inForce = inForceIds.has(u.Id);
+    const ownedRecs = hasCol ? sbOwnedRecords(u) : [];
+    const owned   = ownedRecs.length > 0;
+    const ownedN  = owned ? sbOwnedCount(u) : 0;
+    // When an owned record carries a base number the Sarna dataset knows,
+    // surface the physical mini's identity in the dot's tooltip.
+    const mini = ownedRecs.map(r => r.base && sbMinisByBase ? sbMinisByBase[r.base] : null).find(Boolean);
+    const miniTxt = mini
+      ? ` · Base ${ownedRecs.find(r => r.base && sbMinisByBase?.[r.base]).base}`
+        + (mini.catalogNumbers?.length ? ` · Cat ${mini.catalogNumbers.join('/')}` : '')
+        + (mini.boxSet ? ` · ${mini.boxSet}` : '')
+      : '';
+    const copies  = inForceCopies[u.Id] || 0;
+    const maxed   = copies >= sbMaxCopies(u);
     const dmg     = `${u.BFDamageShort??'–'}/${u.BFDamageMedium??'–'}/${u.BFDamageLong??'–'}`;
     const abil    = (u.BFAbilities || '').trim();
     const role    = u.Role?.Name || '—';
@@ -1155,8 +1289,15 @@ function sbRenderBrowse() {
     const ov      = u.BFOverheat || '—';
     const pv      = u.BFPointValue || '?';
     const intro   = u.DateIntroduced ?? '—';
-    return `<tr class="sb-row${inForce?' in-force':''}" data-uid="${u.Id}">
-      <td class="sb-col-name">${owned?'<span class="sb-owned-dot" title="Owned"></span>':''}${lbEsc(u.Name)}</td>
+    // ✓ once all allowed copies are in the force; with a multi-copy allowance
+    // still in progress, show a "1/3 +" style counter next to the add button.
+    const addCell = maxed
+      ? `<span style="color:var(--green);font-size:11px">✓${copies > 1 ? '×' + copies : ''}</span>`
+      : (copies > 0
+        ? `<span style="color:var(--text2);font-size:10px">${copies}/${sbMaxCopies(u)}</span> <button class="sb-add-btn" onclick="sbAddUnit(${u.Id})">+</button>`
+        : `<button class="sb-add-btn" onclick="sbAddUnit(${u.Id})">+</button>`);
+    return `<tr class="sb-row${maxed?' in-force':''}" data-uid="${u.Id}">
+      <td class="sb-col-name">${owned?`<span class="sb-owned-dot" title="Owned${ownedN > 1 ? ' ×' + ownedN : ''}${lbEsc(miniTxt)}"></span>`:''}${lbEsc(u.Name)}</td>
       <td class="sb-col-pv">${pv}</td>
       <td>${lbEsc(role)}</td>
       <td class="sb-col-dmg">${mv}</td>
@@ -1166,10 +1307,7 @@ function sbRenderBrowse() {
       <td class="sb-col-dmg">${ov}</td>
       <td class="sb-col-abil" title="${lbEsc(abil)}">${lbEsc(abil)}</td>
       <td class="sb-col-dmg">${lbEsc(String(intro))}</td>
-      <td class="sb-col-add">${inForce
-        ? '<span style="color:var(--green);font-size:11px">✓</span>'
-        : `<button class="sb-add-btn" onclick="sbAddUnit(${u.Id})">+</button>`
-      }</td>
+      <td class="sb-col-add">${addCell}</td>
     </tr>`;
   };
 
@@ -1234,11 +1372,21 @@ function sbBuildTypeTabs(filtered) {
     + types.map(t => tab(t, sbTypeLabel(t), countOf(t), ownedOf(t))).join('');
 }
 
+// How many copies of a unit the force may hold: 1 normally, or the
+// collection's Owned Count when a collection with counts is loaded and
+// this unit matches it — owning 3 of a mini means fielding up to 3.
+function sbMaxCopies(unit) {
+  if (!Object.keys(sbCollection).length) return 1;
+  const owned = sbOwnedCount(unit);
+  return owned > 0 ? owned : 1;
+}
+
 function sbAddUnit(id) {
   const unit = document.getElementById('sb-unit-grid')?._umap?.[id];
   if (!unit) return;
   if (sbForce.length >= 500) { alert('Force is full (500 units max).'); return; }
-  if (sbForce.some(f => f.unit.Id === id)) return;
+  const copies = sbForce.filter(f => f.unit.Id === id).length;
+  if (copies >= sbMaxCopies(unit)) return;
   sbForce.push({ unit, skill: 4 });
   sbRenderForce();
   sbRenderBrowse();
