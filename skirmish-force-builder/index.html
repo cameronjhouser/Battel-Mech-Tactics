@@ -69,63 +69,100 @@
   <div class="page-sub">Build an Alpha Strike force from the Master Unit List, organize it into lances, and print cards or record sheets.</div>
 
   <div id="lb-mode-skirmish">
-    <!-- Top controls — collapsible as one unit so the catalog/force panel below can use the freed-up space -->
-    <details class="sfb-collapse" open>
-    <summary>Unit Source &amp; Catalog</summary>
-    <div class="grid-2">
-      <div class="card" style="padding:12px 14px;margin-bottom:0">
-        <div class="card-title">Unit Source</div>
-        <div class="sb-browse-controls" style="margin-bottom:0">
-          <label class="lb-file-label">
-            <span>📂 Collection CSV</span>
-            <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
-          </label>
-          <div class="sb-fgroup sb-fgroup-grow">
-            <label class="sb-fg-label">Saved lists</label>
-            <select id="sb-collection-select"><option value="">No saved lists</option></select>
+    <!-- Sub-tabs: building a force vs building/auditing the mini collection -->
+    <div class="sb-subtabs">
+      <button class="lb-mode-btn on" id="sb-subtab-force" onclick="sbShowView('force')">Force Builder</button>
+      <button class="lb-mode-btn" id="sb-subtab-collection" onclick="sbShowView('collection')">My Collection</button>
+    </div>
+
+    <!-- ── MY COLLECTION VIEW ──────────────────────────── -->
+    <div id="sb-view-collection" style="display:none">
+      <div class="grid-2">
+        <div class="card" style="padding:12px 14px;margin-bottom:0">
+          <div class="card-title">Add Units</div>
+          <div class="sb-browse-controls" style="margin-bottom:0">
+            <label class="lb-file-label">
+              <span>📂 Collection CSV</span>
+              <input type="file" id="sb-csv-input" accept=".csv,.txt" onchange="sbLoadCSV(this)">
+            </label>
+            <div class="sb-fgroup sb-fgroup-grow">
+              <label class="sb-fg-label">Saved lists</label>
+              <select id="sb-collection-select"><option value="">No saved lists</option></select>
+            </div>
+            <button class="lb-btn-sm" onclick="sbSaveCollectionPrompt()" style="padding:4px 12px">Save List</button>
+            <button class="lb-btn-sm" onclick="sbLoadCollectionSelected()" style="padding:4px 12px">Load</button>
+            <button class="lb-btn-sm" onclick="sbDeleteCollectionSelected()" style="padding:4px 12px;background:var(--red);color:#fff">Delete</button>
+            <a href="../collection-template.csv" download="collection-template.csv" style="font-size:11px;color:var(--accent);align-self:center" title="Columns: Name (required), Unit Type, Base Number, Owned Count">⬇ CSV template</a>
           </div>
-          <button class="lb-btn-sm" onclick="sbSaveCollectionPrompt()" style="padding:4px 12px">Save List</button>
-          <button class="lb-btn-sm" onclick="sbLoadCollectionSelected()" style="padding:4px 12px">Load</button>
-          <button class="lb-btn-sm" onclick="sbDeleteCollectionSelected()" style="padding:4px 12px;background:var(--red);color:#fff">Delete</button>
-          <a href="../collection-template.csv" download="collection-template.csv" style="font-size:11px;color:var(--accent);align-self:center" title="Columns: Name (required), Unit Type, Base Number, Owned Count">⬇ CSV template</a>
+          <div class="sb-browse-controls" style="margin:10px 0 0">
+            <div class="sb-fgroup sb-fgroup-grow" style="position:relative">
+              <label class="sb-fg-label">Add unit manually</label>
+              <input type="text" id="sb-manual-name" placeholder="Unit name (e.g. Atlas AS7-D)…" onkeydown="if(event.key==='Enter')sbManualSearch()"
+                style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px">
+              <div id="sb-manual-results" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:30;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;max-height:230px;overflow-y:auto"></div>
+            </div>
+            <div class="sb-fgroup">
+              <label class="sb-fg-label">Count</label>
+              <input type="number" id="sb-manual-count" value="1" min="1" max="99"
+                style="width:52px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 6px;font-size:12px;text-align:center">
+            </div>
+            <button class="lb-btn-sm" onclick="sbManualSearch()" style="padding:4px 12px">Search</button>
+          </div>
+          <div class="sb-browse-controls" style="margin:10px 0 0">
+            <div class="sb-fgroup sb-fgroup-grow">
+              <label class="sb-fg-label">Search box sets</label>
+              <input type="text" id="sb-pack-search" placeholder="Filter by pack/box name…" oninput="sbPopulatePacks(this.value)"
+                style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px">
+            </div>
+            <div class="sb-fgroup sb-fgroup-grow">
+              <label class="sb-fg-label">Add pack / box set</label>
+              <select id="sb-pack-select" onchange="sbRenderPackPreview()"><option value="">Loading packs…</option></select>
+            </div>
+            <button class="lb-btn-sm" onclick="sbAddPack()" style="padding:4px 12px">Add Pack</button>
+          </div>
+          <div id="sb-pack-preview" style="display:none;margin-top:10px"></div>
         </div>
-        <div class="sb-browse-controls" style="margin:10px 0 0">
-          <div class="sb-fgroup sb-fgroup-grow" style="position:relative">
-            <label class="sb-fg-label">Add unit manually</label>
-            <input type="text" id="sb-manual-name" placeholder="Unit name (e.g. Atlas AS7-D)…" onkeydown="if(event.key==='Enter')sbManualSearch()"
-              style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px">
-            <div id="sb-manual-results" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:30;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;max-height:230px;overflow-y:auto"></div>
+        <div class="card" style="padding:12px 14px;margin-bottom:0">
+          <div class="card-title" style="display:flex;align-items:center;gap:8px">Your Collection
+            <span id="sb-coll-count" style="font-weight:400;color:var(--text3);font-size:11px;text-transform:none;letter-spacing:0"></span>
+            <button class="lb-btn-sm" onclick="sbCollClear()" style="margin-left:auto;padding:2px 10px;background:var(--red);color:#fff">Clear</button>
           </div>
-          <div class="sb-fgroup">
-            <label class="sb-fg-label">Count</label>
-            <input type="number" id="sb-manual-count" value="1" min="1" max="99"
-              style="width:52px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 6px;font-size:12px;text-align:center">
-          </div>
-          <button class="lb-btn-sm" onclick="sbManualSearch()" style="padding:4px 12px">Search</button>
-          <div class="sb-fgroup sb-fgroup-grow">
-            <label class="sb-fg-label">Search box sets</label>
-            <input type="text" id="sb-pack-search" placeholder="Filter by pack/box name…" oninput="sbPopulatePacks(this.value)"
-              style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px">
-          </div>
-          <div class="sb-fgroup sb-fgroup-grow">
-            <label class="sb-fg-label">Add pack / box set</label>
-            <select id="sb-pack-select"><option value="">Loading packs…</option></select>
-          </div>
-          <button class="lb-btn-sm" onclick="sbAddPack()" style="padding:4px 12px">Add Pack</button>
+          <div id="sb-coll-status" class="lb-status" style="margin:0 0 8px">The list you're building shows here — add units on the left.</div>
+          <div id="sb-coll-table"></div>
         </div>
       </div>
+      <div class="card" style="padding:12px 14px;margin-top:10px">
+        <div class="card-title">Complete Your Set</div>
+        <div class="sb-browse-controls" style="margin-bottom:8px">
+          <div class="sb-fgroup sb-fgroup-grow" style="max-width:560px">
+            <label class="sb-fg-label">Compare your collection against</label>
+            <select id="sb-cys-scope" onchange="sbRenderCys()"><option value="">Loading sets…</option></select>
+          </div>
+          <div class="sb-fgroup">
+            <label class="sb-fg-check"><input type="checkbox" id="sb-cys-missing" onchange="sbRenderCys()"> Show only what I'm missing</label>
+          </div>
+          <button class="lb-btn-sm" onclick="sbCysPrint()" style="padding:4px 12px">🖨 Print list</button>
+        </div>
+        <div id="sb-cys-summary" style="font-size:12px;color:var(--text2);margin-bottom:8px">Pick a product line or box set above to compare against your collection.</div>
+        <div id="sb-cys-table"></div>
+      </div>
+    </div>
+
+    <!-- ── FORCE BUILDER VIEW ──────────────────────────── -->
+    <div id="sb-view-force">
+    <details class="sfb-collapse" open>
+    <summary>Catalog</summary>
       <div class="card" style="padding:12px 14px;margin-bottom:0">
-        <div class="card-title">Catalog</div>
         <div class="sb-browse-controls" style="margin-bottom:0">
-          <div class="sb-fgroup" style="flex:1 1 100%">
+          <div class="sb-fgroup" style="flex:1 1 200px">
             <label class="sb-fg-label">Faction</label>
             <select id="sb-faction" onchange="sbFactionChanged()"></select>
           </div>
-          <div class="sb-fgroup" style="flex:1 1 100%">
+          <div class="sb-fgroup" style="flex:1 1 200px">
             <label class="sb-fg-label">General / Clan group</label>
             <select id="sb-faction-general" onchange="sbGeneralChanged()" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above, it does not narrow or replace it"></select>
           </div>
-          <div class="sb-fgroup" style="flex:1 1 100%">
+          <div class="sb-fgroup" style="flex:1 1 200px">
             <label class="sb-fg-label">Era</label>
             <select id="sb-era" onchange="sbClearCatalog()">
               <option value="" selected>Select era…</option>
@@ -146,7 +183,6 @@
           <button class="lb-btn-sm" onclick="sbClearForce()" style="padding:4px 12px;background:var(--red);color:#fff">Clear Force</button>
         </div>
       </div>
-    </div>
     </details>
 
     <!-- Grouped filter bar (collapsed by default — most sessions don't touch it) -->
@@ -238,7 +274,7 @@
     </div>
     </details>
 
-    <div id="sb-status" class="lb-status">Select faction + era, then click Load Catalog. Upload a collection CSV to mark owned units.</div>
+    <div id="sb-status" class="lb-status">Select faction + era, then click Load Catalog. Owned units are marked from the My Collection tab.</div>
 
     <div class="sb-layout">
       <!-- Catalog table -->
@@ -328,6 +364,7 @@
     </div>
 
     <div id="sb-formation-out" style="margin-top:14px;display:none"></div>
+    </div><!-- /sb-view-force -->
   </div>
 </main>
 

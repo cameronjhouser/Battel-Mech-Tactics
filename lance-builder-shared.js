@@ -509,17 +509,21 @@ function sbNorm(name) {
 }
 
 // Older saved collections stored `normName -> true`; current shape is
-// `normName -> { type, base, count }`. Normalize in place so every consumer
-// can assume the record form.
+// `normName -> { name, type, base, count }` where `name` is the display
+// name as originally entered (the key is normalized/lowercased). Normalize
+// in place so every consumer can assume the record form.
 function sbNormalizeCollection(map) {
   const out = {};
   Object.keys(map || {}).forEach(k => {
     const v = map[k];
-    out[k] = (v && typeof v === 'object') ? { type: v.type || '', base: v.base || '', count: v.count || 1 }
-                                          : { type: '', base: '', count: 1 };
+    out[k] = (v && typeof v === 'object')
+      ? { name: v.name || '', type: v.type || '', base: v.base || '', count: v.count || 1 }
+      : { name: '', type: '', base: '', count: 1 };
   });
   return out;
 }
+
+function sbCollDisplayName(key) { return sbCollection[key]?.name || key; }
 
 // Collection records whose name fuzzy-matches this unit. When a record
 // carries a Unit Type it must also match the unit's API type — that's the
@@ -551,6 +555,8 @@ function sbLoadMinisData() {
         (sbMinisByBase[b] = sbMinisByBase[b] || []).push(e);
       }));
       sbPopulatePacks();
+      sbPopulateCysScope();
+      sbRenderCys();
       sbRenderBrowse(); // refresh owned dots now that base lookups can resolve
     })
     .catch(() => {});
@@ -565,10 +571,15 @@ let sbManualResults = []; // last MUL search results
 
 function sbCollectionChanged(msg) {
   const n = Object.keys(sbCollection).length;
-  const status = document.getElementById('sb-status');
+  // The collection controls live on the My Collection tab when the page has
+  // one; report there first, falling back to the force view's status line.
+  const status = document.getElementById('sb-coll-status') || document.getElementById('sb-status');
   if (status) status.textContent =
     `${msg} Collection now has ${n} entr${n === 1 ? 'y' : 'ies'} — use "Save List" to keep it.`;
   sbRenderBrowse();
+  sbRenderCollection();
+  sbRenderPackPreview();
+  sbRenderCys();
 }
 
 async function sbManualSearch() {
@@ -602,8 +613,8 @@ function sbManualAdd(i) {
   const key = sbNorm(u.Name);
   if (!key) return;
   const rec = sbCollection[key];
-  if (rec) rec.count = (rec.count || 1) + n;
-  else sbCollection[key] = { type: u.Type?.Name || '', base: '', count: n };
+  if (rec) { rec.count = (rec.count || 1) + n; if (!rec.name) rec.name = u.Name; }
+  else sbCollection[key] = { name: u.Name, type: u.Type?.Name || '', base: '', count: n };
   const resultsEl = document.getElementById('sb-manual-results');
   if (resultsEl) resultsEl.style.display = 'none';
   sbCollectionChanged(`Added ${u.Name}${n > 1 ? ' ×' + n : ''} (owned ×${sbCollection[key].count}).`);
@@ -662,6 +673,8 @@ function sbPopulatePacks(filter) {
       + keys.map(k => `<option value="${lbEsc(k)}">${lbEsc(packs[k].label)}`
         + `${packs[k].year ? ' (' + packs[k].year + ')' : ''} — ${packs[k].entries.length} mini${packs[k].entries.length !== 1 ? 's' : ''}</option>`).join('')
     : `<option value="">No packs match "${lbEsc(filter || '')}"</option>`;
+  // Repopulating resets the selection, so keep the preview in sync.
+  sbRenderPackPreview();
 }
 
 function sbAddPack() {
@@ -677,12 +690,236 @@ function sbAddPack() {
     if (rec) {
       rec.count = (rec.count || 1) + 1;
       if (!rec.base && e.baseNumbers?.length) rec.base = e.baseNumbers[0];
+      if (!rec.name) rec.name = e.name;
     } else {
-      sbCollection[key] = { type: '', base: e.baseNumbers?.[0] || '', count: 1 };
+      sbCollection[key] = { name: e.name, type: '', base: e.baseNumbers?.[0] || '', count: 1 };
     }
     added++;
   });
   sbCollectionChanged(`Added ${added} mini${added !== 1 ? 's' : ''} from "${pack.label}".`);
+}
+
+/* ── My Collection tab ───────────────────────────────────────────────────────
+   The collection-building controls (CSV, saved lists, manual add, pack add)
+   live on their own tab with a visible, editable table of the list being
+   built, a preview of the selected pack's contents, and the Complete Your
+   Set comparison tool. Pages without these elements (none currently) just
+   no-op — every renderer bails when its container is missing. */
+
+function sbShowView(view) {
+  const coll = document.getElementById('sb-view-collection');
+  const force = document.getElementById('sb-view-force');
+  if (!coll || !force) return;
+  coll.style.display = view === 'collection' ? '' : 'none';
+  force.style.display = view === 'force' ? '' : 'none';
+  document.getElementById('sb-subtab-collection')?.classList.toggle('on', view === 'collection');
+  document.getElementById('sb-subtab-force')?.classList.toggle('on', view === 'force');
+  if (view === 'collection') { sbRenderCollection(); sbRenderCys(); }
+}
+
+function sbRenderCollection() {
+  const el = document.getElementById('sb-coll-table');
+  if (!el) return;
+  const keys = Object.keys(sbCollection)
+    .sort((a, b) => sbCollDisplayName(a).localeCompare(sbCollDisplayName(b)));
+  const countEl = document.getElementById('sb-coll-count');
+  if (countEl) {
+    const minis = keys.reduce((s, k) => s + (sbCollection[k].count || 1), 0);
+    countEl.textContent = keys.length ? `${keys.length} entries · ${minis} minis` : '';
+  }
+  if (!keys.length) {
+    el.innerHTML = '<div class="sb-empty-hint">Nothing here yet.<br>Upload a CSV, search a unit, or add a box set on the left.</div>';
+    return;
+  }
+  el.innerHTML = `<div class="sb-table-wrap" style="max-height:440px"><table class="sb-table">
+    <thead><tr><th>Name</th><th>Type</th><th>Base #</th><th style="text-align:center">Count</th><th></th></tr></thead>
+    <tbody>${keys.map(k => {
+      const r = sbCollection[k];
+      return `<tr>
+        <td>${lbEsc(sbCollDisplayName(k))}</td>
+        <td style="color:var(--text3)">${lbEsc(r.type || '')}</td>
+        <td style="color:var(--text3)">${lbEsc(r.base || '')}</td>
+        <td style="text-align:center;white-space:nowrap">
+          <button class="sb-coll-btn" onclick="sbCollAdjust('${k}',-1)" title="One fewer">−</button>
+          <span class="sb-coll-n">${r.count || 1}</span>
+          <button class="sb-coll-btn" onclick="sbCollAdjust('${k}',1)" title="One more">+</button>
+        </td>
+        <td style="text-align:right"><button class="sb-coll-btn sb-coll-del" onclick="sbCollRemove('${k}')" title="Remove">✕</button></td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+function sbCollAdjust(key, delta) {
+  const rec = sbCollection[key];
+  if (!rec) return;
+  rec.count = Math.max(1, (rec.count || 1) + delta);
+  sbCollectionChanged(`${sbCollDisplayName(key)} set to ×${rec.count}.`);
+}
+
+function sbCollRemove(key) {
+  if (!sbCollection[key]) return;
+  const nm = sbCollDisplayName(key);
+  delete sbCollection[key];
+  sbCollectionChanged(`Removed ${nm}.`);
+}
+
+function sbCollClear() {
+  if (!Object.keys(sbCollection).length) return;
+  if (!confirm('Clear the entire collection list?')) return;
+  sbCollection = {};
+  sbCollectionChanged('Collection cleared.');
+}
+
+// Owned records matching a Sarna dataset entry — the reverse of
+// sbOwnedRecords (which matches a MUL unit): a record's verified base
+// number wins outright, otherwise bidirectional name containment (chassis
+// "Atlas" matches an owned "Atlas AS7-D" and vice versa). Max count across
+// matches, same de-dup reasoning as sbOwnedCount.
+function sbEntryOwnedCount(e) {
+  const en = sbNorm(e.name);
+  const bases = e.baseNumbers || [];
+  const counts = Object.keys(sbCollection).filter(k => {
+    const r = sbCollection[k];
+    if (r.base && bases.includes(r.base)) return true;
+    return !!en && !!k && (k === en || k.includes(en) || en.includes(k));
+  }).map(k => sbCollection[k].count || 1);
+  return counts.length ? Math.max(...counts) : 0;
+}
+
+// Contents of the pack currently selected in the Add Pack dropdown, with
+// owned badges — lets the user see exactly what they're about to add.
+function sbRenderPackPreview() {
+  const el = document.getElementById('sb-pack-preview');
+  if (!el) return;
+  const packKey = document.getElementById('sb-pack-select')?.value;
+  const pack = packKey ? sbPackList()[packKey] : null;
+  if (!pack) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = '';
+  el.innerHTML = `<div class="sb-preview-head">In “${lbEsc(pack.label)}”${pack.year ? ` (${pack.year})` : ''} — ${pack.entries.length} mini${pack.entries.length !== 1 ? 's' : ''}:</div>`
+    + pack.entries.map(e => {
+      const owned = sbEntryOwnedCount(e);
+      const models = (e.models || []).slice(0, 4).join(' / ');
+      return `<div class="sb-preview-row">
+        <span class="sb-preview-name">${lbEsc(e.name)}${models ? ` <span class="sb-preview-models">${lbEsc(models)}${(e.models || []).length > 4 ? '…' : ''}</span>` : ''}</span>
+        <span class="sb-preview-base">${e.baseNumbers?.length ? 'Base ' + lbEsc(e.baseNumbers.join(' / ')) : ''}</span>
+        <span class="sb-preview-owned${owned ? ' is-owned' : ''}">${owned ? `✓ owned ×${owned}` : '—'}</span>
+      </div>`;
+    }).join('');
+}
+
+/* ── Complete Your Set ──────────────────────────────────────────────────────
+   Compare the collection against a whole product line / era section or a
+   single pack, flag what's missing, and print the result as a checklist. */
+
+function sbPopulateCysScope() {
+  const sel = document.getElementById('sb-cys-scope');
+  if (!sel) return;
+  const prev = sel.value;
+  const sections = [...new Set(sbMinisEntries.map(e => e.section).filter(Boolean))];
+  const packs = sbPackList();
+  const packKeys = Object.keys(packs).sort((a, b) => packs[a].label.localeCompare(packs[b].label));
+  sel.innerHTML = '<option value="">Select a set to compare…</option>'
+    + '<option value="all">Everything — all Catalyst minis</option>'
+    + `<optgroup label="Product lines / eras">${sections.map(s =>
+        `<option value="sec:${lbEsc(s)}">${lbEsc(s)}</option>`).join('')}</optgroup>`
+    + `<optgroup label="Packs / box sets">${packKeys.map(k =>
+        `<option value="pack:${lbEsc(k)}">${lbEsc(packs[k].label)}${packs[k].year ? ` (${packs[k].year})` : ''}</option>`).join('')}</optgroup>`;
+  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+function sbCysScope() {
+  const v = document.getElementById('sb-cys-scope')?.value || '';
+  if (!v) return null;
+  if (v === 'all') return { label: 'all Catalyst minis', entries: sbMinisEntries };
+  if (v.startsWith('sec:')) {
+    const s = v.slice(4);
+    return { label: s, entries: sbMinisEntries.filter(e => e.section === s) };
+  }
+  if (v.startsWith('pack:')) {
+    const p = sbPackList()[v.slice(5)];
+    return p ? { label: p.label + (p.year ? ` (${p.year})` : ''), entries: p.entries } : null;
+  }
+  return null;
+}
+
+function sbCysRows(scope) {
+  return scope.entries.map(e => ({ e, owned: sbEntryOwnedCount(e) }));
+}
+
+function sbRenderCys() {
+  const tbl = document.getElementById('sb-cys-table');
+  const sum = document.getElementById('sb-cys-summary');
+  if (!tbl) return;
+  const scope = sbCysScope();
+  if (!scope) {
+    tbl.innerHTML = '';
+    if (sum) sum.textContent = sbMinisEntries.length
+      ? 'Pick a product line or box set above to compare against your collection.'
+      : 'Miniatures dataset not loaded yet.';
+    return;
+  }
+  const rows = sbCysRows(scope);
+  const ownedN = rows.filter(r => r.owned).length;
+  const pct = rows.length ? Math.round(100 * ownedN / rows.length) : 0;
+  if (sum) sum.innerHTML = `You own <b>${ownedN}</b> of <b>${rows.length}</b> minis in ${lbEsc(scope.label)} (${pct}%).`;
+  const missingOnly = document.getElementById('sb-cys-missing')?.checked;
+  const shown = missingOnly ? rows.filter(r => !r.owned) : rows;
+  if (!shown.length) {
+    tbl.innerHTML = `<div class="sb-empty-hint">${missingOnly ? 'Nothing missing — set complete! 🏆' : 'No minis in this set.'}</div>`;
+    return;
+  }
+  tbl.innerHTML = `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
+    <thead><tr><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th></tr></thead>
+    <tbody>${shown.map(({ e, owned }) => `<tr${owned ? '' : ' class="sb-cys-missing-row"'}>
+      <td>${lbEsc(e.name)}</td>
+      <td style="color:var(--text3)">${lbEsc((e.models || []).slice(0, 4).join(' / '))}${(e.models || []).length > 4 ? '…' : ''}</td>
+      <td style="color:var(--text3)">${lbEsc((e.baseNumbers || []).join(' / '))}</td>
+      <td style="color:var(--text3)">${lbEsc(e.boxSets?.length ? e.boxSets.join(' · ') : (e.boxSet || e.section || ''))}</td>
+      <td style="white-space:nowrap">${owned ? `<span class="sb-cys-owned">✓ ×${owned}</span>` : '<span class="sb-cys-miss">✗ missing</span>'}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+function sbCysPrint() {
+  const scope = sbCysScope();
+  if (!scope) { alert('Pick a set to compare first.'); return; }
+  const missingOnly = document.getElementById('sb-cys-missing')?.checked;
+  const rows = sbCysRows(scope).filter(r => !missingOnly || !r.owned);
+  const all = sbCysRows(scope);
+  const ownedN = all.filter(r => r.owned).length;
+  const w = window.open('', '_blank');
+  if (!w) { alert('Pop-up blocked — allow pop-ups for this page to print the list.'); return; }
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8">
+<title>Complete Your Set — ${lbEsc(scope.label)}</title>
+<style>
+  body { font: 13px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; color:#111; margin: 32px; }
+  h1 { font-size: 18px; margin: 0 0 2px; }
+  .sub { color:#555; font-size: 12px; margin-bottom: 14px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 4px 10px 4px 0; border-bottom: 1px solid #ddd; vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color:#555; }
+  .dim { color:#777; }
+  .own { color:#0a7a33; font-weight: 600; }
+  .miss { color:#b3261e; font-weight: 600; }
+  .foot { margin-top: 16px; font-size: 10px; color:#888; }
+  @media print { body { margin: 12mm; } }
+</style></head><body>
+<h1>Complete Your Set — ${lbEsc(scope.label)}</h1>
+<div class="sub">${missingOnly ? 'Missing minis only' : 'Full checklist'} · you own ${ownedN} of ${all.length} (${all.length ? Math.round(100 * ownedN / all.length) : 0}%) · printed ${new Date().toLocaleDateString()}</div>
+<table><thead><tr><th style="width:18px"></th><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th></tr></thead><tbody>
+${rows.map(({ e, owned }) => `<tr>
+  <td>☐</td>
+  <td><b>${lbEsc(e.name)}</b></td>
+  <td class="dim">${lbEsc((e.models || []).join(' / '))}</td>
+  <td class="dim">${lbEsc((e.baseNumbers || []).join(' / '))}</td>
+  <td class="dim">${lbEsc(e.boxSets?.length ? e.boxSets.join(' · ') : (e.boxSet || e.section || ''))}</td>
+  <td>${owned ? `<span class="own">✓ ×${owned}</span>` : '<span class="miss">✗</span>'}</td>
+</tr>`).join('')}
+</tbody></table>
+<div class="foot">Miniatures data from Sarna BattleTechWiki (CC BY-NC-SA) · minis by Catalyst Game Labs · BMT Skirmish Force Builder</div>
+</body></html>`);
+  w.document.close();
+  w.focus();
+  w.print();
 }
 
 // Resolve a collection record's base number to its Sarna entry in the
@@ -787,6 +1024,7 @@ function sbParseCollectionCsv(text) {
     if (!name) return;
     rows++;
     const rec = {
+      name,
       type:  cols.type  >= 0 ? (cells[cols.type]  || '') : '',
       base:  cols.base  >= 0 ? (cells[cols.base]  || '') : '',
       count: cols.count >= 0 ? Math.max(1, parseInt(cells[cols.count], 10) || 1) : 1,
@@ -796,7 +1034,7 @@ function sbParseCollectionCsv(text) {
     }
     collection[sbNorm(name)] = rec;
     const variant = cols.variant >= 0 ? (cells[cols.variant] || '') : '';
-    if (variant) collection[sbNorm(name + ' ' + variant)] = { ...rec };
+    if (variant) collection[sbNorm(name + ' ' + variant)] = { ...rec, name: `${name} ${variant}` };
   });
   return { collection, rows, warnings };
 }
@@ -1135,9 +1373,7 @@ function sbLoadCSV(input) {
     const warnTxt = warnings.length
       ? ` ⚠ ${warnings.length} row${warnings.length !== 1 ? 's' : ''} missing Unit Type (matched by name only).`
       : '';
-    document.getElementById('sb-status').textContent =
-      `Collection loaded: ${rows} unit${rows !== 1 ? 's' : ''} from ${file.name}.${warnTxt} Click Load Catalog to browse.`;
-    sbRenderBrowse();
+    sbCollectionChanged(`Collection loaded: ${rows} unit${rows !== 1 ? 's' : ''} from ${file.name}.${warnTxt}`);
   };
   reader.readAsText(file);
 }
@@ -1197,9 +1433,7 @@ function sbLoadCollectionSelected() {
   const saved = sbStoredCollections()[name];
   if (!saved?.collection || !Object.keys(saved.collection).length) { alert('That saved list has no units.'); return; }
   sbCollection = sbNormalizeCollection(saved.collection);
-  document.getElementById('sb-status').textContent =
-    `Collection loaded: ${Object.keys(sbCollection).length} unit names from "${name}". Click Load Catalog to browse.`;
-  sbRenderBrowse();
+  sbCollectionChanged(`Loaded saved list "${name}".`);
   localStorage.setItem('bmtSavedCollections.lastName', name);
 }
 
