@@ -1019,10 +1019,16 @@ let sbCysUnits = null;       // MUL units loaded for the active Faction+Era comp
 let sbCysActiveKind = 'sarna'; // 'sarna' | 'mul' — which control last drove the comparison
 let sbCysRowsCache = [];     // precomputed rows for the currently loaded scope
 let sbCysScopeCache = null;  // the scope sbCysRowsCache was built from
-let sbCysFilters = { name: '', sub1: '', sub2: '', type: '', role: '', pvMin: '', pvMax: '', pack: '', owned: '' };
+let sbCysFilters = { name: '', sub1: '', sub2: '', type: '', role: '', pack: '', owned: '' };
 
 function sbCysResetFilters() {
-  sbCysFilters = { name: '', sub1: '', sub2: '', type: '', role: '', pvMin: '', pvMax: '', pack: '', owned: '' };
+  sbCysFilters = { name: '', sub1: '', sub2: '', type: '', role: '', pack: '', owned: '' };
+}
+
+// Box-set label(s) for a Sarna entry, matching what the table displays —
+// shared by the Pack/box filter dropdown's option list and its matching.
+function sbCysEntryBoxSets(e) {
+  return e.boxSets?.length ? e.boxSets : [e.boxSet || e.section || ''].filter(Boolean);
 }
 
 function sbPopulateCysScope() {
@@ -1204,23 +1210,20 @@ function sbCysRowMatches(row, scope) {
     if (!has(u.Name, f.name)) return false;
     if (f.type && (u.Type?.Name || '') !== f.type) return false;
     if (f.role && (u.Role?.Name || '') !== f.role) return false;
-    if (f.pvMin !== '' && (u.BFPointValue ?? 0) < Number(f.pvMin)) return false;
-    if (f.pvMax !== '' && (u.BFPointValue ?? 0) > Number(f.pvMax)) return false;
-    if (!has(row.boxSets.join(' '), f.pack)) return false;
+    if (f.pack && !row.boxSets.includes(f.pack)) return false;
   } else {
     const e = row.e;
     if (!has(e.name, f.name)) return false;
     if (!has((e.models || []).join(' '), f.sub1)) return false;
     if (!has((e.baseNumbers || []).join(' '), f.sub2)) return false;
-    const packText = e.boxSets?.length ? e.boxSets.join(' ') : (e.boxSet || e.section || '');
-    if (!has(packText, f.pack)) return false;
+    if (f.pack && !sbCysEntryBoxSets(e).includes(f.pack)) return false;
   }
   return true;
 }
 
 function sbCysAnyFilterActive() {
   const f = sbCysFilters;
-  return !!(f.name || f.sub1 || f.sub2 || f.type || f.role || f.pvMin !== '' || f.pvMax !== '' || f.pack || f.owned);
+  return !!(f.name || f.sub1 || f.sub2 || f.type || f.role || f.pack || f.owned);
 }
 
 // Filter input handler: updates state and re-renders ONLY the tbody, so
@@ -1240,10 +1243,12 @@ const SB_CYS_OWNED_OPTS = () => `<option value="">All</option>
 // only thing that runs again on every filter keystroke.
 function sbCysTableShellHtml(scope) {
   const f = sbCysFilters;
+  const packSelect = (opts) => `<select onchange="sbCysFilterChanged('pack', this.value)"><option value="">All</option>${opts.map(o => `<option value="${lbEsc(o)}"${f.pack === o ? ' selected' : ''}>${lbEsc(o)}</option>`).join('')}</select>`;
   if (scope.kind === 'mul') {
     const rows = sbCysRowsCache;
     const types = [...new Set(rows.map(r => r.e.Type?.Name).filter(Boolean))].sort();
     const roles = [...new Set(rows.map(r => r.e.Role?.Name).filter(Boolean))].sort();
+    const boxSets = [...new Set(rows.flatMap(r => r.boxSets))].sort();
     return `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
       <thead>
         <tr><th>Unit</th><th>Type</th><th>Role</th><th>PV</th><th>Box Set</th><th>Owned</th></tr>
@@ -1251,14 +1256,15 @@ function sbCysTableShellHtml(scope) {
           <th><input type="text" placeholder="Filter…" value="${lbEsc(f.name)}" oninput="sbCysFilterChanged('name', this.value)"></th>
           <th><select onchange="sbCysFilterChanged('type', this.value)"><option value="">All</option>${types.map(t => `<option value="${lbEsc(t)}"${f.type === t ? ' selected' : ''}>${lbEsc(t)}</option>`).join('')}</select></th>
           <th><select onchange="sbCysFilterChanged('role', this.value)"><option value="">All</option>${roles.map(r => `<option value="${lbEsc(r)}"${f.role === r ? ' selected' : ''}>${lbEsc(r)}</option>`).join('')}</select></th>
-          <th><div class="sb-cys-pv-range"><input type="number" placeholder="min" value="${lbEsc(f.pvMin)}" oninput="sbCysFilterChanged('pvMin', this.value)"><input type="number" placeholder="max" value="${lbEsc(f.pvMax)}" oninput="sbCysFilterChanged('pvMax', this.value)"></div></th>
-          <th><input type="text" placeholder="Filter…" value="${lbEsc(f.pack)}" oninput="sbCysFilterChanged('pack', this.value)"></th>
+          <th></th>
+          <th>${packSelect(boxSets)}</th>
           <th><select onchange="sbCysFilterChanged('owned', this.value)">${SB_CYS_OWNED_OPTS()}</select></th>
         </tr>
       </thead>
       <tbody id="sb-cys-tbody"></tbody>
     </table></div>`;
   }
+  const boxSets = [...new Set(sbCysRowsCache.flatMap(r => sbCysEntryBoxSets(r.e)))].sort();
   return `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
     <thead>
       <tr><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th></tr>
@@ -1266,7 +1272,7 @@ function sbCysTableShellHtml(scope) {
         <th><input type="text" placeholder="Filter…" value="${lbEsc(f.name)}" oninput="sbCysFilterChanged('name', this.value)"></th>
         <th><input type="text" placeholder="Filter…" value="${lbEsc(f.sub1)}" oninput="sbCysFilterChanged('sub1', this.value)"></th>
         <th><input type="text" placeholder="Filter…" value="${lbEsc(f.sub2)}" oninput="sbCysFilterChanged('sub2', this.value)"></th>
-        <th><input type="text" placeholder="Filter…" value="${lbEsc(f.pack)}" oninput="sbCysFilterChanged('pack', this.value)"></th>
+        <th>${packSelect(boxSets)}</th>
         <th><select onchange="sbCysFilterChanged('owned', this.value)">${SB_CYS_OWNED_OPTS()}</select></th>
       </tr>
     </thead>
@@ -1292,7 +1298,7 @@ function sbCysRowHtml(row, kind) {
     <td>${lbEsc(e.name)}</td>
     <td style="color:var(--text3)">${lbEsc((e.models || []).slice(0, 4).join(' / '))}${(e.models || []).length > 4 ? '…' : ''}</td>
     <td style="color:var(--text3)">${lbEsc((e.baseNumbers || []).join(' / '))}</td>
-    <td style="color:var(--text3)">${lbEsc(e.boxSets?.length ? e.boxSets.join(' · ') : (e.boxSet || e.section || ''))}</td>
+    <td style="color:var(--text3)">${lbEsc(sbCysEntryBoxSets(e).join(' · '))}</td>
     <td style="white-space:nowrap">${owned ? `<span class="sb-cys-owned">✓ ×${owned}</span>` : '<span class="sb-cys-miss">✗ missing</span>'}</td>
   </tr>`;
 }
@@ -1366,7 +1372,7 @@ function sbCysPrint() {
   <td><b>${lbEsc(row.e.name)}</b></td>
   <td class="dim">${lbEsc((row.e.models || []).join(' / '))}</td>
   <td class="dim">${lbEsc((row.e.baseNumbers || []).join(' / '))}</td>
-  <td class="dim">${lbEsc(row.e.boxSets?.length ? row.e.boxSets.join(' · ') : (row.e.boxSet || row.e.section || ''))}</td>
+  <td class="dim">${lbEsc(sbCysEntryBoxSets(row.e).join(' · '))}</td>
   <td>${row.owned ? `<span class="own">✓ ×${row.owned}</span>` : '<span class="miss">✗</span>'}</td>
 </tr>`;
   w.document.write(`<!doctype html><html><head><meta charset="utf-8">

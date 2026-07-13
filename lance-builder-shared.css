@@ -991,5 +991,3 @@
   .sb-cys-filter-row input, .sb-cys-filter-row select { width:100%; box-sizing:border-box; font-size:10px; font-weight:400;
     text-transform:none; letter-spacing:0; background:var(--bg3); color:var(--text); border:1px solid var(--border2);
     border-radius:3px; padding:2px 4px; }
-  .sb-cys-pv-range { display:flex; gap:2px; }
-  .sb-cys-pv-range input { width:50%; min-width:0; }
