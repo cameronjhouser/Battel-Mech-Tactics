@@ -292,6 +292,10 @@
         </div>
       </div>
       <div class="sb-fgroup">
+        <label class="sb-fg-label">Collection list</label>
+        <select id="sb-filter-collection" onchange="sbFilterCollectionChanged()" title="Load a saved list to mark owned units, without switching to My Collection"><option value="">None</option></select>
+      </div>
+      <div class="sb-fgroup">
         <label class="sb-fg-check"><input type="checkbox" id="sb-owned-only" onchange="sbRenderBrowse()"> Owned only</label>
       </div>
       <div class="sb-fgroup">
