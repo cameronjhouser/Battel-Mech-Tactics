@@ -88,13 +88,39 @@ def clean_cell(raw: str) -> str:
 
 
 def split_multi(cell: str) -> list[str]:
-    """'3500B/35713' or '3-50 / 3-49' -> ['3500B', '35713'] / ['3-50', '3-49'].
+    """Model cells: 'GRF-1N / -3N / C' -> ['GRF-1N', '-3N', 'C'].
 
-    Model cells like 'GRF-1N / -3N / C' also come through here; partial
-    variants ('-3N') are kept as written — consumers re-join with the name.
+    Split on slashes only — model designations contain internal spaces
+    ('Prime Config'). Partial variants ('-3N') are kept as written.
     """
     parts = [p.strip() for p in re.split(r"\s*/\s*", cell) if p.strip()]
     return parts or ([cell.strip()] if cell.strip() else [])
+
+
+def split_codes(cell: str) -> list[str]:
+    """Base/catalog cells: '3500B/35713' or a wrapped '35020 3500D' ->
+    separate codes. These never contain internal spaces, so split on
+    whitespace as well as slashes."""
+    return [p for p in re.split(r"[\s/]+", cell) if p]
+
+
+def split_boxsets(cell: str) -> list[str]:
+    """Box Set / Force Pack cells can list several real products a mini
+    ships in ('Legendary MechWarriors Pack or Salvage Box: Legendary',
+    'Beginner Box<br/>A Game of Armored Combat' -> 'Beginner Box /
+    A Game of Armored Combat' post-clean_cell). Split into separate names
+    so each is a first-class, independently filterable pack rather than
+    one joined blob."""
+    if not cell:
+        return []
+    out = []
+    for part in re.split(r"\s*/\s*", cell):
+        part = re.sub(r"\s+or\s*$", "", part.strip())  # dangling "or" left by a <br>-turned-slash split
+        for sub in re.split(r"\s+or\s+", part):
+            sub = sub.strip()
+            if sub:
+                out.append(sub)
+    return out
 
 
 # ── Table parsing ────────────────────────────────────────────────────────────
@@ -160,10 +186,11 @@ def parse_one_table(lines: list[str], start: int, section: str, entries: list[di
             return
         entries.append({
             "name": name,
-            "baseNumbers": split_multi(base),
-            "catalogNumbers": split_multi(catalog),
+            "baseNumbers": split_codes(base),
+            "catalogNumbers": split_codes(catalog),
             "models": split_multi(model),
-            "boxSet": boxset,
+            "boxSets": split_boxsets(boxset),
+            "boxSet": boxset,  # legacy/display: original joined cell text
             "section": section,
         })
 
@@ -209,10 +236,10 @@ def write_outputs(entries: list[dict], out_dir: Path) -> None:
     (out_dir / "sarna-minis.json").write_text(json.dumps(doc, indent=1), encoding="utf-8")
     with (out_dir / "sarna-minis.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["Name", "Base Numbers", "Catalog Numbers", "Models", "Box Set", "Section"])
+        w.writerow(["Name", "Base Numbers", "Catalog Numbers", "Models", "Box Sets", "Section"])
         for e in entries:
             w.writerow([e["name"], " / ".join(e["baseNumbers"]), " / ".join(e["catalogNumbers"]),
-                        " / ".join(e["models"]), e["boxSet"], e["section"]])
+                        " / ".join(e["models"]), " / ".join(e["boxSets"]), e["section"]])
     print(f"Wrote {len(entries)} entries to {out_dir}/sarna-minis.json and .csv")
 
 
@@ -269,10 +296,11 @@ def selftest() -> int:
     g = by_name.get("Griffin", {})
     check(g.get("baseNumbers") == ["1"], f"Griffin base: {g.get('baseNumbers')}")
     check(g.get("models") == ["GRF-1N", "-3N", "C"], f"Griffin models: {g.get('models')}")
-    check(g.get("boxSet") == "Beginner Box", f"Griffin boxSet: {g.get('boxSet')}")
+    check(g.get("boxSets") == ["Beginner Box"], f"Griffin boxSets: {g.get('boxSets')}")
     w = by_name.get("Wolverine", {})
     check(w.get("baseNumbers") == ["2"], f"Wolverine base: {w.get('baseNumbers')}")
-    check("A Game of Armored Combat" in w.get("boxSet", ""), f"Wolverine boxSet: {w.get('boxSet')}")
+    check(w.get("boxSets") == ["Beginner Box", "A Game of Armored Combat"],
+          f"Wolverine boxSets (should be split, not joined): {w.get('boxSets')}")
     l = by_name.get("LRM Carrier", {})
     check(l.get("baseNumbers") == ["3-50", "3-49"], f"LRM Carrier bases: {l.get('baseNumbers')}")
     check(l.get("section") == "Mercenaries", f"LRM Carrier section: {l.get('section')}")
