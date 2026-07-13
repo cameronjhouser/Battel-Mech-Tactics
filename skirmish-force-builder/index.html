@@ -133,17 +133,47 @@
       </div>
       <div class="card" style="padding:12px 14px;margin-top:10px">
         <div class="card-title">Complete Your Set</div>
+        <div class="sb-browse-controls" style="margin-bottom:0">
+          <div class="sb-fgroup" style="flex:1 1 200px">
+            <label class="sb-fg-label">Faction</label>
+            <select id="sb-cys-faction"></select>
+          </div>
+          <div class="sb-fgroup" style="flex:1 1 200px">
+            <label class="sb-fg-label">General / Clan group</label>
+            <select id="sb-cys-faction-general" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above"></select>
+          </div>
+          <div class="sb-fgroup" style="flex:1 1 200px">
+            <label class="sb-fg-label">Era</label>
+            <select id="sb-cys-era">
+              <option value="" selected>Select era…</option>
+              <option value="16">Dark Age (3131–3150)</option>
+              <option value="257">ilClan (3151–present)</option>
+              <option value="254">Late Republic (3101–3130)</option>
+              <option value="15">Early Republic (3081–3100)</option>
+              <option value="14">Jihad (3068–3080)</option>
+              <option value="247">Civil War (3062–3067)</option>
+              <option value="13">Clan Invasion (3050–3061)</option>
+              <option value="256">Late SW – Renaissance (3020–3049)</option>
+              <option value="255">Late SW – LosTech (2901–3019)</option>
+              <option value="11">Early Succession War (2781–2900)</option>
+              <option value="10">Star League (2571–2780)</option>
+            </select>
+          </div>
+          <button class="lb-btn-sm" onclick="sbCysFetchFactionEra()" style="padding:4px 12px">Compare</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin:8px 0">— or —</div>
         <div class="sb-browse-controls" style="margin-bottom:8px">
           <div class="sb-fgroup sb-fgroup-grow" style="max-width:560px">
-            <label class="sb-fg-label">Compare your collection against</label>
-            <select id="sb-cys-scope" onchange="sbRenderCys()"><option value="">Loading sets…</option></select>
+            <label class="sb-fg-label">Compare against a specific box set / product line</label>
+            <select id="sb-cys-scope" onchange="sbCysScopeChanged()"><option value="">Loading sets…</option></select>
           </div>
           <div class="sb-fgroup">
             <label class="sb-fg-check"><input type="checkbox" id="sb-cys-missing" onchange="sbRenderCys()"> Show only what I'm missing</label>
           </div>
           <button class="lb-btn-sm" onclick="sbCysPrint()" style="padding:4px 12px">🖨 Print list</button>
         </div>
-        <div id="sb-cys-summary" style="font-size:12px;color:var(--text2);margin-bottom:8px">Pick a product line or box set above to compare against your collection.</div>
+        <div id="sb-cys-summary" style="font-size:12px;color:var(--text2);margin-bottom:8px">Pick a faction + era, or a product line / box set above, to compare against your collection.</div>
+        <div id="sb-cys-suggestions"></div>
         <div id="sb-cys-table"></div>
       </div>
     </div>

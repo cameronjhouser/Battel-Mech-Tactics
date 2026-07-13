@@ -605,7 +605,7 @@ async function sbManualSearch() {
     box.innerHTML = sbManualResults.length
       ? sbManualResults.map((u, i) =>
         `<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 10px;border-bottom:1px solid var(--border);align-items:center">
-          ${sbImgUrl(u) ? `<img class="sb-mini-thumb" src="${lbEsc(sbImgUrl(u))}" alt="" loading="lazy">` : ''}
+          ${sbImgUrl(u) ? `<img class="sb-mini-thumb" src="${lbEsc(sbImgUrl(u))}" data-img="${lbEsc(sbImgUrl(u))}" data-label="${lbEsc(u.Name)}" alt="" loading="lazy" onclick="event.stopPropagation();sbOpenLightbox(this)">` : ''}
           <span style="font-size:12px;min-width:0;flex:1 1 auto">${lbEsc(u.Name)}
             <span style="color:var(--text3);font-size:10px">${lbEsc(u.Type?.Name || '')} · ${u.BFPointValue || '?'} PV</span></span>
           <button class="lb-btn-sm" style="padding:1px 10px;flex-shrink:0" onclick="sbManualAdd(${i})">Add</button>
@@ -621,6 +621,39 @@ async function sbManualSearch() {
 // load (mixed content) — same host serves them fine over https.
 function sbImgUrl(u) {
   return String(u?.ImageUrl || '').replace(/^http:\/\//i, 'https://');
+}
+
+// Click-to-enlarge for every .sb-mini-thumb (manual search results, the
+// collection table, pack preview). Built on demand and appended once —
+// neither page's HTML needs to carry lightbox markup. Reads the image URL
+// off the clicked element's dataset rather than embedding it in the
+// onclick string, since chassis names routinely carry apostrophes
+// ("Wolf's Dragoons") that would otherwise break out of the JS literal.
+function sbOpenLightbox(el) {
+  const url = el?.dataset?.img;
+  if (!url) return;
+  const label = el.dataset.label || '';
+  let box = document.getElementById('sb-lightbox');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'sb-lightbox';
+    box.className = 'sb-lightbox';
+    box.addEventListener('click', sbCloseLightbox);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') sbCloseLightbox(); });
+    document.body.appendChild(box);
+  }
+  box.innerHTML = `<div class="sb-lightbox-inner">
+    <button type="button" class="sb-lightbox-close" aria-label="Close">✕</button>
+    <img src="${lbEsc(url)}" alt="${lbEsc(label)}">
+    ${label ? `<div class="sb-lightbox-label">${lbEsc(label)}</div>` : ''}
+  </div>`;
+  box.querySelector('.sb-lightbox-inner').addEventListener('click', e => e.stopPropagation());
+  box.querySelector('.sb-lightbox-close').addEventListener('click', sbCloseLightbox);
+  box.classList.add('open');
+}
+
+function sbCloseLightbox() {
+  document.getElementById('sb-lightbox')?.classList.remove('open');
 }
 
 function sbManualAdd(i) {
@@ -888,7 +921,7 @@ function sbRenderCollection() {
     <tbody>${keys.map(k => {
       const r = sbCollection[k];
       return `<tr>
-        <td>${r.img ? `<img class="sb-mini-thumb" src="${lbEsc(r.img)}" alt="" loading="lazy">` : ''}</td>
+        <td>${r.img ? `<img class="sb-mini-thumb" src="${lbEsc(r.img)}" data-img="${lbEsc(r.img)}" data-label="${lbEsc(sbCollDisplayName(k))}" alt="" loading="lazy" onclick="sbOpenLightbox(this)">` : ''}</td>
         <td>${lbEsc(sbCollDisplayName(k))}</td>
         <td style="color:var(--text3)">${lbEsc(r.type || '')}</td>
         <td style="color:var(--text3)">${lbEsc(r.base || '')}</td>
@@ -959,7 +992,7 @@ function sbRenderPackPreview() {
       const img = recs.find(r => r.img)?.img || '';
       const models = (e.models || []).slice(0, 4).join(' / ');
       return `<div class="sb-preview-row">
-        ${img ? `<img class="sb-mini-thumb" src="${lbEsc(img)}" alt="" loading="lazy">` : ''}
+        ${img ? `<img class="sb-mini-thumb" src="${lbEsc(img)}" data-img="${lbEsc(img)}" data-label="${lbEsc(e.name)}" alt="" loading="lazy" onclick="sbOpenLightbox(this)">` : ''}
         <span class="sb-preview-name">${lbEsc(e.name)}${models ? ` <span class="sb-preview-models">${lbEsc(models)}${(e.models || []).length > 4 ? '…' : ''}</span>` : ''}</span>
         <span class="sb-preview-base">${e.baseNumbers?.length ? 'Base ' + lbEsc(e.baseNumbers.join(' / ')) : ''}</span>
         <span class="sb-preview-owned${owned ? ' is-owned' : ''}">${owned ? `✓ owned ×${owned}` : '—'}</span>
@@ -968,8 +1001,15 @@ function sbRenderPackPreview() {
 }
 
 /* ── Complete Your Set ──────────────────────────────────────────────────────
-   Compare the collection against a whole product line / era section or a
-   single pack, flag what's missing, and print the result as a checklist. */
+   Two ways to check completeness: against a real MUL Faction + Era (every
+   fieldable unit the game lists for that house/era — the original ask),
+   or against a Sarna product line / single pack (only meaningful for minis
+   that actually exist). Either way, missing entries get cross-referenced
+   against the Sarna pack dataset so gaps come with "buy this to help fill
+   them" suggestions rather than just a list of what's absent. */
+
+let sbCysUnits = null;       // MUL units loaded for the active Faction+Era compare
+let sbCysActiveKind = 'sarna'; // 'sarna' | 'mul' — which control last drove the comparison
 
 function sbPopulateCysScope() {
   const sel = document.getElementById('sb-cys-scope');
@@ -987,48 +1027,123 @@ function sbPopulateCysScope() {
   if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
 }
 
+function sbCysScopeChanged() {
+  sbCysActiveKind = 'sarna';
+  sbRenderCys();
+}
+
+// Fetch every fieldable unit the MUL lists for a Faction (+ optional
+// General group) and Era — the same per-type-merge approach sbFetchCatalog
+// uses for the Force Builder catalog, but kept in its own sbCysUnits so
+// this comparison doesn't disturb the Force Builder's own loaded catalog.
+async function sbCysFetchFactionEra() {
+  const specific = document.getElementById('sb-cys-faction')?.value || '';
+  const general  = document.getElementById('sb-cys-faction-general')?.value || '';
+  const factionIds = [...new Set([specific, general].filter(Boolean))];
+  const eraId = document.getElementById('sb-cys-era')?.value || '';
+  const sum = document.getElementById('sb-cys-summary');
+  if (!factionIds.length || !eraId) {
+    if (sum) sum.textContent = 'Select a faction and era, then click Compare.';
+    return;
+  }
+  if (sum) sum.textContent = 'Loading units from the Master Unit List…';
+  const fetchOneType = async (typeId) => {
+    const params = new URLSearchParams({ AvailableEras: eraId, minPV: '1', maxPV: '999', Types: String(typeId) });
+    factionIds.forEach(id => params.append('Factions', id));
+    const res = await fetch(`${MUL_API}?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status} (Types=${typeId})`);
+    const data = await res.json();
+    return data.Units || data || [];
+  };
+  try {
+    const results = await Promise.allSettled(SB_MUL_TYPE_IDS.map(fetchOneType));
+    const failed = results.filter(r => r.status === 'rejected');
+    const byId = new Map();
+    results.forEach(r => { if (r.status === 'fulfilled') r.value.forEach(u => byId.set(u.Id, u)); });
+    sbCysUnits = [...byId.values()];
+    if (!sbCysUnits.length && failed.length) throw new Error(failed[0].reason?.message || 'all type queries failed');
+    sbCysActiveKind = 'mul';
+    sbRenderCys();
+  } catch (e) {
+    if (sum) sum.textContent = `Error loading faction/era: ${e.message}`;
+  }
+}
+
+function sbCysFactionLabel() {
+  const specific = document.getElementById('sb-cys-faction')?.value || '';
+  const general  = document.getElementById('sb-cys-faction-general')?.value || '';
+  const ids = [...new Set([specific, general].filter(Boolean))];
+  const eLabel = SB_ERA_LABELS[document.getElementById('sb-cys-era')?.value] || '';
+  const fName = ids.map(id => sbFactionMeta[id]?.name || id).join(' + ') || 'Unknown faction';
+  return eLabel ? `${fName}, ${eLabel}` : fName;
+}
+
 function sbCysScope() {
+  if (sbCysActiveKind === 'mul' && sbCysUnits) {
+    return { kind: 'mul', label: sbCysFactionLabel(), units: sbCysUnits };
+  }
   const v = document.getElementById('sb-cys-scope')?.value || '';
   if (!v) return null;
-  if (v === 'all') return { label: 'all Catalyst minis', entries: sbMinisEntries };
+  if (v === 'all') return { kind: 'sarna', label: 'all Catalyst minis', entries: sbMinisEntries };
   if (v.startsWith('sec:')) {
     const s = v.slice(4);
-    return { label: s, entries: sbMinisEntries.filter(e => e.section === s) };
+    return { kind: 'sarna', label: s, entries: sbMinisEntries.filter(e => e.section === s) };
   }
   if (v.startsWith('pack:')) {
     const p = sbPackList()[v.slice(5)];
-    return p ? { label: p.label + (p.year ? ` (${p.year})` : ''), entries: p.entries } : null;
+    return p ? { kind: 'sarna', label: p.label + (p.year ? ` (${p.year})` : ''), entries: p.entries } : null;
   }
   return null;
 }
 
 function sbCysRows(scope) {
+  if (scope.kind === 'mul') return scope.units.map(u => ({ e: u, owned: sbOwnedCount(u) }));
   return scope.entries.map(e => ({ e, owned: sbEntryOwnedCount(e) }));
 }
 
-function sbRenderCys() {
-  const tbl = document.getElementById('sb-cys-table');
-  const sum = document.getElementById('sb-cys-summary');
-  if (!tbl) return;
-  const scope = sbCysScope();
-  if (!scope) {
-    tbl.innerHTML = '';
-    if (sum) sum.textContent = sbMinisEntries.length
-      ? 'Pick a product line or box set above to compare against your collection.'
-      : 'Miniatures dataset not loaded yet.';
+// For units the collection is missing, rank Sarna packs by how many of
+// those units they'd cover by name match — a "buy this next" hint rather
+// than just a list of gaps. missingUnits are MUL unit objects (.Name).
+function sbSuggestPacksFor(missingUnits) {
+  if (!missingUnits || !missingUnits.length) return [];
+  const packs = sbPackList();
+  const missing = missingUnits.map(u => ({ u, mn: sbNorm(u.Name) })).filter(x => x.mn);
+  const suggestions = [];
+  Object.keys(packs).forEach(key => {
+    const p = packs[key];
+    const covered = new Set();
+    p.entries.forEach(e => {
+      const en = sbNorm(e.name);
+      if (!en) return;
+      missing.forEach(({ u, mn }) => { if (mn.includes(en) || en.includes(mn)) covered.add(u); });
+    });
+    if (covered.size) suggestions.push({ label: p.label, year: p.year, covered: [...covered] });
+  });
+  suggestions.sort((a, b) => b.covered.length - a.covered.length || a.label.localeCompare(b.label));
+  return suggestions;
+}
+
+function sbRenderPackSuggestions(missingUnits) {
+  const el = document.getElementById('sb-cys-suggestions');
+  if (!el) return;
+  if (!missingUnits.length) { el.innerHTML = ''; return; }
+  const suggestions = sbSuggestPacksFor(missingUnits).slice(0, 8);
+  if (!suggestions.length) {
+    el.innerHTML = `<div class="sb-cys-suggest-head">Suggested box sets</div>
+      <div class="sb-empty-hint">No Catalyst miniature matches any of your missing units by name yet.</div>`;
     return;
   }
-  const rows = sbCysRows(scope);
-  const ownedN = rows.filter(r => r.owned).length;
-  const pct = rows.length ? Math.round(100 * ownedN / rows.length) : 0;
-  if (sum) sum.innerHTML = `You own <b>${ownedN}</b> of <b>${rows.length}</b> minis in ${lbEsc(scope.label)} (${pct}%).`;
-  const missingOnly = document.getElementById('sb-cys-missing')?.checked;
-  const shown = missingOnly ? rows.filter(r => !r.owned) : rows;
-  if (!shown.length) {
-    tbl.innerHTML = `<div class="sb-empty-hint">${missingOnly ? 'Nothing missing — set complete! 🏆' : 'No minis in this set.'}</div>`;
-    return;
-  }
-  tbl.innerHTML = `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
+  el.innerHTML = `<div class="sb-cys-suggest-head">Suggested box sets — ranked by how many of your missing units each one covers</div>
+    <div class="sb-cys-suggest-list">${suggestions.map(s => `
+      <div class="sb-cys-suggest-row">
+        <span class="sb-cys-suggest-name">${lbEsc(s.label)}${s.year ? ` <span class="sb-preview-models">(${s.year})</span>` : ''}</span>
+        <span class="sb-cys-suggest-count">covers ${s.covered.length} missing unit${s.covered.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="sb-cys-suggest-units">${s.covered.map(u => lbEsc(u.Name)).join(', ')}</div>`).join('')}</div>`;
+}
+
+function sbCysSarnaTableHtml(shown) {
+  return `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
     <thead><tr><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th></tr></thead>
     <tbody>${shown.map(({ e, owned }) => `<tr${owned ? '' : ' class="sb-cys-missing-row"'}>
       <td>${lbEsc(e.name)}</td>
@@ -1039,20 +1154,78 @@ function sbRenderCys() {
     </tr>`).join('')}</tbody></table></div>`;
 }
 
+function sbCysMulTableHtml(shown) {
+  return `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
+    <thead><tr><th>Unit</th><th>Type</th><th>Role</th><th>PV</th><th>Owned</th></tr></thead>
+    <tbody>${shown.map(({ e: u, owned }) => `<tr${owned ? '' : ' class="sb-cys-missing-row"'}>
+      <td>${lbEsc(u.Name)}</td>
+      <td style="color:var(--text3)">${lbEsc(u.Type?.Name || '')}</td>
+      <td style="color:var(--text3)">${lbEsc(u.Role?.Name || '')}</td>
+      <td style="color:var(--text3)">${u.BFPointValue ?? ''}</td>
+      <td style="white-space:nowrap">${owned ? `<span class="sb-cys-owned">✓ ×${owned}</span>` : '<span class="sb-cys-miss">✗ missing</span>'}</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+
+function sbRenderCys() {
+  const tbl = document.getElementById('sb-cys-table');
+  const sum = document.getElementById('sb-cys-summary');
+  if (!tbl) return;
+  const scope = sbCysScope();
+  if (!scope) {
+    tbl.innerHTML = '';
+    document.getElementById('sb-cys-suggestions')?.replaceChildren();
+    if (sum) sum.textContent = sbMinisEntries.length
+      ? 'Pick a faction + era, or a product line / box set above, to compare against your collection.'
+      : 'Miniatures dataset not loaded yet.';
+    return;
+  }
+  const rows = sbCysRows(scope);
+  const ownedN = rows.filter(r => r.owned).length;
+  const pct = rows.length ? Math.round(100 * ownedN / rows.length) : 0;
+  const noun = scope.kind === 'mul' ? 'units' : 'minis';
+  if (sum) sum.innerHTML = `You own <b>${ownedN}</b> of <b>${rows.length}</b> ${noun} in ${lbEsc(scope.label)} (${pct}%).`;
+  sbRenderPackSuggestions(scope.kind === 'mul' ? rows.filter(r => !r.owned).map(r => r.e) : []);
+  const missingOnly = document.getElementById('sb-cys-missing')?.checked;
+  const shown = missingOnly ? rows.filter(r => !r.owned) : rows;
+  if (!shown.length) {
+    tbl.innerHTML = `<div class="sb-empty-hint">${missingOnly ? 'Nothing missing — set complete! 🏆' : `No ${noun} in this set.`}</div>`;
+    return;
+  }
+  tbl.innerHTML = scope.kind === 'mul' ? sbCysMulTableHtml(shown) : sbCysSarnaTableHtml(shown);
+}
+
 function sbCysPrint() {
   const scope = sbCysScope();
-  if (!scope) { alert('Pick a set to compare first.'); return; }
+  if (!scope) { alert('Pick a faction + era, or a set to compare, first.'); return; }
+  const isMul = scope.kind === 'mul';
   const missingOnly = document.getElementById('sb-cys-missing')?.checked;
-  const rows = sbCysRows(scope).filter(r => !missingOnly || !r.owned);
   const all = sbCysRows(scope);
+  const rows = all.filter(r => !missingOnly || !r.owned);
   const ownedN = all.filter(r => r.owned).length;
+  const suggestions = isMul ? sbSuggestPacksFor(all.filter(r => !r.owned).map(r => r.e)).slice(0, 10) : [];
   const w = window.open('', '_blank');
   if (!w) { alert('Pop-up blocked — allow pop-ups for this page to print the list.'); return; }
+  const rowHtml = ({ e, owned }) => isMul ? `<tr>
+  <td>☐</td>
+  <td><b>${lbEsc(e.Name)}</b></td>
+  <td class="dim">${lbEsc(e.Type?.Name || '')}</td>
+  <td class="dim">${lbEsc(e.Role?.Name || '')}</td>
+  <td class="dim">${e.BFPointValue ?? ''}</td>
+  <td>${owned ? `<span class="own">✓ ×${owned}</span>` : '<span class="miss">✗</span>'}</td>
+</tr>` : `<tr>
+  <td>☐</td>
+  <td><b>${lbEsc(e.name)}</b></td>
+  <td class="dim">${lbEsc((e.models || []).join(' / '))}</td>
+  <td class="dim">${lbEsc((e.baseNumbers || []).join(' / '))}</td>
+  <td class="dim">${lbEsc(e.boxSets?.length ? e.boxSets.join(' · ') : (e.boxSet || e.section || ''))}</td>
+  <td>${owned ? `<span class="own">✓ ×${owned}</span>` : '<span class="miss">✗</span>'}</td>
+</tr>`;
   w.document.write(`<!doctype html><html><head><meta charset="utf-8">
 <title>Complete Your Set — ${lbEsc(scope.label)}</title>
 <style>
   body { font: 13px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; color:#111; margin: 32px; }
   h1 { font-size: 18px; margin: 0 0 2px; }
+  h2 { font-size: 14px; margin: 22px 0 6px; }
   .sub { color:#555; font-size: 12px; margin-bottom: 14px; }
   table { border-collapse: collapse; width: 100%; }
   th, td { text-align: left; padding: 4px 10px 4px 0; border-bottom: 1px solid #ddd; vertical-align: top; }
@@ -1064,17 +1237,16 @@ function sbCysPrint() {
   @media print { body { margin: 12mm; } }
 </style></head><body>
 <h1>Complete Your Set — ${lbEsc(scope.label)}</h1>
-<div class="sub">${missingOnly ? 'Missing minis only' : 'Full checklist'} · you own ${ownedN} of ${all.length} (${all.length ? Math.round(100 * ownedN / all.length) : 0}%) · printed ${new Date().toLocaleDateString()}</div>
-<table><thead><tr><th style="width:18px"></th><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th></tr></thead><tbody>
-${rows.map(({ e, owned }) => `<tr>
-  <td>☐</td>
-  <td><b>${lbEsc(e.name)}</b></td>
-  <td class="dim">${lbEsc((e.models || []).join(' / '))}</td>
-  <td class="dim">${lbEsc((e.baseNumbers || []).join(' / '))}</td>
-  <td class="dim">${lbEsc(e.boxSets?.length ? e.boxSets.join(' · ') : (e.boxSet || e.section || ''))}</td>
-  <td>${owned ? `<span class="own">✓ ×${owned}</span>` : '<span class="miss">✗</span>'}</td>
-</tr>`).join('')}
+<div class="sub">${missingOnly ? `Missing ${isMul ? 'units' : 'minis'} only` : 'Full checklist'} · you own ${ownedN} of ${all.length} (${all.length ? Math.round(100 * ownedN / all.length) : 0}%) · printed ${new Date().toLocaleDateString()}</div>
+<table><thead><tr>${isMul
+    ? '<th style="width:18px"></th><th>Unit</th><th>Type</th><th>Role</th><th>PV</th><th>Owned</th>'
+    : '<th style="width:18px"></th><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th>'}</tr></thead><tbody>
+${rows.map(rowHtml).join('')}
 </tbody></table>
+${suggestions.length ? `<h2>Suggested box sets to fill the gaps</h2>
+<table><thead><tr><th>Pack / box set</th><th>Covers</th></tr></thead><tbody>
+${suggestions.map(s => `<tr><td><b>${lbEsc(s.label)}</b>${s.year ? ' (' + s.year + ')' : ''}</td><td class="dim">${s.covered.length} missing unit${s.covered.length !== 1 ? 's' : ''}: ${s.covered.map(u => lbEsc(u.Name)).join(', ')}</td></tr>`).join('')}
+</tbody></table>` : ''}
 <div class="foot">Miniatures data from Sarna BattleTechWiki (CC BY-NC-SA) · minis by Catalyst Game Labs · BMT Skirmish Force Builder</div>
 </body></html>`);
   w.document.close();
@@ -1371,7 +1543,9 @@ function sbInit() {
   LB_FACTIONS.filter(f => f.id).forEach(f => {
     sbFactionMeta[f.id] = { name: f.name, isClan: !!f.isClan };
   });
-  sbPopulateFactions(LB_FACTIONS.filter(f => f.id).map(f => ({ value: f.id, label: f.name })));
+  const curatedEntries = LB_FACTIONS.filter(f => f.id).map(f => ({ value: f.id, label: f.name }));
+  sbPopulateFactions(curatedEntries);
+  sbPopulateFactions(curatedEntries, 'sb-cys-faction', 'sb-cys-faction-general'); // Complete Your Set's own faction/era picker
   sbLoadFactions();
   // Populate the formation-type dropdown up front — it otherwise only
   // refreshes on the faction select's onchange, which never fires if the
@@ -1404,9 +1578,9 @@ function sbMulBase() {
 //   #sb-faction          — specific factions, split into "Clans" vs everyone else
 //   #sb-faction-general  — broader faction groups ("…General"), its own filter
 // mirroring the reference tool's separate specific=/general= URL params.
-function sbPopulateFactions(entries) {
-  const sel = document.getElementById('sb-faction');
-  const genSel = document.getElementById('sb-faction-general');
+function sbPopulateFactions(entries, selId = 'sb-faction', genSelId = 'sb-faction-general') {
+  const sel = document.getElementById(selId);
+  const genSel = document.getElementById(genSelId);
   if (!sel || !genSel) return;
   const prevF = sel.value, prevG = genSel.value;
 
@@ -1518,6 +1692,7 @@ async function sbLoadFactions() {
       sbFactionMeta[id] = { name: e.label, isClan: curated?.isClan ?? /\bclan\b/i.test(e.label) };
     });
     sbPopulateFactions(entries);
+    sbPopulateFactions(entries, 'sb-cys-faction', 'sb-cys-faction-general');
     sbFactionsLive = true;
   } catch (e) {
     console.log('Faction live-load failed, keeping curated list:', e.message);
