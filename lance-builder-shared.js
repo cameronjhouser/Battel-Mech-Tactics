@@ -523,7 +523,14 @@ function sbNormalizeCollection(map) {
   return out;
 }
 
-function sbCollDisplayName(key) { return sbCollection[key]?.name || key; }
+// Capitalize the first letter of every word (also after "-", "/", "("),
+// without lowercasing anything the user typed in caps — "atlas as7-d"
+// becomes "Atlas As7-D" while "UrbanMech" and "AS7-D" pass through intact.
+function sbTitleCase(s) {
+  return String(s || '').replace(/(^|[\s(\/-])([a-z])/g, (m, pre, ch) => pre + ch.toUpperCase());
+}
+
+function sbCollDisplayName(key) { return sbCollection[key]?.name || sbTitleCase(key); }
 
 // Collection records whose name fuzzy-matches this unit. When a record
 // carries a Unit Type it must also match the unit's API type — that's the
@@ -1024,7 +1031,7 @@ function sbParseCollectionCsv(text) {
     if (!name) return;
     rows++;
     const rec = {
-      name,
+      name:  sbTitleCase(name),
       type:  cols.type  >= 0 ? (cells[cols.type]  || '') : '',
       base:  cols.base  >= 0 ? (cells[cols.base]  || '') : '',
       count: cols.count >= 0 ? Math.max(1, parseInt(cells[cols.count], 10) || 1) : 1,
@@ -1034,7 +1041,7 @@ function sbParseCollectionCsv(text) {
     }
     collection[sbNorm(name)] = rec;
     const variant = cols.variant >= 0 ? (cells[cols.variant] || '') : '';
-    if (variant) collection[sbNorm(name + ' ' + variant)] = { ...rec, name: `${name} ${variant}` };
+    if (variant) collection[sbNorm(name + ' ' + variant)] = { ...rec, name: sbTitleCase(`${name} ${variant}`) };
   });
   return { collection, rows, warnings };
 }
