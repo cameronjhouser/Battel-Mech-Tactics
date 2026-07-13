@@ -462,6 +462,13 @@ function lbSwitchMode(mode) {
 
 /* ── SKIRMISH FORCE BUILDER ─────────────────────────── */
 let sbCollection = {};   // normalized name -> { type, base, count } (from uploaded CSV)
+// Name of the saved list sbCollection currently, exactly matches (source of
+// truth for both the My Collection tab's picker and the Force Builder
+// filter bar's picker) — '' whenever the active collection is an ad-hoc
+// build (CSV upload, manual/pack adds) that doesn't correspond to any
+// single saved list, so a stale name is never shown once the collection
+// has moved on from it.
+let sbActiveCollectionName = '';
 const SB_COLLECTION_STORAGE_KEY = 'bmtSavedCollections.v1';
 let sbCatalog    = [];   // all MUL units for current faction/era
 let sbForce      = [];   // array of { unit, skill }
@@ -577,7 +584,13 @@ function sbLoadMinisData() {
    records the CSV path builds, so "Save List" persists them with counts. */
 let sbManualResults = []; // last MUL search results
 
-function sbCollectionChanged(msg) {
+// keepActiveName: true only when the caller just loaded a saved list by
+// name (sbLoadCollectionByName already set sbActiveCollectionName and
+// refreshed both pickers) — every other mutation (manual/pack add, CSV
+// upload, per-row edits) leaves it false so the pickers fall back to
+// "None" instead of showing a name that no longer matches sbCollection.
+function sbCollectionChanged(msg, keepActiveName) {
+  if (!keepActiveName) { sbActiveCollectionName = ''; sbRefreshCollectionSelect(); }
   const n = Object.keys(sbCollection).length;
   // The collection controls live on the My Collection tab when the page has
   // one; report there first, falling back to the force view's status line.
@@ -1906,26 +1919,70 @@ function sbSaveCollectionPrompt() {
   alert(`Saved "${key}" with ${n} unit names.`);
 }
 
+// Keeps two selects in sync with the same saved-list data: the My
+// Collection tab's own picker (sb-collection-select) and the Force
+// Builder filter bar's "Collection list" picker (sb-filter-collection).
+// The latter always carries a "None" option, since — unlike the My
+// Collection picker, where an empty state just means no lists exist yet —
+// "None" there is a deliberate resting choice: no saved list is driving
+// the owned-unit filter right now.
 function sbRefreshCollectionSelect(selectName) {
+  if (selectName !== undefined) sbActiveCollectionName = selectName;
   const el = document.getElementById('sb-collection-select');
-  if (!el) return;
+  const filterEl = document.getElementById('sb-filter-collection');
   const collections = sbStoredCollections();
   const names = Object.keys(collections).sort((a, b) => a.localeCompare(b));
-  const want = selectName ?? el.value;
-  el.innerHTML = names.length
-    ? names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${collections[n].unitCount || 0})</option>`).join('')
-    : '<option value="">No saved lists</option>';
-  if (names.includes(want)) el.value = want;
+  const want = names.includes(sbActiveCollectionName) ? sbActiveCollectionName : '';
+  if (el) {
+    el.innerHTML = names.length
+      ? names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${collections[n].unitCount || 0})</option>`).join('')
+      : '<option value="">No saved lists</option>';
+    if (names.length) el.value = want;
+  }
+  if (filterEl) {
+    filterEl.innerHTML = '<option value="">None</option>'
+      + names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${collections[n].unitCount || 0})</option>`).join('');
+    filterEl.value = want;
+  }
+}
+
+// Loads a saved list by name into sbCollection and marks it as the active
+// list (sbRefreshCollectionSelect keeps both pickers showing it). Returns
+// false (and alerts) without changing anything if the name doesn't
+// resolve to a usable list.
+function sbLoadCollectionByName(name) {
+  const saved = sbStoredCollections()[name];
+  if (!saved?.collection || !Object.keys(saved.collection).length) { alert('That saved list has no units.'); return false; }
+  sbCollection = sbNormalizeCollection(saved.collection);
+  localStorage.setItem('bmtSavedCollections.lastName', name);
+  sbRefreshCollectionSelect(name);
+  return true;
 }
 
 function sbLoadCollectionSelected() {
   const name = document.getElementById('sb-collection-select')?.value;
   if (!name) { alert('No saved list selected.'); return; }
-  const saved = sbStoredCollections()[name];
-  if (!saved?.collection || !Object.keys(saved.collection).length) { alert('That saved list has no units.'); return; }
-  sbCollection = sbNormalizeCollection(saved.collection);
-  sbCollectionChanged(`Loaded saved list "${name}".`);
-  localStorage.setItem('bmtSavedCollections.lastName', name);
+  if (!sbLoadCollectionByName(name)) return;
+  sbCollectionChanged(`Loaded saved list "${name}".`, true);
+}
+
+// The Force Builder filter bar's own "Collection list" picker — lets a
+// saved list drive the Owned-only filter and owned dots without switching
+// to the My Collection tab. "None" (the default) is a no-op: it neither
+// loads nor clears anything, so an in-progress unsaved collection (a
+// fresh CSV upload, manual adds, pack adds) is never destroyed just
+// because this picker happens to show its neutral resting state.
+function sbFilterCollectionChanged() {
+  const sel = document.getElementById('sb-filter-collection');
+  const name = sel?.value || '';
+  if (!name) return;
+  if (!sbLoadCollectionByName(name)) { sel.value = ''; return; }
+  const status = document.getElementById('sb-status');
+  if (status) status.textContent = `Owned units now marked from saved list "${name}" (${Object.keys(sbCollection).length} entries).`;
+  sbRenderBrowse();
+  sbRenderCollection();
+  sbRenderPackPreview();
+  sbRenderCys();
 }
 
 function sbDeleteCollectionSelected() {
@@ -1935,6 +1992,7 @@ function sbDeleteCollectionSelected() {
   const collections = sbStoredCollections();
   delete collections[name];
   sbSetStoredCollections(collections);
+  if (sbActiveCollectionName === name) sbActiveCollectionName = '';
   sbRefreshCollectionSelect();
 }
 
