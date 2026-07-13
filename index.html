@@ -983,6 +983,14 @@
   .sb-cys-suggest-count { color:var(--accent); font-size:11px; white-space:nowrap; }
   .sb-cys-suggest-units { padding:0 10px 6px; color:var(--text3); font-size:10px; border-bottom:1px solid var(--border); }
   .sb-cys-suggest-units:last-child { border-bottom:none; }
+  /* Per-column filter row baked into the Complete Your Set table's thead */
+  .sb-cys-filter-row th { padding:3px 6px; background:var(--bg2); border-bottom:1px solid var(--border2); cursor:default; }
+  .sb-cys-filter-row th:hover { color:inherit; }
+  .sb-cys-filter-row input, .sb-cys-filter-row select { width:100%; box-sizing:border-box; font-size:10px; font-weight:400;
+    text-transform:none; letter-spacing:0; background:var(--bg3); color:var(--text); border:1px solid var(--border2);
+    border-radius:3px; padding:2px 4px; }
+  .sb-cys-pv-range { display:flex; gap:2px; }
+  .sb-cys-pv-range input { width:50%; min-width:0; }
 </style>
 </head>
 <body>
@@ -2491,7 +2499,7 @@
             <select id="sb-cys-scope" onchange="sbCysScopeChanged()"><option value="">Loading sets…</option></select>
           </div>
           <div class="sb-fgroup">
-            <label class="sb-fg-check"><input type="checkbox" id="sb-cys-missing" onchange="sbRenderCys()"> Show only what I'm missing</label>
+            <label class="sb-fg-check"><input type="checkbox" id="sb-cys-missing" onchange="sbRenderCysTbody()"> Show only what I'm missing</label>
           </div>
           <button class="lb-btn-sm" onclick="sbCysPrint()" style="padding:4px 12px">🖨 Print list</button>
         </div>

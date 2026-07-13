@@ -1006,10 +1006,24 @@ function sbRenderPackPreview() {
    or against a Sarna product line / single pack (only meaningful for minis
    that actually exist). Either way, missing entries get cross-referenced
    against the Sarna pack dataset so gaps come with "buy this to help fill
-   them" suggestions rather than just a list of what's absent. */
+   them" suggestions rather than just a list of what's absent.
+
+   The results table has a per-column filter row baked into its own thead,
+   built once per scope load (sbRenderCys) alongside a cached, precomputed
+   row set (sbCysRowsCache — box-set lookups per unit are the expensive
+   part, so they're done once, not on every keystroke). Typing in a filter
+   only touches the tbody (sbRenderCysTbody), so the filter inputs
+   themselves are never destroyed and never lose focus mid-keystroke. */
 
 let sbCysUnits = null;       // MUL units loaded for the active Faction+Era compare
 let sbCysActiveKind = 'sarna'; // 'sarna' | 'mul' — which control last drove the comparison
+let sbCysRowsCache = [];     // precomputed rows for the currently loaded scope
+let sbCysScopeCache = null;  // the scope sbCysRowsCache was built from
+let sbCysFilters = { name: '', sub1: '', sub2: '', type: '', role: '', pvMin: '', pvMax: '', pack: '', owned: '' };
+
+function sbCysResetFilters() {
+  sbCysFilters = { name: '', sub1: '', sub2: '', type: '', role: '', pvMin: '', pvMax: '', pack: '', owned: '' };
+}
 
 function sbPopulateCysScope() {
   const sel = document.getElementById('sb-cys-scope');
@@ -1029,6 +1043,7 @@ function sbPopulateCysScope() {
 
 function sbCysScopeChanged() {
   sbCysActiveKind = 'sarna';
+  sbCysResetFilters();
   sbRenderCys();
 }
 
@@ -1063,6 +1078,7 @@ async function sbCysFetchFactionEra() {
     sbCysUnits = [...byId.values()];
     if (!sbCysUnits.length && failed.length) throw new Error(failed[0].reason?.message || 'all type queries failed');
     sbCysActiveKind = 'mul';
+    sbCysResetFilters();
     sbRenderCys();
   } catch (e) {
     if (sum) sum.textContent = `Error loading faction/era: ${e.message}`;
@@ -1096,8 +1112,38 @@ function sbCysScope() {
   return null;
 }
 
-function sbCysRows(scope) {
-  if (scope.kind === 'mul') return scope.units.map(u => ({ e: u, owned: sbOwnedCount(u) }));
+// One row per (Sarna entry, pack-membership) pair, sbNorm'd once — reused
+// by sbPacksForUnit for every unit in the loaded scope instead of
+// recomputing sbNorm(entry.name) per unit.
+function sbPackMembershipIndex() {
+  const packs = sbPackList();
+  const idx = [];
+  Object.keys(packs).forEach(key => {
+    const p = packs[key];
+    const label = p.label + (p.year ? ` (${p.year})` : '');
+    p.entries.forEach(e => {
+      const en = sbNorm(e.name);
+      if (en) idx.push({ en, label });
+    });
+  });
+  return idx;
+}
+
+// Sarna packs whose minis correspond (by chassis-name match) to this MUL
+// unit — the Box Set column for the Faction/Era table.
+function sbPacksForUnit(u, idx) {
+  const mn = sbNorm(u.Name);
+  if (!mn) return [];
+  const labels = new Set();
+  idx.forEach(({ en, label }) => { if (mn.includes(en) || en.includes(mn)) labels.add(label); });
+  return [...labels];
+}
+
+function sbCysComputeRows(scope) {
+  if (scope.kind === 'mul') {
+    const idx = sbPackMembershipIndex();
+    return scope.units.map(u => ({ e: u, owned: sbOwnedCount(u), boxSets: sbPacksForUnit(u, idx) }));
+  }
   return scope.entries.map(e => ({ e, owned: sbEntryOwnedCount(e) }));
 }
 
@@ -1142,28 +1188,133 @@ function sbRenderPackSuggestions(missingUnits) {
       <div class="sb-cys-suggest-units">${s.covered.map(u => lbEsc(u.Name)).join(', ')}</div>`).join('')}</div>`;
 }
 
-function sbCysSarnaTableHtml(shown) {
-  return `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
-    <thead><tr><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th></tr></thead>
-    <tbody>${shown.map(({ e, owned }) => `<tr${owned ? '' : ' class="sb-cys-missing-row"'}>
-      <td>${lbEsc(e.name)}</td>
-      <td style="color:var(--text3)">${lbEsc((e.models || []).slice(0, 4).join(' / '))}${(e.models || []).length > 4 ? '…' : ''}</td>
-      <td style="color:var(--text3)">${lbEsc((e.baseNumbers || []).join(' / '))}</td>
-      <td style="color:var(--text3)">${lbEsc(e.boxSets?.length ? e.boxSets.join(' · ') : (e.boxSet || e.section || ''))}</td>
-      <td style="white-space:nowrap">${owned ? `<span class="sb-cys-owned">✓ ×${owned}</span>` : '<span class="sb-cys-miss">✗ missing</span>'}</td>
-    </tr>`).join('')}</tbody></table></div>`;
+// A row passes if it satisfies every active column filter AND the
+// standalone "missing only" checkbox. Summary/suggestions are always
+// computed from the full, unfiltered row set — filters only narrow what's
+// shown in the table itself.
+function sbCysRowMatches(row, scope) {
+  const f = sbCysFilters;
+  const missingOnly = document.getElementById('sb-cys-missing')?.checked;
+  if (missingOnly && row.owned) return false;
+  if (f.owned === 'owned' && !row.owned) return false;
+  if (f.owned === 'missing' && row.owned) return false;
+  const has = (val, needle) => !needle || String(val || '').toLowerCase().includes(needle.trim().toLowerCase());
+  if (scope.kind === 'mul') {
+    const u = row.e;
+    if (!has(u.Name, f.name)) return false;
+    if (f.type && (u.Type?.Name || '') !== f.type) return false;
+    if (f.role && (u.Role?.Name || '') !== f.role) return false;
+    if (f.pvMin !== '' && (u.BFPointValue ?? 0) < Number(f.pvMin)) return false;
+    if (f.pvMax !== '' && (u.BFPointValue ?? 0) > Number(f.pvMax)) return false;
+    if (!has(row.boxSets.join(' '), f.pack)) return false;
+  } else {
+    const e = row.e;
+    if (!has(e.name, f.name)) return false;
+    if (!has((e.models || []).join(' '), f.sub1)) return false;
+    if (!has((e.baseNumbers || []).join(' '), f.sub2)) return false;
+    const packText = e.boxSets?.length ? e.boxSets.join(' ') : (e.boxSet || e.section || '');
+    if (!has(packText, f.pack)) return false;
+  }
+  return true;
 }
 
-function sbCysMulTableHtml(shown) {
+function sbCysAnyFilterActive() {
+  const f = sbCysFilters;
+  return !!(f.name || f.sub1 || f.sub2 || f.type || f.role || f.pvMin !== '' || f.pvMax !== '' || f.pack || f.owned);
+}
+
+// Filter input handler: updates state and re-renders ONLY the tbody, so
+// the filter row built into the thead is never touched and never loses
+// keystroke focus.
+function sbCysFilterChanged(key, value) {
+  sbCysFilters[key] = value;
+  sbRenderCysTbody();
+}
+
+const SB_CYS_OWNED_OPTS = () => `<option value="">All</option>
+  <option value="owned"${sbCysFilters.owned === 'owned' ? ' selected' : ''}>Owned only</option>
+  <option value="missing"${sbCysFilters.owned === 'missing' ? ' selected' : ''}>Missing only</option>`;
+
+// Builds the table shell — header labels plus a filter row baked into the
+// same thead — but an EMPTY tbody; sbRenderCysTbody fills it in and is the
+// only thing that runs again on every filter keystroke.
+function sbCysTableShellHtml(scope) {
+  const f = sbCysFilters;
+  if (scope.kind === 'mul') {
+    const rows = sbCysRowsCache;
+    const types = [...new Set(rows.map(r => r.e.Type?.Name).filter(Boolean))].sort();
+    const roles = [...new Set(rows.map(r => r.e.Role?.Name).filter(Boolean))].sort();
+    return `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
+      <thead>
+        <tr><th>Unit</th><th>Type</th><th>Role</th><th>PV</th><th>Box Set</th><th>Owned</th></tr>
+        <tr class="sb-cys-filter-row">
+          <th><input type="text" placeholder="Filter…" value="${lbEsc(f.name)}" oninput="sbCysFilterChanged('name', this.value)"></th>
+          <th><select onchange="sbCysFilterChanged('type', this.value)"><option value="">All</option>${types.map(t => `<option value="${lbEsc(t)}"${f.type === t ? ' selected' : ''}>${lbEsc(t)}</option>`).join('')}</select></th>
+          <th><select onchange="sbCysFilterChanged('role', this.value)"><option value="">All</option>${roles.map(r => `<option value="${lbEsc(r)}"${f.role === r ? ' selected' : ''}>${lbEsc(r)}</option>`).join('')}</select></th>
+          <th><div class="sb-cys-pv-range"><input type="number" placeholder="min" value="${lbEsc(f.pvMin)}" oninput="sbCysFilterChanged('pvMin', this.value)"><input type="number" placeholder="max" value="${lbEsc(f.pvMax)}" oninput="sbCysFilterChanged('pvMax', this.value)"></div></th>
+          <th><input type="text" placeholder="Filter…" value="${lbEsc(f.pack)}" oninput="sbCysFilterChanged('pack', this.value)"></th>
+          <th><select onchange="sbCysFilterChanged('owned', this.value)">${SB_CYS_OWNED_OPTS()}</select></th>
+        </tr>
+      </thead>
+      <tbody id="sb-cys-tbody"></tbody>
+    </table></div>`;
+  }
   return `<div class="sb-table-wrap" style="max-height:480px"><table class="sb-table">
-    <thead><tr><th>Unit</th><th>Type</th><th>Role</th><th>PV</th><th>Owned</th></tr></thead>
-    <tbody>${shown.map(({ e: u, owned }) => `<tr${owned ? '' : ' class="sb-cys-missing-row"'}>
+    <thead>
+      <tr><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th></tr>
+      <tr class="sb-cys-filter-row">
+        <th><input type="text" placeholder="Filter…" value="${lbEsc(f.name)}" oninput="sbCysFilterChanged('name', this.value)"></th>
+        <th><input type="text" placeholder="Filter…" value="${lbEsc(f.sub1)}" oninput="sbCysFilterChanged('sub1', this.value)"></th>
+        <th><input type="text" placeholder="Filter…" value="${lbEsc(f.sub2)}" oninput="sbCysFilterChanged('sub2', this.value)"></th>
+        <th><input type="text" placeholder="Filter…" value="${lbEsc(f.pack)}" oninput="sbCysFilterChanged('pack', this.value)"></th>
+        <th><select onchange="sbCysFilterChanged('owned', this.value)">${SB_CYS_OWNED_OPTS()}</select></th>
+      </tr>
+    </thead>
+    <tbody id="sb-cys-tbody"></tbody>
+  </table></div>`;
+}
+
+function sbCysRowHtml(row, kind) {
+  const owned = row.owned;
+  if (kind === 'mul') {
+    const u = row.e;
+    return `<tr${owned ? '' : ' class="sb-cys-missing-row"'}>
       <td>${lbEsc(u.Name)}</td>
       <td style="color:var(--text3)">${lbEsc(u.Type?.Name || '')}</td>
       <td style="color:var(--text3)">${lbEsc(u.Role?.Name || '')}</td>
       <td style="color:var(--text3)">${u.BFPointValue ?? ''}</td>
+      <td style="color:var(--text3)">${lbEsc(row.boxSets.join(' · '))}</td>
       <td style="white-space:nowrap">${owned ? `<span class="sb-cys-owned">✓ ×${owned}</span>` : '<span class="sb-cys-miss">✗ missing</span>'}</td>
-    </tr>`).join('')}</tbody></table></div>`;
+    </tr>`;
+  }
+  const e = row.e;
+  return `<tr${owned ? '' : ' class="sb-cys-missing-row"'}>
+    <td>${lbEsc(e.name)}</td>
+    <td style="color:var(--text3)">${lbEsc((e.models || []).slice(0, 4).join(' / '))}${(e.models || []).length > 4 ? '…' : ''}</td>
+    <td style="color:var(--text3)">${lbEsc((e.baseNumbers || []).join(' / '))}</td>
+    <td style="color:var(--text3)">${lbEsc(e.boxSets?.length ? e.boxSets.join(' · ') : (e.boxSet || e.section || ''))}</td>
+    <td style="white-space:nowrap">${owned ? `<span class="sb-cys-owned">✓ ×${owned}</span>` : '<span class="sb-cys-miss">✗ missing</span>'}</td>
+  </tr>`;
+}
+
+// Light re-render: only the tbody, using the cached rows + current filter
+// state. Runs on every filter keystroke/selection and the missing-only
+// checkbox — never rebuilds the filter inputs themselves.
+function sbRenderCysTbody() {
+  const tbody = document.getElementById('sb-cys-tbody');
+  const scope = sbCysScopeCache;
+  if (!tbody || !scope) return;
+  const shown = sbCysRowsCache.filter(r => sbCysRowMatches(r, scope));
+  const cols = scope.kind === 'mul' ? 6 : 5;
+  if (!shown.length) {
+    const missingOnly = document.getElementById('sb-cys-missing')?.checked;
+    const msg = missingOnly && !sbCysAnyFilterActive()
+      ? 'Nothing missing — set complete! 🏆'
+      : 'No rows match your filters.';
+    tbody.innerHTML = `<tr><td colspan="${cols}"><div class="sb-empty-hint">${msg}</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = shown.map(r => sbCysRowHtml(r, scope.kind)).join('');
 }
 
 function sbRenderCys() {
@@ -1171,6 +1322,7 @@ function sbRenderCys() {
   const sum = document.getElementById('sb-cys-summary');
   if (!tbl) return;
   const scope = sbCysScope();
+  sbCysScopeCache = scope;
   if (!scope) {
     tbl.innerHTML = '';
     document.getElementById('sb-cys-suggestions')?.replaceChildren();
@@ -1179,19 +1331,15 @@ function sbRenderCys() {
       : 'Miniatures dataset not loaded yet.';
     return;
   }
-  const rows = sbCysRows(scope);
+  sbCysRowsCache = sbCysComputeRows(scope);
+  const rows = sbCysRowsCache;
   const ownedN = rows.filter(r => r.owned).length;
   const pct = rows.length ? Math.round(100 * ownedN / rows.length) : 0;
   const noun = scope.kind === 'mul' ? 'units' : 'minis';
   if (sum) sum.innerHTML = `You own <b>${ownedN}</b> of <b>${rows.length}</b> ${noun} in ${lbEsc(scope.label)} (${pct}%).`;
   sbRenderPackSuggestions(scope.kind === 'mul' ? rows.filter(r => !r.owned).map(r => r.e) : []);
-  const missingOnly = document.getElementById('sb-cys-missing')?.checked;
-  const shown = missingOnly ? rows.filter(r => !r.owned) : rows;
-  if (!shown.length) {
-    tbl.innerHTML = `<div class="sb-empty-hint">${missingOnly ? 'Nothing missing — set complete! 🏆' : `No ${noun} in this set.`}</div>`;
-    return;
-  }
-  tbl.innerHTML = scope.kind === 'mul' ? sbCysMulTableHtml(shown) : sbCysSarnaTableHtml(shown);
+  tbl.innerHTML = sbCysTableShellHtml(scope);
+  sbRenderCysTbody();
 }
 
 function sbCysPrint() {
@@ -1199,26 +1347,27 @@ function sbCysPrint() {
   if (!scope) { alert('Pick a faction + era, or a set to compare, first.'); return; }
   const isMul = scope.kind === 'mul';
   const missingOnly = document.getElementById('sb-cys-missing')?.checked;
-  const all = sbCysRows(scope);
-  const rows = all.filter(r => !missingOnly || !r.owned);
+  const all = sbCysComputeRows(scope);
+  const rows = all.filter(r => sbCysRowMatches(r, scope));
   const ownedN = all.filter(r => r.owned).length;
   const suggestions = isMul ? sbSuggestPacksFor(all.filter(r => !r.owned).map(r => r.e)).slice(0, 10) : [];
   const w = window.open('', '_blank');
   if (!w) { alert('Pop-up blocked — allow pop-ups for this page to print the list.'); return; }
-  const rowHtml = ({ e, owned }) => isMul ? `<tr>
+  const rowHtml = (row) => isMul ? `<tr>
   <td>☐</td>
-  <td><b>${lbEsc(e.Name)}</b></td>
-  <td class="dim">${lbEsc(e.Type?.Name || '')}</td>
-  <td class="dim">${lbEsc(e.Role?.Name || '')}</td>
-  <td class="dim">${e.BFPointValue ?? ''}</td>
-  <td>${owned ? `<span class="own">✓ ×${owned}</span>` : '<span class="miss">✗</span>'}</td>
+  <td><b>${lbEsc(row.e.Name)}</b></td>
+  <td class="dim">${lbEsc(row.e.Type?.Name || '')}</td>
+  <td class="dim">${lbEsc(row.e.Role?.Name || '')}</td>
+  <td class="dim">${row.e.BFPointValue ?? ''}</td>
+  <td class="dim">${lbEsc(row.boxSets.join(' · '))}</td>
+  <td>${row.owned ? `<span class="own">✓ ×${row.owned}</span>` : '<span class="miss">✗</span>'}</td>
 </tr>` : `<tr>
   <td>☐</td>
-  <td><b>${lbEsc(e.name)}</b></td>
-  <td class="dim">${lbEsc((e.models || []).join(' / '))}</td>
-  <td class="dim">${lbEsc((e.baseNumbers || []).join(' / '))}</td>
-  <td class="dim">${lbEsc(e.boxSets?.length ? e.boxSets.join(' · ') : (e.boxSet || e.section || ''))}</td>
-  <td>${owned ? `<span class="own">✓ ×${owned}</span>` : '<span class="miss">✗</span>'}</td>
+  <td><b>${lbEsc(row.e.name)}</b></td>
+  <td class="dim">${lbEsc((row.e.models || []).join(' / '))}</td>
+  <td class="dim">${lbEsc((row.e.baseNumbers || []).join(' / '))}</td>
+  <td class="dim">${lbEsc(row.e.boxSets?.length ? row.e.boxSets.join(' · ') : (row.e.boxSet || row.e.section || ''))}</td>
+  <td>${row.owned ? `<span class="own">✓ ×${row.owned}</span>` : '<span class="miss">✗</span>'}</td>
 </tr>`;
   w.document.write(`<!doctype html><html><head><meta charset="utf-8">
 <title>Complete Your Set — ${lbEsc(scope.label)}</title>
@@ -1237,9 +1386,9 @@ function sbCysPrint() {
   @media print { body { margin: 12mm; } }
 </style></head><body>
 <h1>Complete Your Set — ${lbEsc(scope.label)}</h1>
-<div class="sub">${missingOnly ? `Missing ${isMul ? 'units' : 'minis'} only` : 'Full checklist'} · you own ${ownedN} of ${all.length} (${all.length ? Math.round(100 * ownedN / all.length) : 0}%) · printed ${new Date().toLocaleDateString()}</div>
+<div class="sub">${sbCysAnyFilterActive() || missingOnly ? 'Filtered view' : 'Full checklist'} · you own ${ownedN} of ${all.length} (${all.length ? Math.round(100 * ownedN / all.length) : 0}%) overall · printed ${new Date().toLocaleDateString()}</div>
 <table><thead><tr>${isMul
-    ? '<th style="width:18px"></th><th>Unit</th><th>Type</th><th>Role</th><th>PV</th><th>Owned</th>'
+    ? '<th style="width:18px"></th><th>Unit</th><th>Type</th><th>Role</th><th>PV</th><th>Box Set</th><th>Owned</th>'
     : '<th style="width:18px"></th><th>Mini</th><th>Models</th><th>Base #</th><th>Pack / box</th><th>Owned</th>'}</tr></thead><tbody>
 ${rows.map(rowHtml).join('')}
 </tbody></table>
