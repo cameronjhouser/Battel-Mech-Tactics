@@ -509,16 +509,17 @@ function sbNorm(name) {
 }
 
 // Older saved collections stored `normName -> true`; current shape is
-// `normName -> { name, type, base, count }` where `name` is the display
-// name as originally entered (the key is normalized/lowercased). Normalize
-// in place so every consumer can assume the record form.
+// `normName -> { name, type, base, count, img }` where `name` is the
+// display name as originally entered (the key is normalized/lowercased)
+// and `img` is the MUL's unit image URL once a lookup has resolved it.
+// Normalize in place so every consumer can assume the record form.
 function sbNormalizeCollection(map) {
   const out = {};
   Object.keys(map || {}).forEach(k => {
     const v = map[k];
     out[k] = (v && typeof v === 'object')
-      ? { name: v.name || '', type: v.type || '', base: v.base || '', count: v.count || 1 }
-      : { name: '', type: '', base: '', count: 1 };
+      ? { name: v.name || '', type: v.type || '', base: v.base || '', count: v.count || 1, img: v.img || '' }
+      : { name: '', type: '', base: '', count: 1, img: '' };
   });
   return out;
 }
@@ -587,6 +588,7 @@ function sbCollectionChanged(msg) {
   sbRenderCollection();
   sbRenderPackPreview();
   sbRenderCys();
+  sbBackfillMissingTypes(); // async — passively fills in type/image for CSV/saved-list records
 }
 
 async function sbManualSearch() {
@@ -620,8 +622,15 @@ function sbManualAdd(i) {
   const key = sbNorm(u.Name);
   if (!key) return;
   const rec = sbCollection[key];
-  if (rec) { rec.count = (rec.count || 1) + n; if (!rec.name) rec.name = u.Name; }
-  else sbCollection[key] = { name: u.Name, type: u.Type?.Name || '', base: '', count: n };
+  if (rec) {
+    rec.count = (rec.count || 1) + n;
+    if (!rec.name) rec.name = u.Name;
+    if (!rec.type) rec.type = u.Type?.Name || '';
+    if (!rec.img) rec.img = u.ImageUrl || '';
+  } else {
+    sbCollection[key] = { name: u.Name, type: u.Type?.Name || '', base: '', count: n, img: u.ImageUrl || '' };
+  }
+  sbTypeLookupTried.add(key); // this record's type/image is already authoritative — skip passive backfill
   const resultsEl = document.getElementById('sb-manual-results');
   if (resultsEl) resultsEl.style.display = 'none';
   sbCollectionChanged(`Added ${u.Name}${n > 1 ? ' ×' + n : ''} (owned ×${sbCollection[key].count}).`);
@@ -701,13 +710,14 @@ function sbAddPack() {
       if (!rec.name) rec.name = e.name;
       if (!rec.type) { rec.type = sbGuessType(e, pack.label); toVerify.push(e); }
     } else {
-      sbCollection[key] = { name: e.name, type: sbGuessType(e, pack.label), base: e.baseNumbers?.[0] || '', count: 1 };
+      sbCollection[key] = { name: e.name, type: sbGuessType(e, pack.label), base: e.baseNumbers?.[0] || '', count: 1, img: '' };
       toVerify.push(e);
     }
+    sbTypeLookupTried.add(key); // covered by the richer per-entry lookup below — skip the plain-name passive backfill
     added++;
   });
   sbCollectionChanged(`Added ${added} mini${added !== 1 ? 's' : ''} from "${pack.label}".`);
-  sbFillPackTypes(toVerify); // async — MUL-verified types land as they resolve
+  sbFillPackTypes(toVerify); // async — MUL-verified types/images land as they resolve
 }
 
 // Best-effort unit type for a Sarna mini, from name signals first, then the
@@ -723,31 +733,63 @@ function sbGuessType(e, packLabel) {
   return '';
 }
 
-// Resolve a Sarna mini's unit type from the MUL: search by chassis name,
-// prefer the result whose variant tail matches one of the mini's Model
-// designations ("Scorpion" + SCP-1N picks the Mech, not the tank). With no
-// model match, only trust the search when every candidate agrees on type.
-async function sbLookupTypeFor(e) {
-  try {
-    const chassis = e.name.replace(/\s*\([^)]*\)/g, '').trim();
-    const res = await fetch(`${MUL_API}?${new URLSearchParams({ Name: chassis, minPV: '1', maxPV: '999' })}`);
-    if (!res.ok) return '';
-    const data = await res.json();
-    const en = sbNorm(chassis);
-    const models = (e.models || []).map(sbNorm).filter(Boolean);
-    const cands = (data.Units || data || []).filter(u => sbNorm(u.Name).includes(en) && u.Type?.Name);
-    if (!cands.length) return '';
-    const byModel = cands.find(u => {
-      const tail = sbNorm(u.Name).replace(en, '').trim();
-      return tail && models.some(m => tail === m || tail.includes(m) || m.includes(tail));
-    });
-    if (byModel) return byModel.Type.Name;
-    const types = [...new Set(cands.map(u => u.Type.Name))];
-    return types.length === 1 ? types[0] : '';
-  } catch { return ''; }
+// Some chassis carry two names — a Clan designation and an Inner Sphere
+// reporting name ("Hellbringer (Loki)", "Timber Wolf (Mad Cat)") — and
+// MUL may index the unit under either one. Searching only the primary name
+// can miss it (or vice versa), so return BOTH names as independent search
+// terms rather than always stripping the parenthetical down to one.
+function sbNameVariants(name) {
+  const s = String(name || '').trim();
+  const m = s.match(/^(.*?)\s*\(([^)]+)\)\s*(.*)$/);
+  if (!m) return [s].filter(Boolean);
+  const primary = `${m[1]} ${m[3]}`.trim();
+  const alt = m[2].trim();
+  return [...new Set([primary, alt].filter(Boolean))];
 }
 
-// Verify freshly pack-added records' types against the MUL in the
+// Resolve a unit's type + MUL image by name, trying every name variant
+// (see sbNameVariants). Prefers a candidate whose variant tail matches one
+// of the given model designations ("Scorpion" + SCP-1N picks the Mech, not
+// the tank); with no model match, only trusts the search when every
+// candidate (across all name variants) agrees on type.
+async function sbLookupUnitInfo(name, models) {
+  const variants = sbNameVariants(name);
+  const modelKeys = (models || []).map(sbNorm).filter(Boolean);
+  const allCands = [];
+  for (const variant of variants) {
+    try {
+      const res = await fetch(`${MUL_API}?${new URLSearchParams({ Name: variant, minPV: '1', maxPV: '999' })}`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const en = sbNorm(variant);
+      const rawVariant = variant.toLowerCase();
+      // sbNorm strips parenthetical content, so a candidate named
+      // "Hellbringer (Loki) Prime" normalizes to "hellbringer prime" —
+      // losing "Loki" before the substring check below ever runs. Check
+      // the raw (un-stripped) name too, so searching an alt/Clan name that
+      // only exists inside the candidate's parentheses still matches.
+      const cands = (data.Units || data || []).filter(u => u.Type?.Name && (
+        String(u.Name || '').toLowerCase().includes(rawVariant)
+        || sbNorm(u.Name).includes(en) || en.includes(sbNorm(u.Name))
+      ));
+      cands.forEach(u => allCands.push({ u, en }));
+      if (modelKeys.length) {
+        const byModel = cands.find(u => {
+          const tail = sbNorm(u.Name).replace(en, '').trim();
+          return tail && modelKeys.some(m => tail === m || tail.includes(m) || m.includes(tail));
+        });
+        if (byModel) return { type: byModel.Type.Name, img: byModel.ImageUrl || '' };
+      }
+    } catch { /* try the next variant */ }
+  }
+  if (!allCands.length) return { type: '', img: '' };
+  const types = [...new Set(allCands.map(c => c.u.Type.Name))];
+  if (types.length !== 1) return { type: '', img: '' };
+  const withImg = allCands.find(c => c.u.ImageUrl) || allCands[0];
+  return { type: types[0], img: withImg.u.ImageUrl || '' };
+}
+
+// Verify freshly pack-added records' types/images against the MUL in the
 // background (small concurrency, one re-render at the end). Records the
 // user has since removed or retyped are left alone.
 async function sbFillPackTypes(entries) {
@@ -760,9 +802,37 @@ async function sbFillPackTypes(entries) {
       const rec = sbCollection[sbNorm(e.name)];
       if (!rec) continue;
       const guess = rec.type;
-      const t = await sbLookupTypeFor(e);
+      const { type: t, img } = await sbLookupUnitInfo(e.name, e.models);
       const cur = sbCollection[sbNorm(e.name)];
-      if (t && cur === rec && rec.type === guess && rec.type !== t) { rec.type = t; changed = true; }
+      if (cur !== rec) continue; // record was replaced/removed mid-lookup
+      if (t && rec.type === guess && rec.type !== t) { rec.type = t; changed = true; }
+      if (img && !rec.img) { rec.img = img; changed = true; }
+    }
+  }));
+  if (changed) { sbRenderCollection(); sbRenderBrowse(); }
+}
+
+// Passive backfill for ANY collection record missing a type — CSV uploads
+// and saved lists carry no MUL-verified type at all, so search for it in
+// the background the same way pack-add does, once per record per session
+// (sbTypeLookupTried avoids re-hitting the MUL every time the collection
+// re-renders). Called from sbCollectionChanged.
+let sbTypeLookupTried = new Set();
+async function sbBackfillMissingTypes() {
+  const keys = Object.keys(sbCollection).filter(k => !sbCollection[k].type && !sbTypeLookupTried.has(k));
+  if (!keys.length) return;
+  keys.forEach(k => sbTypeLookupTried.add(k));
+  let changed = false;
+  const queue = keys.slice();
+  await Promise.all(Array.from({ length: 3 }, async () => {
+    while (queue.length) {
+      const key = queue.shift();
+      const rec = sbCollection[key];
+      if (!rec) continue;
+      const { type: t, img } = await sbLookupUnitInfo(rec.name || key);
+      if (sbCollection[key] !== rec) continue; // replaced/removed mid-lookup
+      if (t && !rec.type) { rec.type = t; changed = true; }
+      if (img && !rec.img) { rec.img = img; changed = true; }
     }
   }));
   if (changed) { sbRenderCollection(); sbRenderBrowse(); }
@@ -801,10 +871,11 @@ function sbRenderCollection() {
     return;
   }
   el.innerHTML = `<div class="sb-table-wrap" style="max-height:440px"><table class="sb-table">
-    <thead><tr><th>Name</th><th>Type</th><th>Base #</th><th style="text-align:center">Count</th><th></th></tr></thead>
+    <thead><tr><th></th><th>Name</th><th>Type</th><th>Base #</th><th style="text-align:center">Count</th><th></th></tr></thead>
     <tbody>${keys.map(k => {
       const r = sbCollection[k];
       return `<tr>
+        <td>${r.img ? `<img class="sb-mini-thumb" src="${lbEsc(r.img)}" alt="" loading="lazy">` : ''}</td>
         <td>${lbEsc(sbCollDisplayName(k))}</td>
         <td style="color:var(--text3)">${lbEsc(r.type || '')}</td>
         <td style="color:var(--text3)">${lbEsc(r.base || '')}</td>
@@ -842,17 +913,21 @@ function sbCollClear() {
 // Owned records matching a Sarna dataset entry — the reverse of
 // sbOwnedRecords (which matches a MUL unit): a record's verified base
 // number wins outright, otherwise bidirectional name containment (chassis
-// "Atlas" matches an owned "Atlas AS7-D" and vice versa). Max count across
-// matches, same de-dup reasoning as sbOwnedCount.
-function sbEntryOwnedCount(e) {
+// "Atlas" matches an owned "Atlas AS7-D" and vice versa).
+function sbEntryOwnedRecords(e) {
   const en = sbNorm(e.name);
   const bases = e.baseNumbers || [];
-  const counts = Object.keys(sbCollection).filter(k => {
+  return Object.keys(sbCollection).filter(k => {
     const r = sbCollection[k];
     if (r.base && bases.includes(r.base)) return true;
     return !!en && !!k && (k === en || k.includes(en) || en.includes(k));
-  }).map(k => sbCollection[k].count || 1);
-  return counts.length ? Math.max(...counts) : 0;
+  }).map(k => sbCollection[k]);
+}
+
+// Max count across matches, same de-dup reasoning as sbOwnedCount.
+function sbEntryOwnedCount(e) {
+  const recs = sbEntryOwnedRecords(e);
+  return recs.length ? Math.max(...recs.map(r => r.count || 1)) : 0;
 }
 
 // Contents of the pack currently selected in the Add Pack dropdown, with
@@ -866,9 +941,12 @@ function sbRenderPackPreview() {
   el.style.display = '';
   el.innerHTML = `<div class="sb-preview-head">In “${lbEsc(pack.label)}”${pack.year ? ` (${pack.year})` : ''} — ${pack.entries.length} mini${pack.entries.length !== 1 ? 's' : ''}:</div>`
     + pack.entries.map(e => {
-      const owned = sbEntryOwnedCount(e);
+      const recs = sbEntryOwnedRecords(e);
+      const owned = recs.length ? Math.max(...recs.map(r => r.count || 1)) : 0;
+      const img = recs.find(r => r.img)?.img || '';
       const models = (e.models || []).slice(0, 4).join(' / ');
       return `<div class="sb-preview-row">
+        ${img ? `<img class="sb-mini-thumb" src="${lbEsc(img)}" alt="" loading="lazy">` : ''}
         <span class="sb-preview-name">${lbEsc(e.name)}${models ? ` <span class="sb-preview-models">${lbEsc(models)}${(e.models || []).length > 4 ? '…' : ''}</span>` : ''}</span>
         <span class="sb-preview-base">${e.baseNumbers?.length ? 'Base ' + lbEsc(e.baseNumbers.join(' / ')) : ''}</span>
         <span class="sb-preview-owned${owned ? ' is-owned' : ''}">${owned ? `✓ owned ×${owned}` : '—'}</span>
@@ -1097,6 +1175,7 @@ function sbParseCollectionCsv(text) {
       type:  cols.type  >= 0 ? (cells[cols.type]  || '') : '',
       base:  cols.base  >= 0 ? (cells[cols.base]  || '') : '',
       count: cols.count >= 0 ? Math.max(1, parseInt(cells[cols.count], 10) || 1) : 1,
+      img:   '',
     };
     if (hasHeader && cols.type >= 0 && !rec.type) {
       warnings.push(`Row ${li + 2}: "${name}" has no Unit Type — matched by name only.`);
