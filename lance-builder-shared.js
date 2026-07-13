@@ -2513,16 +2513,21 @@ function sbSaveForcePrompt() {
 
 // Populates the saved-force <select> from storage, keeping the given name
 // selected if provided (otherwise keeps whatever was already selected).
+// Always carries a "None" option — without it, a select with only real
+// saved-lance options auto-selects the first one alphabetically, forcing
+// a name into Load/Delete even though the user never chose it (e.g. when
+// building a fresh force from scratch, with no intent to touch a saved
+// one). "None" (value "") is the default whenever the wanted name isn't
+// a real saved lance.
 function sbRefreshSavedSelect(selectName) {
   const el = document.getElementById('sb-saved-select');
   if (!el) return;
   const lances = sbStoredLances();
   const names = Object.keys(lances).sort((a, b) => a.localeCompare(b));
   const want = selectName ?? el.value;
-  el.innerHTML = names.length
-    ? names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${lances[n].unitCount || 0}u, ${lances[n].totalPV || 0}PV)</option>`).join('')
-    : '<option value="">No saved forces</option>';
-  if (names.includes(want)) el.value = want;
+  el.innerHTML = '<option value="">None</option>'
+    + names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${lances[n].unitCount || 0}u, ${lances[n].totalPV || 0}PV)</option>`).join('');
+  el.value = names.includes(want) ? want : '';
 }
 
 function sbLoadSelected() {
