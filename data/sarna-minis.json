@@ -1,7 +1,7 @@
 {
  "source": "https://www.sarna.net/wiki/Miniatures_-_Catalyst_Game_Labs",
  "attribution": "Data from Sarna BattleTechWiki (CC BY-NC-SA); miniatures by Catalyst Game Labs.",
- "note": "Interim dataset extracted from a July 2026 page capture; boxSets for catalog numbers 35700s/36000s/38000s (and select others) are ground-truth, hand-verified against the live Sarna wiki tables, with each pack a mini ships in listed separately. Entries with older or unmapped catalog numbers have an empty boxSets and fall back to the section-level boxSet.",
+ "note": "Interim dataset extracted from a July 2026 page capture; boxSets/packYears for catalog numbers 35700s/36000s/38000s (and select others) are ground-truth, hand-verified against the live Sarna wiki tables, with each pack a mini ships in listed separately. Entries with older or unmapped catalog numbers have an empty boxSets and fall back to the section-level boxSet.",
  "fetched": "2026-07-12T19:34:06+00:00",
  "entries": [
   {
@@ -910,9 +910,11 @@
     "CAT-LOKI"
    ],
    "models": [],
-   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSet": "Hellbringer / Summoner Two-Pack (CAT-LOKI/CAT-THOR)",
    "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "boxSets": []
+   "boxSets": [
+    "Hellbringer / Summoner Two-Pack (CAT-LOKI/CAT-THOR)"
+   ]
   },
   {
    "name": "Summoner (Thor) x2",
@@ -921,9 +923,11 @@
     "CAT-THOR"
    ],
    "models": [],
-   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSet": "Hellbringer / Summoner Two-Pack (CAT-LOKI/CAT-THOR)",
    "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "boxSets": []
+   "boxSets": [
+    "Hellbringer / Summoner Two-Pack (CAT-LOKI/CAT-THOR)"
+   ]
   },
   {
    "name": "Hellbringer (Loki)",
@@ -932,9 +936,11 @@
     "35000A"
    ],
    "models": [],
-   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSet": "Hellbringer / Summoner Two-Pack (35000A)",
    "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "boxSets": []
+   "boxSets": [
+    "Hellbringer / Summoner Two-Pack (35000A)"
+   ]
   },
   {
    "name": "Summoner (Thor)",
@@ -943,9 +949,11 @@
     "35000A"
    ],
    "models": [],
-   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSet": "Hellbringer / Summoner Two-Pack (35000A)",
    "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "boxSets": []
+   "boxSets": [
+    "Hellbringer / Summoner Two-Pack (35000A)"
+   ]
   },
   {
    "name": "BattleMaster",
@@ -956,9 +964,11 @@
    "models": [
     "BLR-4S"
    ],
-   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSet": "BattleMaster / Timber Wolf Two-Pack (35000B)",
    "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "boxSets": []
+   "boxSets": [
+    "BattleMaster / Timber Wolf Two-Pack (35000B)"
+   ]
   },
   {
    "name": "Timber Wolf (Mad Cat)",
@@ -967,9 +977,11 @@
     "35000B"
    ],
    "models": [],
-   "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSet": "BattleMaster / Timber Wolf Two-Pack (35000B)",
    "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "boxSets": []
+   "boxSets": [
+    "BattleMaster / Timber Wolf Two-Pack (35000B)"
+   ]
   },
   {
    "name": "Griffin",
@@ -1221,9 +1233,11 @@
     "C 3 Legend Killer",
     "Legend Killer 2"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSet": "BattleTech: Essentials",
    "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "boxSets": []
+   "boxSets": [
+    "BattleTech: Essentials"
+   ]
   },
   {
    "name": "Dire Wolf",
@@ -6990,5 +7004,101 @@
    "section": "Premium Miniatures",
    "boxSets": []
   }
- ]
+ ],
+ "packYears": {
+  "Hellbringer / Summoner Two-Pack (CAT-LOKI/CAT-THOR)": 2009,
+  "Hellbringer / Summoner Two-Pack (35000A)": 2011,
+  "BattleMaster / Timber Wolf Two-Pack (35000B)": 2014,
+  "BattleTech Beginner Box": 2019,
+  "BattleTech: A Game of Armored Combat": 2019,
+  "BattleTech Beginner Box, Second Edition": 2022,
+  "BattleTech: Essentials": 2023,
+  "Clan Command Star": 2020,
+  "Salvage Box: Clan Invasion": 2020,
+  "Clan Heavy Striker Star": 2020,
+  "Clan Invasion Box Set": 2020,
+  "Clan Elemental Star": 2020,
+  "Wolf's Dragoons Assault Star": 2021,
+  "Inner Sphere Battle Lance": 2020,
+  "Inner Sphere Command Lance": 2020,
+  "Legendary MechWarriors Pack": 2020,
+  "Salvage Box: Legendary": 2020,
+  "Salvage Box: UrbanMech": 2020,
+  "Clan Ad Hoc Star": 2021,
+  "Clan Fire Star": 2021,
+  "Clan Heavy Battle Star": 2021,
+  "Clan Heavy Star": 2021,
+  "Clan Striker Star": 2021,
+  "Clan Support Star": 2021,
+  "Inner Sphere Direct Fire Lance": 2021,
+  "Inner Sphere Fire Lance": 2021,
+  "Inner Sphere Heavy Battle Lance": 2021,
+  "Inner Sphere Heavy Lance": 2021,
+  "Inner Sphere Striker Lance": 2021,
+  "Inner Sphere Support Lance": 2021,
+  "Inner Sphere Urban Lance": 2021,
+  "ComStar Battle Level II": 2021,
+  "ComStar Command Level II": 2021,
+  "Salvage Box: Shilone": 2021,
+  "Eridani Light Horse Hunter Lance": 2023,
+  "Hansen's Roughriders Battle Lance": 2023,
+  "Northwind Highlanders Command Lance": 2023,
+  "Kell Hounds Striker Lance": 2023,
+  "Gray Death Legion Heavy Battle Lance": 2023,
+  "Snord's Irregulars Assault Lance": 2023,
+  "Proliferation Cycle Pack": 2023,
+  "UrbanMech Lance": 2023,
+  "Star League Command Lance": 2024,
+  "Salvage Box: Urbanmech LAM": 2024,
+  "Second Star League Assault Lance": 2024,
+  "McCarron's Armored Cavalry Assault Lance": 2024,
+  "Black Remnant Command Lance": 2024,
+  "Third Star League Strike Team": 2024,
+  "Third Star League Battle Group": 2025,
+  "21st Centauri Lancers Command Lance": 2025,
+  "Illician Lancers Command Lance": 2026,
+  "Alpha Strike Boxed Set": 2022,
+  "BattleTech Aces: Scouring Sands": 2025,
+  "Mercenary Kickstarter Bonus 100mm Timber Wolf (Mad Cat)": 2024,
+  "Mercenaries Box Set": 2024,
+  "Inner Sphere Recon Lance": 2024,
+  "Inner Sphere Pursuit Lance": 2024,
+  "Battlefield Support: Recon & Hunter Lance": 2024,
+  "Inner Sphere Security Lance": 2024,
+  "Clan Cavalry Star": 2024,
+  "Battlefield Support: Assault & Cavalry Lances": 2024,
+  "Inner Sphere Assault Lance": 2024,
+  "Inner Sphere Heavy Recon Lance": 2024,
+  "Battlefield Support: Battle & Fire Lances": 2024,
+  "Clan Direct Fire Star": 2024,
+  "Inner Sphere Battle Armor Platoon": 2024,
+  "Battlefield Support: Objectives": 2024,
+  "Legendary MechWarriors II Pack": 2024,
+  "Legendary MechWarriors III Pack": 2024,
+  "Battlefield Support: Rifle & Command Lances": 2024,
+  "Battlefield Support: Heavy Battle & Sweep Lances": 2024,
+  "Somerset Strikers ForcePack": 2024,
+  "Salvage Box: Visigoth": 2024,
+  "Salvage Box: Savannah Master": 2024,
+  "Salvage Box: Blood Asp (Star Adder)": 2024,
+  "BattleTech: House Davion Cavalry Lance": 2025,
+  "BattleTech: House Davion Heavy Battle Lance": 2025,
+  "BattleTech: House Kurita Ranger Lance": 2026,
+  "BattleTech: House Kurita Command Lance": 2026
+ },
+ "catalogYears": {
+  "36000": 2021,
+  "37009M": 2022,
+  "37010M": 2022,
+  "37011M": 2022,
+  "37012M": 2023,
+  "37013M": 2023,
+  "37014M": 2023,
+  "37015M": 2024,
+  "37016M": 2024,
+  "37017M": 2024,
+  "37018M": 2024,
+  "37020M": 2023,
+  "37021M": 2023
+ }
 }

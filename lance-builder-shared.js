@@ -532,6 +532,8 @@ function sbNormalizeCollection(map) {
 // exists (404) or while it loads, everything below no-ops.
 let sbMinisByBase = null; // base-number string -> [entries]; {} once load settles
 let sbMinisEntries = [];  // raw dataset entries (pack-add source)
+let sbPackYears = {};     // real pack name -> release year
+let sbCatalogYears = {};  // catalog number -> release year (fallback packs)
 function sbLoadMinisData() {
   if (sbMinisByBase !== null) return;
   sbMinisByBase = {};
@@ -540,6 +542,8 @@ function sbLoadMinisData() {
     .then(j => {
       if (!j?.entries) return;
       sbMinisEntries = j.entries;
+      sbPackYears = j.packYears || {};
+      sbCatalogYears = j.catalogYears || {};
       // Base numbers are NOT globally unique — early production waves each
       // restart at 1 (base "1" is simultaneously a Griffin, a Commando, and
       // an Alpha Strike mini), so every base keys a list of candidates.
@@ -618,7 +622,7 @@ function sbPackList() {
   sbMinisEntries.forEach(e => {
     if (e.boxSets && e.boxSets.length) {
       e.boxSets.forEach(name => {
-        (packs[name] = packs[name] || { label: name, entries: [] }).entries.push(e);
+        (packs[name] = packs[name] || { label: name, name, entries: [] }).entries.push(e);
       });
     } else {
       (e.catalogNumbers || []).forEach(cat => {
@@ -628,25 +632,36 @@ function sbPackList() {
       });
     }
   });
-  // Label catalog-fallback packs by their contents so they're recognizable:
-  // "35760 · Mercenaries — Bane, Highlander IIC, Phoenix Hawk IIC +2"
   Object.keys(packs).forEach(k => {
     const p = packs[k];
-    if (p.label) return;
-    const names = [...new Set(p.entries.map(e => e.name))];
-    const preview = names.slice(0, 3).join(', ') + (names.length > 3 ? ` +${names.length - 3}` : '');
-    p.label = `${p.cat} · ${p.section} — ${preview}`;
+    if (!p.label) {
+      // Label catalog-fallback packs by their contents so they're recognizable:
+      // "35760 · Mercenaries — Bane, Highlander IIC, Phoenix Hawk IIC +2"
+      const names = [...new Set(p.entries.map(e => e.name))];
+      const preview = names.slice(0, 3).join(', ') + (names.length > 3 ? ` +${names.length - 3}` : '');
+      p.label = `${p.cat} · ${p.section} — ${preview}`;
+    }
+    p.year = (p.name ? sbPackYears[p.name] : sbCatalogYears[p.cat]) || '';
   });
   return packs;
 }
 
-function sbPopulatePacks() {
+// filter: case-insensitive substring match against the pack label (which
+// includes the year), so a search box lets the user narrow ~100 packs by
+// name or by release year.
+function sbPopulatePacks(filter) {
   const sel = document.getElementById('sb-pack-select');
   if (!sel) return;
   const packs = sbPackList();
-  const keys = Object.keys(packs).sort((a, b) => packs[a].label.localeCompare(packs[b].label));
-  sel.innerHTML = '<option value="">Select pack / box set…</option>'
-    + keys.map(k => `<option value="${lbEsc(k)}">${lbEsc(packs[k].label)} (${packs[k].entries.length})</option>`).join('');
+  const q = (filter || '').trim().toLowerCase();
+  const keys = Object.keys(packs)
+    .filter(k => !q || packs[k].label.toLowerCase().includes(q) || String(packs[k].year).includes(q))
+    .sort((a, b) => packs[a].label.localeCompare(packs[b].label));
+  sel.innerHTML = keys.length
+    ? '<option value="">Select pack / box set…</option>'
+      + keys.map(k => `<option value="${lbEsc(k)}">${lbEsc(packs[k].label)}`
+        + `${packs[k].year ? ' (' + packs[k].year + ')' : ''} — ${packs[k].entries.length} mini${packs[k].entries.length !== 1 ? 's' : ''}</option>`).join('')
+    : `<option value="">No packs match "${lbEsc(filter || '')}"</option>`;
 }
 
 function sbAddPack() {

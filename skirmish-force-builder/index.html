@@ -103,6 +103,11 @@
           </div>
           <button class="lb-btn-sm" onclick="sbManualSearch()" style="padding:4px 12px">Search</button>
           <div class="sb-fgroup sb-fgroup-grow">
+            <label class="sb-fg-label">Search box sets</label>
+            <input type="text" id="sb-pack-search" placeholder="Filter by pack/box name…" oninput="sbPopulatePacks(this.value)"
+              style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px">
+          </div>
+          <div class="sb-fgroup sb-fgroup-grow">
             <label class="sb-fg-label">Add pack / box set</label>
             <select id="sb-pack-select"><option value="">Loading packs…</option></select>
           </div>
