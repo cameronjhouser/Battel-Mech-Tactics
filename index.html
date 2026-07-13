@@ -941,7 +941,21 @@
   .sb-coll-btn.sb-coll-del:hover { background:var(--red); color:#fff; border-color:var(--red); }
   .sb-coll-n { display:inline-block; min-width:22px; text-align:center; font-family:var(--mono); font-size:12px; }
   .sb-mini-thumb { width:28px; height:28px; object-fit:contain; border-radius:3px; background:var(--bg3);
-    border:1px solid var(--border2); display:block; flex-shrink:0; }
+    border:1px solid var(--border2); display:block; flex-shrink:0; cursor:zoom-in; }
+  .sb-mini-thumb:hover { border-color:var(--accent); }
+  /* Click-to-enlarge image popup, built on demand by sbOpenLightbox() */
+  .sb-lightbox { display:none; position:fixed; inset:0; z-index:1000; padding:40px;
+    background:rgba(0,0,0,.85); align-items:center; justify-content:center; }
+  .sb-lightbox.open { display:flex; }
+  .sb-lightbox-inner { position:relative; display:flex; flex-direction:column; align-items:center;
+    max-width:90vw; max-height:90vh; }
+  .sb-lightbox-inner img { max-width:90vw; max-height:80vh; object-fit:contain; border-radius:6px;
+    background:var(--bg2); box-shadow:0 10px 40px rgba(0,0,0,.6); }
+  .sb-lightbox-label { margin-top:12px; color:#fff; font-family:var(--cond); font-size:15px;
+    letter-spacing:.03em; text-align:center; }
+  .sb-lightbox-close { position:absolute; top:-34px; right:-8px; background:none; border:none;
+    color:#fff; font-size:24px; line-height:1; padding:4px 8px; cursor:pointer; }
+  .sb-lightbox-close:hover { color:var(--accent); }
   /* Pack contents preview under the Add Pack dropdown */
   #sb-pack-preview { border:1px solid var(--border); border-radius:5px; background:var(--bg1);
     max-height:260px; overflow-y:auto; font-size:11px; }
@@ -959,6 +973,16 @@
   .sb-cys-owned { color:var(--green); font-weight:600; }
   .sb-cys-miss { color:var(--red); font-weight:600; }
   .sb-cys-missing-row td { background:color-mix(in srgb, var(--red) 6%, transparent); }
+  .sb-cys-suggest-head { font-family:var(--cond); font-size:10px; font-weight:700; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--text2); margin-bottom:6px; }
+  .sb-cys-suggest-list { border:1px solid var(--border); border-radius:5px; background:var(--bg1);
+    margin-bottom:12px; max-height:200px; overflow-y:auto; }
+  .sb-cys-suggest-row { display:flex; justify-content:space-between; gap:10px; padding:5px 10px 0;
+    font-size:12px; }
+  .sb-cys-suggest-name { color:var(--text); font-weight:600; }
+  .sb-cys-suggest-count { color:var(--accent); font-size:11px; white-space:nowrap; }
+  .sb-cys-suggest-units { padding:0 10px 6px; color:var(--text3); font-size:10px; border-bottom:1px solid var(--border); }
+  .sb-cys-suggest-units:last-child { border-bottom:none; }
 </style>
 </head>
 <body>
@@ -2432,17 +2456,47 @@
       </div>
       <div class="card" style="padding:12px 14px;margin-top:10px">
         <div class="card-title">Complete Your Set</div>
+        <div class="sb-browse-controls" style="margin-bottom:0">
+          <div class="sb-fgroup" style="flex:1 1 200px">
+            <label class="sb-fg-label">Faction</label>
+            <select id="sb-cys-faction"></select>
+          </div>
+          <div class="sb-fgroup" style="flex:1 1 200px">
+            <label class="sb-fg-label">General / Clan group</label>
+            <select id="sb-cys-faction-general" title="Broadens the pool — adds any unit legal for this General group ON TOP OF the specific Faction above"></select>
+          </div>
+          <div class="sb-fgroup" style="flex:1 1 200px">
+            <label class="sb-fg-label">Era</label>
+            <select id="sb-cys-era">
+              <option value="" selected>Select era…</option>
+              <option value="16">Dark Age (3131–3150)</option>
+              <option value="257">ilClan (3151–present)</option>
+              <option value="254">Late Republic (3101–3130)</option>
+              <option value="15">Early Republic (3081–3100)</option>
+              <option value="14">Jihad (3068–3080)</option>
+              <option value="247">Civil War (3062–3067)</option>
+              <option value="13">Clan Invasion (3050–3061)</option>
+              <option value="256">Late SW – Renaissance (3020–3049)</option>
+              <option value="255">Late SW – LosTech (2901–3019)</option>
+              <option value="11">Early Succession War (2781–2900)</option>
+              <option value="10">Star League (2571–2780)</option>
+            </select>
+          </div>
+          <button class="lb-btn-sm" onclick="sbCysFetchFactionEra()" style="padding:4px 12px">Compare</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin:8px 0">— or —</div>
         <div class="sb-browse-controls" style="margin-bottom:8px">
           <div class="sb-fgroup sb-fgroup-grow" style="max-width:560px">
-            <label class="sb-fg-label">Compare your collection against</label>
-            <select id="sb-cys-scope" onchange="sbRenderCys()"><option value="">Loading sets…</option></select>
+            <label class="sb-fg-label">Compare against a specific box set / product line</label>
+            <select id="sb-cys-scope" onchange="sbCysScopeChanged()"><option value="">Loading sets…</option></select>
           </div>
           <div class="sb-fgroup">
             <label class="sb-fg-check"><input type="checkbox" id="sb-cys-missing" onchange="sbRenderCys()"> Show only what I'm missing</label>
           </div>
           <button class="lb-btn-sm" onclick="sbCysPrint()" style="padding:4px 12px">🖨 Print list</button>
         </div>
-        <div id="sb-cys-summary" style="font-size:12px;color:var(--text2);margin-bottom:8px">Pick a product line or box set above to compare against your collection.</div>
+        <div id="sb-cys-summary" style="font-size:12px;color:var(--text2);margin-bottom:8px">Pick a faction + era, or a product line / box set above, to compare against your collection.</div>
+        <div id="sb-cys-suggestions"></div>
         <div id="sb-cys-table"></div>
       </div>
     </div>
