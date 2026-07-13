@@ -690,6 +690,7 @@ function sbAddPack() {
   const pack = sbPackList()[packKey];
   if (!pack) { alert('Pack not found.'); return; }
   let added = 0;
+  const toVerify = [];
   pack.entries.forEach(e => {
     const key = sbNorm(e.name);
     if (!key) return;
@@ -698,12 +699,73 @@ function sbAddPack() {
       rec.count = (rec.count || 1) + 1;
       if (!rec.base && e.baseNumbers?.length) rec.base = e.baseNumbers[0];
       if (!rec.name) rec.name = e.name;
+      if (!rec.type) { rec.type = sbGuessType(e, pack.label); toVerify.push(e); }
     } else {
-      sbCollection[key] = { name: e.name, type: '', base: e.baseNumbers?.[0] || '', count: 1 };
+      sbCollection[key] = { name: e.name, type: sbGuessType(e, pack.label), base: e.baseNumbers?.[0] || '', count: 1 };
+      toVerify.push(e);
     }
     added++;
   });
   sbCollectionChanged(`Added ${added} mini${added !== 1 ? 's' : ''} from "${pack.label}".`);
+  sbFillPackTypes(toVerify); // async — MUL-verified types land as they resolve
+}
+
+// Best-effort unit type for a Sarna mini, from name signals first, then the
+// pack family (every "Battlefield Support: …" pack is vehicles, not Mechs).
+// Only an immediate guess — sbFillPackTypes verifies against the MUL and
+// overwrites whenever it's reachable.
+function sbGuessType(e, packLabel) {
+  const n = ` ${e.name.toLowerCase()} `;
+  if (n.includes('battle armor')) return 'Battle Armor';
+  if (/[ -](truck|hq|mash|transport|repair)[ -]/.test(n)) return 'Support Vehicle';
+  if (/[ -](tank|hovertank|carrier)[ -]/.test(n)) return 'Combat Vehicle';
+  if (/^battlefield support\b/i.test(packLabel || '')) return 'Combat Vehicle';
+  return '';
+}
+
+// Resolve a Sarna mini's unit type from the MUL: search by chassis name,
+// prefer the result whose variant tail matches one of the mini's Model
+// designations ("Scorpion" + SCP-1N picks the Mech, not the tank). With no
+// model match, only trust the search when every candidate agrees on type.
+async function sbLookupTypeFor(e) {
+  try {
+    const chassis = e.name.replace(/\s*\([^)]*\)/g, '').trim();
+    const res = await fetch(`${MUL_API}?${new URLSearchParams({ Name: chassis, minPV: '1', maxPV: '999' })}`);
+    if (!res.ok) return '';
+    const data = await res.json();
+    const en = sbNorm(chassis);
+    const models = (e.models || []).map(sbNorm).filter(Boolean);
+    const cands = (data.Units || data || []).filter(u => sbNorm(u.Name).includes(en) && u.Type?.Name);
+    if (!cands.length) return '';
+    const byModel = cands.find(u => {
+      const tail = sbNorm(u.Name).replace(en, '').trim();
+      return tail && models.some(m => tail === m || tail.includes(m) || m.includes(tail));
+    });
+    if (byModel) return byModel.Type.Name;
+    const types = [...new Set(cands.map(u => u.Type.Name))];
+    return types.length === 1 ? types[0] : '';
+  } catch { return ''; }
+}
+
+// Verify freshly pack-added records' types against the MUL in the
+// background (small concurrency, one re-render at the end). Records the
+// user has since removed or retyped are left alone.
+async function sbFillPackTypes(entries) {
+  const queue = (entries || []).slice();
+  if (!queue.length) return;
+  let changed = false;
+  await Promise.all(Array.from({ length: 3 }, async () => {
+    while (queue.length) {
+      const e = queue.shift();
+      const rec = sbCollection[sbNorm(e.name)];
+      if (!rec) continue;
+      const guess = rec.type;
+      const t = await sbLookupTypeFor(e);
+      const cur = sbCollection[sbNorm(e.name)];
+      if (t && cur === rec && rec.type === guess && rec.type !== t) { rec.type = t; changed = true; }
+    }
+  }));
+  if (changed) { sbRenderCollection(); sbRenderBrowse(); }
 }
 
 /* ── My Collection tab ───────────────────────────────────────────────────────
