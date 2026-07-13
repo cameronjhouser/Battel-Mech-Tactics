@@ -605,11 +605,37 @@ function sbManualAdd(i) {
   sbCollectionChanged(`Added ${u.Name}${n > 1 ? ' ×' + n : ''} (owned ×${sbCollection[key].count}).`);
 }
 
+// One dropdown entry per PRODUCT, not per page section. Most entries carry
+// real, hand-verified per-mini pack names in boxSets — a mini sold in
+// several packs (e.g. a Legendary MechWarriors mini also sold in its own
+// Salvage Box) joins EACH of those packs separately, so owning just one of
+// them is still a selectable filter. For the minority with no verified
+// pack name for their era, the catalog number is the next-best product
+// boundary (each ForcePack/box has its own catalog number, and a mini sold
+// in several products carries several catalog numbers and joins each).
 function sbPackList() {
   const packs = {};
   sbMinisEntries.forEach(e => {
-    const p = e.boxSet || e.section || '';
-    if (p) (packs[p] = packs[p] || []).push(e);
+    if (e.boxSets && e.boxSets.length) {
+      e.boxSets.forEach(name => {
+        (packs[name] = packs[name] || { label: name, entries: [] }).entries.push(e);
+      });
+    } else {
+      (e.catalogNumbers || []).forEach(cat => {
+        const key = 'cat:' + cat;
+        if (!packs[key]) packs[key] = { label: '', entries: [], cat, section: e.section || '' };
+        packs[key].entries.push(e);
+      });
+    }
+  });
+  // Label catalog-fallback packs by their contents so they're recognizable:
+  // "35760 · Mercenaries — Bane, Highlander IIC, Phoenix Hawk IIC +2"
+  Object.keys(packs).forEach(k => {
+    const p = packs[k];
+    if (p.label) return;
+    const names = [...new Set(p.entries.map(e => e.name))];
+    const preview = names.slice(0, 3).join(', ') + (names.length > 3 ? ` +${names.length - 3}` : '');
+    p.label = `${p.cat} · ${p.section} — ${preview}`;
   });
   return packs;
 }
@@ -618,17 +644,18 @@ function sbPopulatePacks() {
   const sel = document.getElementById('sb-pack-select');
   if (!sel) return;
   const packs = sbPackList();
-  const names = Object.keys(packs).sort((a, b) => a.localeCompare(b));
+  const keys = Object.keys(packs).sort((a, b) => packs[a].label.localeCompare(packs[b].label));
   sel.innerHTML = '<option value="">Select pack / box set…</option>'
-    + names.map(p => `<option value="${lbEsc(p)}">${lbEsc(p)} (${packs[p].length})</option>`).join('');
+    + keys.map(k => `<option value="${lbEsc(k)}">${lbEsc(packs[k].label)} (${packs[k].entries.length})</option>`).join('');
 }
 
 function sbAddPack() {
-  const pack = document.getElementById('sb-pack-select')?.value;
-  if (!pack) { alert('Select a pack / box set first.'); return; }
-  const entries = sbPackList()[pack] || [];
+  const packKey = document.getElementById('sb-pack-select')?.value;
+  if (!packKey) { alert('Select a pack / box set first.'); return; }
+  const pack = sbPackList()[packKey];
+  if (!pack) { alert('Pack not found.'); return; }
   let added = 0;
-  entries.forEach(e => {
+  pack.entries.forEach(e => {
     const key = sbNorm(e.name);
     if (!key) return;
     const rec = sbCollection[key];
@@ -640,7 +667,7 @@ function sbAddPack() {
     }
     added++;
   });
-  sbCollectionChanged(`Added ${added} mini${added !== 1 ? 's' : ''} from "${pack}".`);
+  sbCollectionChanged(`Added ${added} mini${added !== 1 ? 's' : ''} from "${pack.label}".`);
 }
 
 // Resolve a collection record's base number to its Sarna entry in the

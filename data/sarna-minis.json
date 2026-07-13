@@ -1,8 +1,8 @@
 {
  "source": "https://www.sarna.net/wiki/Miniatures_-_Catalyst_Game_Labs",
  "attribution": "Data from Sarna BattleTechWiki (CC BY-NC-SA); miniatures by Catalyst Game Labs.",
- "note": "Interim dataset extracted from a July 2026 page capture; replaced by scrape_sarna_minis.py once the monthly cron runs. Box sets are section-level only.",
- "fetched": "2026-07-12T18:53:50+00:00",
+ "note": "Interim dataset extracted from a July 2026 page capture; boxSets for catalog numbers 35700s/36000s/38000s (and select others) are ground-truth, hand-verified against the live Sarna wiki tables, with each pack a mini ships in listed separately. Entries with older or unmapped catalog numbers have an empty boxSets and fall back to the section-level boxSet.",
+ "fetched": "2026-07-12T19:34:06+00:00",
  "entries": [
   {
    "name": "Commando",
@@ -14,7 +14,8 @@
     "COM-2D"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Spider",
@@ -26,7 +27,8 @@
     "SDR-5V"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Jenner",
@@ -38,7 +40,8 @@
     "JR7-D"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Panther",
@@ -50,7 +53,8 @@
     "PNT-9R"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Assassin",
@@ -62,7 +66,8 @@
     "ASN-21"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Cicada",
@@ -74,7 +79,8 @@
     "CDA-2A"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Clint",
@@ -86,7 +92,8 @@
     "CLNT-2-3T"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Hermes II",
@@ -98,7 +105,8 @@
     "HER-2S"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Whitworth",
@@ -110,7 +118,8 @@
     "WTH-1"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Vindicator",
@@ -122,7 +131,8 @@
     "VND-1R"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Enforcer",
@@ -134,7 +144,8 @@
     "ENF-4R"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Hunchback",
@@ -146,7 +157,8 @@
     "HBK-4G"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Trebuchet",
@@ -158,7 +170,8 @@
     "TBT-5N"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Dervish",
@@ -170,7 +183,8 @@
     "DV-6M"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Dragon",
@@ -182,7 +196,8 @@
     "DRG-1N"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Quickdraw",
@@ -194,7 +209,8 @@
     "QKD-4G"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Catapult",
@@ -206,7 +222,8 @@
     "CPLT-C1"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "JagerMech",
@@ -218,7 +235,8 @@
     "JM6-S"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Grasshopper",
@@ -230,7 +248,8 @@
     "GHR-5H"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Awesome",
@@ -242,7 +261,8 @@
     "AWS-8Q"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Zeus",
@@ -254,7 +274,8 @@
     "ZEU-6S"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Cyclops",
@@ -266,7 +287,8 @@
     "CP-10-Z"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Banshee",
@@ -278,7 +300,8 @@
     "BNC-3E"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Atlas",
@@ -290,7 +313,8 @@
     "AS7-D"
    ],
    "boxSet": "Classic BattleTech Introductory Box Set",
-   "section": "Classic BattleTech Introductory Box Set"
+   "section": "Classic BattleTech Introductory Box Set",
+   "boxSets": []
   },
   {
    "name": "Commando",
@@ -304,7 +328,8 @@
     "COM-2D"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Spider",
@@ -319,7 +344,8 @@
     "SDR-5V"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Jenner",
@@ -334,7 +360,8 @@
     "JR7-D"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Panther",
@@ -349,7 +376,8 @@
     "PNT-9R"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Assassin",
@@ -363,7 +391,8 @@
     "ASN-21"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Cicada",
@@ -378,7 +407,8 @@
     "CDA-2A"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Clint",
@@ -393,7 +423,8 @@
     "CLNT-2-3T"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Hermes II",
@@ -407,7 +438,8 @@
     "HER-2S"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Whitworth",
@@ -421,7 +453,8 @@
     "WTH-1"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Vindicator",
@@ -436,7 +469,8 @@
     "VND-1R"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Enforcer",
@@ -450,7 +484,8 @@
     "ENF-4R"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Hunchback",
@@ -464,7 +499,8 @@
     "HBK-4G"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Trebuchet",
@@ -479,7 +515,8 @@
     "TBT-5N"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Dervish",
@@ -494,7 +531,8 @@
     "DV-6M"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Dragon",
@@ -509,7 +547,8 @@
     "DRG-1N"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Quickdraw",
@@ -524,7 +563,8 @@
     "QKD-4G"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Catapult",
@@ -539,7 +579,8 @@
     "CPLT-C1"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Grasshopper",
@@ -554,7 +595,8 @@
     "GHR-5H"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Awesome",
@@ -569,7 +611,8 @@
     "AWS-8Q"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Zeus",
@@ -584,7 +627,8 @@
     "ZEU-6S"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Cyclops",
@@ -599,7 +643,8 @@
     "CP-10-Z"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Banshee",
@@ -614,7 +659,8 @@
     "BNC-3E"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "'Atlas'",
@@ -629,7 +675,8 @@
     "AS7-D"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Flea",
@@ -643,7 +690,8 @@
     "FLE-15"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Firestarter",
@@ -657,7 +705,8 @@
     "FS9-H"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Raven",
@@ -671,7 +720,8 @@
     "RVN-3L"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Wolfhound",
@@ -685,7 +735,8 @@
     "WLF-1"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Vulcan",
@@ -699,7 +750,8 @@
     "VL-2T"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Blackjack",
@@ -713,7 +765,8 @@
     "BJ-1"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Hatchetman",
@@ -727,7 +780,8 @@
     "HCT-3F"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Centurion",
@@ -741,7 +795,8 @@
     "CN9-A"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Cataphract",
@@ -755,7 +810,8 @@
     "CTF-2X"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Guillotine",
@@ -769,7 +825,8 @@
     "GLT-3N"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Orion",
@@ -783,7 +840,8 @@
     "ON1-K"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Charger",
@@ -797,7 +855,8 @@
     "CGR-1A1"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Victor",
@@ -811,7 +870,8 @@
     "VTR-9B"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Shogun",
@@ -825,7 +885,8 @@
     "SHG-2E"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Stalker",
@@ -839,7 +900,8 @@
     "STK-3F"
    ],
    "boxSet": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
-   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs"
+   "section": "BattleTech Introductory Box Set and Alpha Strike Lance Packs",
+   "boxSets": []
   },
   {
    "name": "Hellbringer (Loki) x2",
@@ -849,7 +911,8 @@
    ],
    "models": [],
    "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSets": []
   },
   {
    "name": "Summoner (Thor) x2",
@@ -859,7 +922,8 @@
    ],
    "models": [],
    "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSets": []
   },
   {
    "name": "Hellbringer (Loki)",
@@ -869,7 +933,8 @@
    ],
    "models": [],
    "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSets": []
   },
   {
    "name": "Summoner (Thor)",
@@ -879,7 +944,8 @@
    ],
    "models": [],
    "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSets": []
   },
   {
    "name": "BattleMaster",
@@ -891,7 +957,8 @@
     "BLR-4S"
    ],
    "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSets": []
   },
   {
    "name": "Timber Wolf (Mad Cat)",
@@ -901,7 +968,8 @@
    ],
    "models": [],
    "boxSet": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
-   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates"
+   "section": "25th Anniversary Introductory Box Set and BattleTech Introductory Box Set Seperates",
+   "boxSets": []
   },
   {
    "name": "Griffin",
@@ -916,8 +984,11 @@
     "-3N",
     "C"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech Beginner Box",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech Beginner Box"
+   ]
   },
   {
    "name": "Wolverine",
@@ -925,7 +996,8 @@
     "2"
    ],
    "catalogNumbers": [
-    "35020 3500D"
+    "35020",
+    "3500D"
    ],
    "models": [
     "WVR-6R",
@@ -933,8 +1005,12 @@
     "-9R",
     "-10R"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech Beginner Box / BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech Beginner Box",
+    "BattleTech: A Game of Armored Combat"
+   ]
   },
   {
    "name": "Awesome",
@@ -948,8 +1024,11 @@
     "AWS-8Q",
     "-11H"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech: A Game of Armored Combat"
+   ]
   },
   {
    "name": "Catapult",
@@ -964,8 +1043,11 @@
     "-C1b",
     "- C5A"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech: A Game of Armored Combat"
+   ]
   },
   {
    "name": "Thunderbolt",
@@ -982,8 +1064,11 @@
     "-7S",
     "-12R"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech: A Game of Armored Combat"
+   ]
   },
   {
    "name": "Commando",
@@ -997,8 +1082,11 @@
     "COM-2D",
     "-9S"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech: A Game of Armored Combat"
+   ]
   },
   {
    "name": "BattleMaster",
@@ -1013,8 +1101,11 @@
     "-6G",
     "C 3"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech: A Game of Armored Combat"
+   ]
   },
   {
    "name": "Shadow Hawk",
@@ -1030,8 +1121,11 @@
     "-7H",
     "C"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech: A Game of Armored Combat"
+   ]
   },
   {
    "name": "Locust",
@@ -1049,8 +1143,11 @@
     "-7V",
     "7V2"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech: A Game of Armored Combat",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech: A Game of Armored Combat"
+   ]
   },
   {
    "name": "Griffin",
@@ -1065,8 +1162,11 @@
     "-3N",
     "-C"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech Beginner Box, Second Edition",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech Beginner Box, Second Edition"
+   ]
   },
   {
    "name": "Vindicator",
@@ -1082,8 +1182,11 @@
     "-1X",
     "-7L"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech Beginner Box, Second Edition",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech Beginner Box, Second Edition"
+   ]
   },
   {
    "name": "Centurion",
@@ -1096,8 +1199,11 @@
    "models": [
     "Yen-Lo- Wang"
    ],
-   "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "boxSet": "BattleTech: Essentials",
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": [
+    "BattleTech: Essentials"
+   ]
   },
   {
    "name": "Rifleman",
@@ -1116,7 +1222,8 @@
     "Legend Killer 2"
    ],
    "boxSet": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
-   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat"
+   "section": "BattleTech Beginner Boxes and BattleTech: A Game of Armored Combat",
+   "boxSets": []
   },
   {
    "name": "Dire Wolf",
@@ -1124,14 +1231,19 @@
     "1"
    ],
    "catalogNumbers": [
-    "35720 36001"
+    "35720",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "E Config T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Command Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Command Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Mist Lynx",
@@ -1139,14 +1251,19 @@
     "2"
    ],
    "catalogNumbers": [
-    "35720 36001"
+    "35720",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Command Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Command Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Shadow Cat",
@@ -1154,14 +1271,19 @@
     "3"
    ],
    "catalogNumbers": [
-    "35720 36001"
+    "35720",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Command Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Command Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Stormcrow",
@@ -1169,14 +1291,19 @@
     "4"
    ],
    "catalogNumbers": [
-    "35720 36001"
+    "35720",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "H Config T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Command Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Command Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Summoner",
@@ -1184,14 +1311,19 @@
     "5"
    ],
    "catalogNumbers": [
-    "35720 36001"
+    "35720",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config U Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Command Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Command Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Gargoyle",
@@ -1199,14 +1331,19 @@
     "6"
    ],
    "catalogNumbers": [
-    "35722 36001"
+    "35722",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Striker Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Striker Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Hellbringer",
@@ -1214,14 +1351,19 @@
     "7"
    ],
    "catalogNumbers": [
-    "35722 36001"
+    "35722",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Striker Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Striker Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Ice Ferret",
@@ -1229,14 +1371,19 @@
     "8"
    ],
    "catalogNumbers": [
-    "35722 36001"
+    "35722",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Striker Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Striker Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Mad Dog",
@@ -1244,14 +1391,19 @@
     "9"
    ],
    "catalogNumbers": [
-    "35722 36001"
+    "35722",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Striker Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Striker Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Viper",
@@ -1259,14 +1411,19 @@
     "10"
    ],
    "catalogNumbers": [
-    "35722 36001"
+    "35722",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Striker Star / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Striker Star",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Adder",
@@ -1274,14 +1431,19 @@
     "11"
    ],
    "catalogNumbers": [
-    "35030 36001"
+    "35030",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "H Config T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Invasion Box Set / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Invasion Box Set",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Mongrel",
@@ -1289,14 +1451,19 @@
     "12"
    ],
    "catalogNumbers": [
-    "35030 36001"
+    "35030",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Invasion Box Set / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Invasion Box Set",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Nova",
@@ -1304,14 +1471,19 @@
     "13"
    ],
    "catalogNumbers": [
-    "35030 36001"
+    "35030",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Invasion Box Set / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Invasion Box Set",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Timber Wolf",
@@ -1319,14 +1491,19 @@
     "14"
    ],
    "catalogNumbers": [
-    "35030 36001"
+    "35030",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Invasion Box Set / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Invasion Box Set",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Executioner",
@@ -1334,14 +1511,19 @@
     "15"
    ],
    "catalogNumbers": [
-    "35030 36001"
+    "35030",
+    "36001"
    ],
    "models": [
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Invasion Box Set / Salvage Box: Clan Invasion",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Invasion Box Set",
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Elemental Battle Armor",
@@ -1349,14 +1531,20 @@
     "16"
    ],
    "catalogNumbers": [
-    "35030 35739"
+    "35030",
+    "35739"
    ],
    "models": [
     "Standard",
     "Fire Elemental III"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Invasion Box Set / Clan Elemental Star / Wolf's Dragoons Assault Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Invasion Box Set",
+    "Clan Elemental Star",
+    "Wolf's Dragoons Assault Star"
+   ]
   },
   {
    "name": "Phoenix Hawk",
@@ -1372,8 +1560,11 @@
     "-99",
     "C 2"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Battle Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Battle Lance"
+   ]
   },
   {
    "name": "Rifleman",
@@ -1390,8 +1581,11 @@
     "-9T",
     "C 3"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Battle Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Battle Lance"
+   ]
   },
   {
    "name": "Warhammer",
@@ -1409,8 +1603,11 @@
     "C",
     "C 2"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Battle Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Battle Lance"
+   ]
   },
   {
    "name": "Wasp",
@@ -1425,8 +1622,11 @@
     "-5A",
     "C"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Battle Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Battle Lance"
+   ]
   },
   {
    "name": "Archer",
@@ -1443,8 +1643,11 @@
     "-7C Archer C",
     "ARC-2R Morgan"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Command Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Command Lance"
+   ]
   },
   {
    "name": "Marauder",
@@ -1464,8 +1667,11 @@
     "-7R",
     "C"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Command Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Command Lance"
+   ]
   },
   {
    "name": "Stinger",
@@ -1481,8 +1687,11 @@
     "-6R",
     "-6S"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Command Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Command Lance"
+   ]
   },
   {
    "name": "Valkyrie",
@@ -1499,8 +1708,11 @@
     "- QD8",
     "C"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Command Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Command Lance"
+   ]
   },
   {
    "name": "Archer ll",
@@ -1508,15 +1720,20 @@
     "25"
    ],
    "catalogNumbers": [
-    "35740 36003"
+    "35740",
+    "36003"
    ],
    "models": [
     "ARC-2R",
     "4M",
     "4M2"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Legendary MechWarriors Pack / Salvage Box: Legendary",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Legendary MechWarriors Pack",
+    "Salvage Box: Legendary"
+   ]
   },
   {
    "name": "Morgan Kell",
@@ -1528,8 +1745,11 @@
     "-4M",
     "-4M2"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Salvage Box: Legendary",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Salvage Box: Legendary"
+   ]
   },
   {
    "name": "Dire Wolf Natasha Kerensky",
@@ -1537,13 +1757,18 @@
     "26"
    ],
    "catalogNumbers": [
-    "35740 36003"
+    "35740",
+    "36003"
    ],
    "models": [
     "Widowmaker"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Legendary MechWarriors Pack / Salvage Box: Legendary",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Legendary MechWarriors Pack",
+    "Salvage Box: Legendary"
+   ]
   },
   {
    "name": "Marauder Grayson Death Carlyle",
@@ -1551,7 +1776,8 @@
     "27"
    ],
    "catalogNumbers": [
-    "35740 36003"
+    "35740",
+    "36003"
    ],
    "models": [
     "MAD-3R",
@@ -1563,8 +1789,12 @@
     "-7R",
     "C"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Legendary MechWarriors Pack / Salvage Box: Legendary",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Legendary MechWarriors Pack",
+    "Salvage Box: Legendary"
+   ]
   },
   {
    "name": "Timber Wolf Aidan Pryde",
@@ -1572,13 +1802,18 @@
     "28"
    ],
    "catalogNumbers": [
-    "35740 36003"
+    "35740",
+    "36003"
    ],
    "models": [
     "Pryde"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Legendary MechWarriors Pack / Salvage Box: Legendary",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Legendary MechWarriors Pack",
+    "Salvage Box: Legendary"
+   ]
   },
   {
    "name": "UrbanMech",
@@ -1593,8 +1828,11 @@
     "- R69",
     "-R80"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Salvage Box: UrbanMech",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Salvage Box: UrbanMech"
+   ]
   },
   {
    "name": "Fire Falcon",
@@ -1608,8 +1846,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Ad Hoc Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Ad Hoc Star"
+   ]
   },
   {
    "name": "Hellion",
@@ -1623,8 +1864,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Ad Hoc Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Ad Hoc Star"
+   ]
   },
   {
    "name": "Howler",
@@ -1637,8 +1881,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Ad Hoc Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Ad Hoc Star"
+   ]
   },
   {
    "name": "Kodiak",
@@ -1652,8 +1899,11 @@
     "1",
     "6"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Ad Hoc Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Ad Hoc Star"
+   ]
   },
   {
    "name": "Pack Hunter",
@@ -1668,8 +1918,11 @@
     "4",
     "5"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Ad Hoc Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Ad Hoc Star"
+   ]
   },
   {
    "name": "Cougar",
@@ -1683,8 +1936,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Fire Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Fire Star"
+   ]
   },
   {
    "name": "Fire Moth",
@@ -1698,8 +1954,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Fire Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Fire Star"
+   ]
   },
   {
    "name": "Kit Fox",
@@ -1713,8 +1972,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Fire Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Fire Star"
+   ]
   },
   {
    "name": "Nova Cat",
@@ -1728,8 +1990,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Fire Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Fire Star"
+   ]
   },
   {
    "name": "Warhawk",
@@ -1743,8 +2008,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Fire Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Fire Star"
+   ]
   },
   {
    "name": "Crossbow",
@@ -1758,8 +2026,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Battle Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Battle Star"
+   ]
   },
   {
    "name": "Ebon Jaguar",
@@ -1773,8 +2044,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Battle Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Battle Star"
+   ]
   },
   {
    "name": "Huntsman",
@@ -1788,8 +2062,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Battle Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Battle Star"
+   ]
   },
   {
    "name": "Kingfisher",
@@ -1803,8 +2080,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Battle Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Battle Star"
+   ]
   },
   {
    "name": "Turkina",
@@ -1818,8 +2098,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Battle Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Battle Star"
+   ]
   },
   {
    "name": "Behemoth",
@@ -1832,8 +2115,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Star"
+   ]
   },
   {
    "name": "Hunchback IIC",
@@ -1846,8 +2132,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Star"
+   ]
   },
   {
    "name": "Marauder IIC",
@@ -1861,8 +2150,11 @@
     "1",
     "10"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Star"
+   ]
   },
   {
    "name": "Supernova",
@@ -1876,8 +2168,11 @@
     "1",
     "5"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Star"
+   ]
   },
   {
    "name": "Warhammer IIC",
@@ -1890,8 +2185,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Heavy Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Heavy Star"
+   ]
   },
   {
    "name": "Conjurer",
@@ -1904,8 +2202,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Striker Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Striker Star"
+   ]
   },
   {
    "name": "Horned Owl",
@@ -1919,8 +2220,11 @@
     "1",
     "5"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Striker Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Striker Star"
+   ]
   },
   {
    "name": "Incubus",
@@ -1934,8 +2238,11 @@
     "1",
     "9"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Striker Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Striker Star"
+   ]
   },
   {
    "name": "Piranha",
@@ -1950,8 +2257,11 @@
     "2",
     "5"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Striker Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Striker Star"
+   ]
   },
   {
    "name": "Vapor Eagle",
@@ -1965,8 +2275,11 @@
     "1",
     "3"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Striker Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Striker Star"
+   ]
   },
   {
    "name": "Arctic Cheetah",
@@ -1980,8 +2293,11 @@
     "Prime Config",
     "F Config T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Support Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Support Star"
+   ]
   },
   {
    "name": "Battle Cobra",
@@ -1995,8 +2311,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Support Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Support Star"
+   ]
   },
   {
    "name": "Black Lanner",
@@ -2010,8 +2329,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Support Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Support Star"
+   ]
   },
   {
    "name": "Linebacker",
@@ -2025,8 +2347,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Support Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Support Star"
+   ]
   },
   {
    "name": "Night Gyr",
@@ -2040,8 +2365,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Clan Support Star",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Clan Support Star"
+   ]
   },
   {
    "name": "Atlas",
@@ -2056,8 +2384,11 @@
     "AS8-K",
     "C"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Direct Fire Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Direct Fire Lance"
+   ]
   },
   {
    "name": "Crusader",
@@ -2073,8 +2404,11 @@
     "-9R",
     "-10S"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Direct Fire Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Direct Fire Lance"
+   ]
   },
   {
    "name": "Marauder II",
@@ -2089,8 +2423,11 @@
     "-6A",
     "C"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Direct Fire Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Direct Fire Lance"
+   ]
   },
   {
    "name": "Orion",
@@ -2105,8 +2442,11 @@
     "-Kb",
     "C 2"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Direct Fire Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Direct Fire Lance"
+   ]
   },
   {
    "name": "Longbow",
@@ -2121,8 +2461,11 @@
     "-10C",
     "-14Q"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Fire Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Fire Lance"
+   ]
   },
   {
    "name": "Stalker",
@@ -2136,8 +2479,11 @@
     "STK-3F",
     "-9F"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Fire Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Fire Lance"
+   ]
   },
   {
    "name": "Trebuchet",
@@ -2151,8 +2497,11 @@
     "TBT-5N",
     "-9N"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Fire Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Fire Lance"
+   ]
   },
   {
    "name": "Zeus",
@@ -2165,8 +2514,11 @@
    "models": [
     "ZEU-5S"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Fire Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Fire Lance"
+   ]
   },
   {
    "name": "Axman",
@@ -2180,8 +2532,11 @@
     "AXM-1N",
     "-5N"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Heavy Battle Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Heavy Battle Lance"
+   ]
   },
   {
    "name": "Bushwacker",
@@ -2195,8 +2550,11 @@
     "BSW-X1",
     "- X4"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Heavy Battle Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Heavy Battle Lance"
+   ]
   },
   {
    "name": "Cataphract",
@@ -2210,8 +2568,11 @@
     "CTF-3D",
     "-5LL"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Heavy Battle Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Heavy Battle Lance"
+   ]
   },
   {
    "name": "NightStar",
@@ -2225,8 +2586,11 @@
     "NSR-9J",
     "-10D"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Heavy Battle Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Heavy Battle Lance"
+   ]
   },
   {
    "name": "Banshee",
@@ -2240,8 +2604,11 @@
     "BNC-3S",
     "-12S"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Heavy Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Heavy Lance"
+   ]
   },
   {
    "name": "Centurion",
@@ -2257,8 +2624,11 @@
     "CN9-D3 CN10-B",
     "CN10-D"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Heavy Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Heavy Lance"
+   ]
   },
   {
    "name": "Grasshopper",
@@ -2272,8 +2642,11 @@
     "GHR-5H",
     "-8K"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Heavy Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Heavy Lance"
+   ]
   },
   {
    "name": "Blackjack",
@@ -2287,8 +2660,11 @@
     "BJ-1",
     "-5"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Striker Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Striker Lance"
+   ]
   },
   {
    "name": "Jenner",
@@ -2303,8 +2679,11 @@
     "-K",
     "-N"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Striker Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Striker Lance"
+   ]
   },
   {
    "name": "Panther",
@@ -2321,8 +2700,11 @@
     "- C",
     "-CA"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Striker Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Striker Lance"
+   ]
   },
   {
    "name": "Wolfhound",
@@ -2339,8 +2721,11 @@
     "-6S",
     "-1 Allard"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Striker Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Striker Lance"
+   ]
   },
   {
    "name": "Cyclops",
@@ -2356,8 +2741,11 @@
     "-11- A-DC CP-11-G",
     "C"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Support Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Support Lance"
+   ]
   },
   {
    "name": "Dragon",
@@ -2371,8 +2759,11 @@
     "DRG-1N",
     "-12K"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Support Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Support Lance"
+   ]
   },
   {
    "name": "Spider",
@@ -2388,8 +2779,11 @@
     "-8M",
     "-9M"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Support Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Support Lance"
+   ]
   },
   {
    "name": "Thug",
@@ -2404,8 +2798,11 @@
     "-11Eb",
     "-13U THG-11E Marita"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Support Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Support Lance"
+   ]
   },
   {
    "name": "Enforcer",
@@ -2419,8 +2816,11 @@
     "ENF-4R",
     "-5R"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Urban Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Urban Lance"
+   ]
   },
   {
    "name": "Hunchback",
@@ -2439,8 +2839,11 @@
     "C HBK-4G Shakir",
     "-4G Hohiro"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Urban Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Urban Lance"
+   ]
   },
   {
    "name": "Raven",
@@ -2455,8 +2858,11 @@
     "-4L",
     "-5L"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Urban Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Urban Lance"
+   ]
   },
   {
    "name": "Victor",
@@ -2474,8 +2880,11 @@
     "-12D",
     "C"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Inner Sphere Urban Lance",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Inner Sphere Urban Lance"
+   ]
   },
   {
    "name": "Crab",
@@ -2492,8 +2901,11 @@
     "-30",
     "-54"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Battle Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Battle Level II"
+   ]
   },
   {
    "name": "Crockett",
@@ -2510,8 +2922,11 @@
     "-5003-CJ",
     "-5006-1"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Battle Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Battle Level II"
+   ]
   },
   {
    "name": "Flashman",
@@ -2525,8 +2940,11 @@
     "FLS-8K",
     "-10E"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Battle Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Battle Level II"
+   ]
   },
   {
    "name": "Guillotine",
@@ -2543,8 +2961,11 @@
     "-5M",
     "-7M"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Battle Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Battle Level II"
+   ]
   },
   {
    "name": "Lancelot",
@@ -2563,8 +2984,11 @@
     "-08",
     "-09"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Battle Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Battle Level II"
+   ]
   },
   {
    "name": "Mongoose",
@@ -2582,8 +3006,11 @@
     "C",
     "C 2"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Battle Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Battle Level II"
+   ]
   },
   {
    "name": "Black Knight",
@@ -2598,8 +3025,11 @@
     "BL-6b-KNT BL-7-KNT",
     "BL-18-KNT"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Command Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Command Level II"
+   ]
   },
   {
    "name": "Exterminator",
@@ -2614,8 +3044,11 @@
     "-4C",
     "-7X"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Command Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Command Level II"
+   ]
   },
   {
    "name": "Highlander",
@@ -2631,8 +3064,11 @@
     "-733C HGN-733P",
     "-740"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Command Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Command Level II"
+   ]
   },
   {
    "name": "King Crab",
@@ -2648,8 +3084,11 @@
     "-0000",
     "-011"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Command Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Command Level II"
+   ]
   },
   {
    "name": "Mercury",
@@ -2665,8 +3104,11 @@
     "-97",
     "-105"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Command Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Command Level II"
+   ]
   },
   {
    "name": "Sentinel",
@@ -2682,8 +3124,11 @@
     "-3M",
     "-6S"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "ComStar Command Level II",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "ComStar Command Level II"
+   ]
   },
   {
    "name": "Shilone",
@@ -2697,8 +3142,11 @@
     "SL-17",
     "-17R"
    ],
-   "boxSet": "BattleTech Clan Invasion",
-   "section": "BattleTech Clan Invasion"
+   "boxSet": "Salvage Box: Shilone",
+   "section": "BattleTech Clan Invasion",
+   "boxSets": [
+    "Salvage Box: Shilone"
+   ]
   },
   {
    "name": "Archer",
@@ -2712,8 +3160,12 @@
     "ARC-2W",
     "C 2"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Clan Elemental Star / Wolf's Dragoons Assault Star",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Clan Elemental Star",
+    "Wolf's Dragoons Assault Star"
+   ]
   },
   {
    "name": "Blackjack",
@@ -2727,8 +3179,12 @@
     "BJ-2",
     "C"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Clan Elemental Star / Wolf's Dragoons Assault Star",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Clan Elemental Star",
+    "Wolf's Dragoons Assault Star"
+   ]
   },
   {
    "name": "Rifleman",
@@ -2745,8 +3201,12 @@
     "-9T",
     "C 3"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Clan Elemental Star / Wolf's Dragoons Assault Star",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Clan Elemental Star",
+    "Wolf's Dragoons Assault Star"
+   ]
   },
   {
    "name": "Timber Wolf",
@@ -2760,8 +3220,12 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Clan Elemental Star / Wolf's Dragoons Assault Star",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Clan Elemental Star",
+    "Wolf's Dragoons Assault Star"
+   ]
   },
   {
    "name": "Sagittaire",
@@ -2776,8 +3240,11 @@
     "-9D",
     "-14R"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Eridani Light Horse Hunter Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Eridani Light Horse Hunter Lance"
+   ]
   },
   {
    "name": "Banshee",
@@ -2791,8 +3258,11 @@
     "BNC-3S",
     "-12S"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Eridani Light Horse Hunter Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Eridani Light Horse Hunter Lance"
+   ]
   },
   {
    "name": "Cyclops",
@@ -2808,8 +3278,11 @@
     "-11-G",
     "C"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Eridani Light Horse Hunter Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Eridani Light Horse Hunter Lance"
+   ]
   },
   {
    "name": "Thunderbolt",
@@ -2824,8 +3297,11 @@
     "-9SE",
     "-10SE"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Eridani Light Horse Hunter Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Eridani Light Horse Hunter Lance"
+   ]
   },
   {
    "name": "Penetrator",
@@ -2841,8 +3317,11 @@
     "-6T PTR-8D",
     "-4D Christifori"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Hansen's Roughriders Battle Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Hansen's Roughriders Battle Lance"
+   ]
   },
   {
    "name": "Atlas",
@@ -2857,8 +3336,11 @@
     "AS8-K",
     "C"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Hansen's Roughriders Battle Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Hansen's Roughriders Battle Lance"
+   ]
   },
   {
    "name": "Enforcer",
@@ -2871,8 +3353,11 @@
    "models": [
     "ENF-5D"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Hansen's Roughriders Battle Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Hansen's Roughriders Battle Lance"
+   ]
   },
   {
    "name": "Hatchetman",
@@ -2885,8 +3370,11 @@
    "models": [
     "HCT-6D"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Hansen's Roughriders Battle Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Hansen's Roughriders Battle Lance"
+   ]
   },
   {
    "name": "Gunslinger",
@@ -2900,8 +3388,11 @@
     "GUN-1ERD",
     "-3ERD"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Northwind Highlanders Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Northwind Highlanders Command Lance"
+   ]
   },
   {
    "name": "Highlander",
@@ -2917,8 +3408,11 @@
     "-733C HGN-733P",
     "-740"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Northwind Highlanders Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Northwind Highlanders Command Lance"
+   ]
   },
   {
    "name": "Grasshopper",
@@ -2931,8 +3425,11 @@
    "models": [
     "GHR-5J"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Northwind Highlanders Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Northwind Highlanders Command Lance"
+   ]
   },
   {
    "name": "Warhammer",
@@ -2945,8 +3442,11 @@
    "models": [
     "WHM-7S"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Northwind Highlanders Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Northwind Highlanders Command Lance"
+   ]
   },
   {
    "name": "Nightsky",
@@ -2961,8 +3461,11 @@
     "-5T",
     "-7S"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Kell Hounds Striker Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Kell Hounds Striker Lance"
+   ]
   },
   {
    "name": "Wolfhound",
@@ -2979,8 +3482,11 @@
     "-6S",
     "-1 Allard"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Kell Hounds Striker Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Kell Hounds Striker Lance"
+   ]
   },
   {
    "name": "Griffin",
@@ -2993,8 +3499,11 @@
    "models": [
     "GRF-3M"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Kell Hounds Striker Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Kell Hounds Striker Lance"
+   ]
   },
   {
    "name": "Crusader",
@@ -3007,8 +3516,11 @@
    "models": [
     "CRD-5M"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Kell Hounds Striker Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Kell Hounds Striker Lance"
+   ]
   },
   {
    "name": "Regent",
@@ -3021,8 +3533,11 @@
    "models": [
     "Prime Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Gray Death Legion Heavy Battle Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Gray Death Legion Heavy Battle Lance"
+   ]
   },
   {
    "name": "Shadow Hawk",
@@ -3038,8 +3553,11 @@
     "-7H",
     "C"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Gray Death Legion Heavy Battle Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Gray Death Legion Heavy Battle Lance"
+   ]
   },
   {
    "name": "Gargoyle",
@@ -3052,8 +3570,11 @@
    "models": [
     "C Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Gray Death Legion Heavy Battle Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Gray Death Legion Heavy Battle Lance"
+   ]
   },
   {
    "name": "Catapult",
@@ -3067,8 +3588,11 @@
     "CPLT-K2K",
     "-K4"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Gray Death Legion Heavy Battle Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Gray Death Legion Heavy Battle Lance"
+   ]
   },
   {
    "name": "Spartan",
@@ -3083,8 +3607,11 @@
     "- N1",
     "-N4"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Snord's Irregulars Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Snord's Irregulars Assault Lance"
+   ]
   },
   {
    "name": "Rifleman",
@@ -3097,8 +3624,11 @@
    "models": [
     "RFL-3N Rifleman Sneede"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Snord's Irregulars Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Snord's Irregulars Assault Lance"
+   ]
   },
   {
    "name": "Highlander",
@@ -3111,8 +3641,11 @@
    "models": [
     "HGN-694"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Snord's Irregulars Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Snord's Irregulars Assault Lance"
+   ]
   },
   {
    "name": "Guillotine",
@@ -3129,8 +3662,11 @@
     "-5M",
     "-7M"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Snord's Irregulars Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Snord's Irregulars Assault Lance"
+   ]
   },
   {
    "name": "Battleaxe",
@@ -3144,8 +3680,11 @@
     "BKX-7K",
     "- RISC"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Proliferation Cycle Pack",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Proliferation Cycle Pack"
+   ]
   },
   {
    "name": "Ymir",
@@ -3158,8 +3697,11 @@
    "models": [
     "BWP-2B"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Proliferation Cycle Pack",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Proliferation Cycle Pack"
+   ]
   },
   {
    "name": "Coyotl",
@@ -3172,8 +3714,11 @@
    "models": [
     "Prime Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Proliferation Cycle Pack",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Proliferation Cycle Pack"
+   ]
   },
   {
    "name": "Firebee",
@@ -3186,8 +3731,11 @@
    "models": [
     "FRB-2E"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Proliferation Cycle Pack",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Proliferation Cycle Pack"
+   ]
   },
   {
    "name": "Gladiator",
@@ -3202,8 +3750,11 @@
     "-7R",
     "SF"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Proliferation Cycle Pack",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Proliferation Cycle Pack"
+   ]
   },
   {
    "name": "Icarus II",
@@ -3217,8 +3768,11 @@
     "ICR-1S",
     "-2X"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Proliferation Cycle Pack",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Proliferation Cycle Pack"
+   ]
   },
   {
    "name": "Mackie",
@@ -3231,8 +3785,11 @@
    "models": [
     "MSK-6S"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Proliferation Cycle Pack",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Proliferation Cycle Pack"
+   ]
   },
   {
    "name": "UrbanMech",
@@ -3245,8 +3802,11 @@
    "models": [
     "UM-R60L"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "UrbanMech Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "UrbanMech Lance"
+   ]
   },
   {
    "name": "UrbanMech",
@@ -3261,8 +3821,11 @@
     "- R69",
     "-R80"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "UrbanMech Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "UrbanMech Lance"
+   ]
   },
   {
    "name": "UrbanMech",
@@ -3275,8 +3838,11 @@
    "models": [
     "UM-R27"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "UrbanMech Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "UrbanMech Lance"
+   ]
   },
   {
    "name": "UrbanMech",
@@ -3289,8 +3855,11 @@
    "models": [
     "UM-R68"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "UrbanMech Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "UrbanMech Lance"
+   ]
   },
   {
    "name": "Atlas II",
@@ -3305,8 +3874,11 @@
     "- DK-H",
     "-D- H Kerensky"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Star League Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Star League Command Lance"
+   ]
   },
   {
    "name": "Phoenix Hawk",
@@ -3319,8 +3891,11 @@
    "models": [
     "PXH-1b \"Special\" PXH-1c \"Special\""
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Star League Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Star League Command Lance"
+   ]
   },
   {
    "name": "Thunder Hawk",
@@ -3334,8 +3909,11 @@
     "TDK-7X",
     "-7Z"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Star League Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Star League Command Lance"
+   ]
   },
   {
    "name": "Orion",
@@ -3348,8 +3926,11 @@
    "models": [
     "ON1-Kb Kerensky"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Star League Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Star League Command Lance"
+   ]
   },
   {
    "name": "Urbanmech LAM (Mech Mode)",
@@ -3360,8 +3941,11 @@
     "36012"
    ],
    "models": [],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Salvage Box: Urbanmech LAM",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Salvage Box: Urbanmech LAM"
+   ]
   },
   {
    "name": "Urbanmech LAM (AirMech Mode)",
@@ -3372,8 +3956,11 @@
     "36012"
    ],
    "models": [],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Salvage Box: Urbanmech LAM",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Salvage Box: Urbanmech LAM"
+   ]
   },
   {
    "name": "Urbanmech LAM (Aerospace Mode)",
@@ -3384,8 +3971,11 @@
     "36012"
    ],
    "models": [],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Salvage Box: Urbanmech LAM",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Salvage Box: Urbanmech LAM"
+   ]
   },
   {
    "name": "Coolant Truck",
@@ -3398,8 +3988,11 @@
    "models": [
     "135-K Lifesaver"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Second Star League Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Second Star League Assault Lance"
+   ]
   },
   {
    "name": "Helios",
@@ -3413,8 +4006,11 @@
     "HEL-3D",
     "-6RISC"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Second Star League Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Second Star League Assault Lance"
+   ]
   },
   {
    "name": "Argus",
@@ -3427,8 +4023,11 @@
    "models": [
     "AGS-4D"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Second Star League Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Second Star League Assault Lance"
+   ]
   },
   {
    "name": "Dire Wolf",
@@ -3441,8 +4040,11 @@
    "models": [
     "Prometheus"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Second Star League Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Second Star League Assault Lance"
+   ]
   },
   {
    "name": "Emperor",
@@ -3456,8 +4058,11 @@
     "EMP-6A",
     "-6X"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Second Star League Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Second Star League Assault Lance"
+   ]
   },
   {
    "name": "Starslayer",
@@ -3472,8 +4077,11 @@
     "-2C",
     "-4C"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "McCarron's Armored Cavalry Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "McCarron's Armored Cavalry Assault Lance"
+   ]
   },
   {
    "name": "Awesome",
@@ -3486,8 +4094,11 @@
    "models": [
     "AWS-9Q"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "McCarron's Armored Cavalry Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "McCarron's Armored Cavalry Assault Lance"
+   ]
   },
   {
    "name": "Black Knight",
@@ -3502,8 +4113,11 @@
     "BL-6b-KNT BL-7-KNT",
     "BL-18-KNT"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "McCarron's Armored Cavalry Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "McCarron's Armored Cavalry Assault Lance"
+   ]
   },
   {
    "name": "Tian-Zong",
@@ -3518,8 +4132,11 @@
     "- N2",
     "-N3"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "McCarron's Armored Cavalry Assault Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "McCarron's Armored Cavalry Assault Lance"
+   ]
   },
   {
    "name": "Blood Asp",
@@ -3532,8 +4149,11 @@
    "models": [
     "I Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Black Remnant Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Black Remnant Command Lance"
+   ]
   },
   {
    "name": "Cyclops",
@@ -3546,8 +4166,11 @@
    "models": [
     "CP-11-H"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Black Remnant Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Black Remnant Command Lance"
+   ]
   },
   {
    "name": "Flashman",
@@ -3561,8 +4184,11 @@
     "FLS-8K",
     "-10E"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Black Remnant Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Black Remnant Command Lance"
+   ]
   },
   {
    "name": "Dragon Fire",
@@ -3581,8 +4207,11 @@
     "-7K",
     "-9D"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Black Remnant Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Black Remnant Command Lance"
+   ]
   },
   {
    "name": "Hammerhead",
@@ -3595,8 +4224,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Strike Team",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Strike Team"
+   ]
   },
   {
    "name": "Havoc",
@@ -3610,8 +4242,11 @@
     "HVC-P6",
     "- P7"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Strike Team",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Strike Team"
+   ]
   },
   {
    "name": "Jackalope",
@@ -3628,8 +4263,11 @@
     "-NH",
     "-KA"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Strike Team",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Strike Team"
+   ]
   },
   {
    "name": "Kintaro",
@@ -3644,8 +4282,11 @@
     "-20",
     "-22"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Strike Team",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Strike Team"
+   ]
   },
   {
    "name": "Lament",
@@ -3658,8 +4299,11 @@
    "models": [
     "LMT-2R"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Strike Team",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Strike Team"
+   ]
   },
   {
    "name": "J-27 Ordnance Transport",
@@ -3674,8 +4318,11 @@
     "Fusion Armor",
     "RISC"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Strike Team",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Strike Team"
+   ]
   },
   {
    "name": "Excalibur",
@@ -3690,8 +4337,11 @@
     "- B2b",
     "-B2- RISC"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Battle Group",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Battle Group"
+   ]
   },
   {
    "name": "Malice",
@@ -3706,8 +4356,11 @@
     "- XV",
     "-Y-SH- LAZR"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Battle Group",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Battle Group"
+   ]
   },
   {
    "name": "Peacekeeper",
@@ -3720,8 +4373,11 @@
    "models": [
     "PKP-1A"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Battle Group",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Battle Group"
+   ]
   },
   {
    "name": "Savage Wolf",
@@ -3734,8 +4390,11 @@
    "models": [
     "A Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Battle Group",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Battle Group"
+   ]
   },
   {
    "name": "Savior Repair Vehicle",
@@ -3748,8 +4407,11 @@
    "models": [
     "Standard"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Battle Group",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Battle Group"
+   ]
   },
   {
    "name": "Wendigo",
@@ -3763,8 +4425,11 @@
     "Prime Config",
     "Wendigo- XR"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Third Star League Battle Group",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Third Star League Battle Group"
+   ]
   },
   {
    "name": "Shadow Cat",
@@ -3777,8 +4442,11 @@
    "models": [
     "I Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "21st Centauri Lancers Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "21st Centauri Lancers Command Lance"
+   ]
   },
   {
    "name": "Shockwave",
@@ -3792,8 +4460,11 @@
     "SKW-2F",
     "SKW-6H"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "21st Centauri Lancers Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "21st Centauri Lancers Command Lance"
+   ]
   },
   {
    "name": "Stalker",
@@ -3806,8 +4477,11 @@
    "models": [
     "STK-8S"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "21st Centauri Lancers Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "21st Centauri Lancers Command Lance"
+   ]
   },
   {
    "name": "Jade Hawk",
@@ -3821,8 +4495,11 @@
     "1",
     "JHK-03"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "21st Centauri Lancers Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "21st Centauri Lancers Command Lance"
+   ]
   },
   {
    "name": "Scarabus",
@@ -3836,8 +4513,11 @@
     "SCB-9A",
     "-9T"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Illician Lancers Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Illician Lancers Command Lance"
+   ]
   },
   {
    "name": "Ostroc",
@@ -3853,8 +4533,11 @@
     "-3M",
     "-6R"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Illician Lancers Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Illician Lancers Command Lance"
+   ]
   },
   {
    "name": "Ostsol",
@@ -3867,8 +4550,11 @@
    "models": [
     "OTL-9R"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Illician Lancers Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Illician Lancers Command Lance"
+   ]
   },
   {
    "name": "Ostwar",
@@ -3882,8 +4568,11 @@
     "OWR-2M",
     "-3M"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Illician Lancers Command Lance",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Illician Lancers Command Lance"
+   ]
   },
   {
    "name": "Archer",
@@ -3899,8 +4588,11 @@
     "-9R",
     "-9W"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Atlas",
@@ -3913,8 +4605,11 @@
    "models": [
     "AS7-S"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Blackjack",
@@ -3927,8 +4622,11 @@
    "models": [
     "BJ-3"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Fire Moth",
@@ -3941,8 +4639,11 @@
    "models": [
     "D Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Nova",
@@ -3956,8 +4657,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "Independent Release ForcePacks",
-   "section": "Independent Release ForcePacks"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Independent Release ForcePacks",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Locust",
@@ -3970,8 +4674,11 @@
    "models": [
     "LCT-3M"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Phoenix Hawk",
@@ -3987,8 +4694,11 @@
     "-99",
     "C 2"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Pouncer",
@@ -4002,8 +4712,11 @@
     "Prime Config",
     "T Config W Config"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Timber Wolf",
@@ -4017,8 +4730,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Warhammer",
@@ -4036,8 +4752,11 @@
     "C",
     "C 2"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Warhawk",
@@ -4050,8 +4769,11 @@
    "models": [
     "C Config"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Wasp",
@@ -4064,8 +4786,11 @@
    "models": [
     "WSP-3W"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Wraith",
@@ -4080,8 +4805,11 @@
     "TR2",
     "TR5"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Alpha Strike Boxed Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Alpha Strike Boxed Set"
+   ]
   },
   {
    "name": "Bane",
@@ -4094,8 +4822,11 @@
    "models": [
     "3"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "BattleTech Aces: Scouring Sands",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "BattleTech Aces: Scouring Sands"
+   ]
   },
   {
    "name": "Fulcrum Hovertank",
@@ -4108,8 +4839,11 @@
    "models": [
     "Standard"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "BattleTech Aces: Scouring Sands",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "BattleTech Aces: Scouring Sands"
+   ]
   },
   {
    "name": "Howler",
@@ -4122,8 +4856,11 @@
    "models": [
     "6"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "BattleTech Aces: Scouring Sands",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "BattleTech Aces: Scouring Sands"
+   ]
   },
   {
    "name": "Locust IIC",
@@ -4136,8 +4873,11 @@
    "models": [
     "4"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "BattleTech Aces: Scouring Sands",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "BattleTech Aces: Scouring Sands"
+   ]
   },
   {
    "name": "Marauder IIC",
@@ -4150,8 +4890,11 @@
    "models": [
     "6"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "BattleTech Aces: Scouring Sands",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "BattleTech Aces: Scouring Sands"
+   ]
   },
   {
    "name": "Rifleman",
@@ -4164,8 +4907,11 @@
    "models": [
     "C 2"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "BattleTech Aces: Scouring Sands",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "BattleTech Aces: Scouring Sands"
+   ]
   },
   {
    "name": "Summoner",
@@ -4178,8 +4924,11 @@
    "models": [
     "H Config"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "BattleTech Aces: Scouring Sands",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "BattleTech Aces: Scouring Sands"
+   ]
   },
   {
    "name": "Thunderbolt IIC",
@@ -4192,8 +4941,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "BattleTech Aces: Scouring Sands",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "BattleTech Aces: Scouring Sands"
+   ]
   },
   {
    "name": "Timber Wolf (Mad Cat)",
@@ -4207,8 +4959,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Mercenary Kickstarter Bonus 100mm Timber Wolf (Mad Cat)",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Mercenary Kickstarter Bonus 100mm Timber Wolf (Mad Cat)"
+   ]
   },
   {
    "name": "Devastator",
@@ -4223,8 +4978,11 @@
     "-2-EC",
     "-11"
    ],
-   "boxSet": "Alpha Strike",
-   "section": "Alpha Strike"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Alpha Strike",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Flea",
@@ -4239,8 +4997,11 @@
     "-20",
     "-21"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Firefly",
@@ -4256,8 +5017,11 @@
     "-4D",
     "-5A"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Caesar",
@@ -4271,8 +5035,11 @@
     "CES-3R",
     "-5R"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Quickdraw",
@@ -4287,8 +5054,11 @@
     "-5M",
     "-9G"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Starslayer",
@@ -4303,8 +5073,11 @@
     "-2C",
     "-4C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Ostsol",
@@ -4321,8 +5094,11 @@
     "-8F",
     "C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Chameleon",
@@ -4337,8 +5113,11 @@
     "-8V",
     "-9V"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Maxim",
@@ -4352,8 +5131,11 @@
     "Standard",
     "Escort"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Galleon",
@@ -4371,8 +5153,11 @@
     "-201",
     "C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Mercenaries Box Set",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Mercenaries Box Set"
+   ]
   },
   {
    "name": "Firestarter",
@@ -4387,8 +5172,11 @@
     "-A",
     "-N \"Mirage II\""
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Recon Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Recon Lance"
+   ]
   },
   {
    "name": "Javelin",
@@ -4402,8 +5190,11 @@
     "JVN-10N",
     "-12N"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Recon Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Recon Lance"
+   ]
   },
   {
    "name": "Ostscout",
@@ -4420,8 +5211,11 @@
     "-8J",
     "-12R"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Recon Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Recon Lance"
+   ]
   },
   {
    "name": "Spector",
@@ -4435,8 +5229,11 @@
     "SPR-5F",
     "-6F"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Recon Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Recon Lance"
+   ]
   },
   {
    "name": "Cicada",
@@ -4450,8 +5247,11 @@
     "CDA-2A",
     "-4A"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Pursuit Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Pursuit Lance"
+   ]
   },
   {
    "name": "Clint",
@@ -4467,8 +5267,11 @@
     "-2-3UL CLNT-3-3T",
     "-3-4T"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Pursuit Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Pursuit Lance"
+   ]
   },
   {
    "name": "Dervish",
@@ -4483,8 +5286,11 @@
     "-7D",
     "-11DK"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Pursuit Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Pursuit Lance"
+   ]
   },
   {
    "name": "Hermes II",
@@ -4501,8 +5307,11 @@
     "-5Sr",
     "-7A"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Pursuit Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Pursuit Lance"
+   ]
   },
   {
    "name": "Skulker",
@@ -4518,8 +5327,11 @@
     "Mk. II",
     "C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Recon & Hunter Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Recon & Hunter Lance"
+   ]
   },
   {
    "name": "Warrior",
@@ -4533,8 +5345,11 @@
     "H-7",
     "-7F"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Recon & Hunter Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Recon & Hunter Lance"
+   ]
   },
   {
    "name": "Behemoth",
@@ -4549,8 +5364,11 @@
     "Refit",
     "Davion"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Recon & Hunter Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Recon & Hunter Lance"
+   ]
   },
   {
    "name": "Ontos",
@@ -4564,8 +5382,11 @@
     "Standard",
     "Chemical Laser"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Recon & Hunter Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Recon & Hunter Lance"
+   ]
   },
   {
    "name": "JagerMech",
@@ -4581,8 +5402,11 @@
     "-DDa JM7-D",
     "- DD"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Security Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Security Lance"
+   ]
   },
   {
    "name": "Scorpion",
@@ -4599,8 +5423,11 @@
     "-12S",
     "C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Security Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Security Lance"
+   ]
   },
   {
    "name": "Vulcan",
@@ -4617,8 +5444,11 @@
     "-6M",
     "-7T"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Security Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Security Lance"
+   ]
   },
   {
    "name": "Whitworth",
@@ -4632,8 +5462,11 @@
     "WTH-1",
     "-2H"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Security Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Security Lance"
+   ]
   },
   {
    "name": "Black Python White Raven",
@@ -4646,8 +5479,11 @@
    "models": [
     "(Black Python) 1 (White Raven) 1"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Cavalry Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Cavalry Star"
+   ]
   },
   {
    "name": "Shadow Hawk IIC",
@@ -4661,8 +5497,11 @@
     "1",
     "11"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Cavalry Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Cavalry Star"
+   ]
   },
   {
    "name": "Griffin IIC",
@@ -4675,8 +5514,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Cavalry Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Cavalry Star"
+   ]
   },
   {
    "name": "Jenner IIC",
@@ -4689,8 +5531,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Cavalry Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Cavalry Star"
+   ]
   },
   {
    "name": "Locust IIC",
@@ -4704,8 +5549,11 @@
     "1",
     "10"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Cavalry Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Cavalry Star"
+   ]
   },
   {
    "name": "Demolisher",
@@ -4721,8 +5569,11 @@
     "Mk II Fuel Cell",
     "Reinforced"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Assault & Cavalry Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Assault & Cavalry Lances"
+   ]
   },
   {
    "name": "Schrek",
@@ -4736,8 +5587,11 @@
     "Standard",
     "XL"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Assault & Cavalry Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Assault & Cavalry Lances"
+   ]
   },
   {
    "name": "Condor",
@@ -4752,8 +5606,11 @@
     "LAC",
     "Ultra"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Assault & Cavalry Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Assault & Cavalry Lances"
+   ]
   },
   {
    "name": "Pegasus",
@@ -4768,8 +5625,11 @@
     "3058 Upgrade Sealed",
     "MML"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Assault & Cavalry Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Assault & Cavalry Lances"
+   ]
   },
   {
    "name": "Pillager",
@@ -4783,8 +5643,11 @@
     "PLG-3Z",
     "-6Z"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Assault Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Assault Lance"
+   ]
   },
   {
    "name": "Goliath",
@@ -4798,8 +5661,11 @@
     "GOL-1H",
     "-3M"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Assault Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Assault Lance"
+   ]
   },
   {
    "name": "Shogun",
@@ -4816,8 +5682,11 @@
     "C 2",
     "C 3"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Assault Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Assault Lance"
+   ]
   },
   {
    "name": "Hoplite",
@@ -4832,8 +5701,11 @@
     "-4C",
     "-5C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Assault Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Assault Lance"
+   ]
   },
   {
    "name": "Charger",
@@ -4847,8 +5719,11 @@
     "CGR-1A1",
     "C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Heavy Recon Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Heavy Recon Lance"
+   ]
   },
   {
    "name": "Ostroc",
@@ -4864,8 +5739,11 @@
     "-3M",
     "-6R"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Heavy Recon Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Heavy Recon Lance"
+   ]
   },
   {
    "name": "Merlin",
@@ -4880,8 +5758,11 @@
     "-1D",
     "C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Heavy Recon Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Heavy Recon Lance"
+   ]
   },
   {
    "name": "Assassin",
@@ -4895,8 +5776,11 @@
     "ASN-21",
     "-109"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Heavy Recon Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Heavy Recon Lance"
+   ]
   },
   {
    "name": "Manticore",
@@ -4910,8 +5794,11 @@
     "Standard",
     "XL"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Battle & Fire Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Battle & Fire Lances"
+   ]
   },
   {
    "name": "Vedette",
@@ -4927,8 +5814,11 @@
     "LB-X",
     "Armor"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Battle & Fire Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Battle & Fire Lances"
+   ]
   },
   {
    "name": "LRM Carrier -or- SRM Carrier",
@@ -4945,8 +5835,11 @@
     "C -or- Standard",
     "C"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Battle & Fire Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Battle & Fire Lances"
+   ]
   },
   {
    "name": "Bane",
@@ -4960,8 +5853,11 @@
     "1",
     "6"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Direct Fire Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Direct Fire Star"
+   ]
   },
   {
    "name": "Highlander IIC",
@@ -4976,8 +5872,11 @@
     "3",
     "4"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Direct Fire Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Direct Fire Star"
+   ]
   },
   {
    "name": "Phoenix Hawk IIC",
@@ -4990,8 +5889,11 @@
    "models": [
     "1"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Direct Fire Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Direct Fire Star"
+   ]
   },
   {
    "name": "Grizzly",
@@ -5005,8 +5907,11 @@
     "1",
     "3"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Direct Fire Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Direct Fire Star"
+   ]
   },
   {
    "name": "Rifleman IIC",
@@ -5020,8 +5925,11 @@
     "1",
     "10"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Clan Direct Fire Star",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Clan Direct Fire Star"
+   ]
   },
   {
    "name": "Inner Sphere Standard Battle Armor",
@@ -5035,8 +5943,11 @@
     "Standard",
     "Magnetic"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Inner Sphere Battle Armor Platoon",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Inner Sphere Battle Armor Platoon"
+   ]
   },
   {
    "name": "Mobile Long Tom",
@@ -5051,8 +5962,11 @@
     "LT- MOB-25",
     "-25F"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Objectives",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Objectives"
+   ]
   },
   {
    "name": "Mobile HQ",
@@ -5067,8 +5981,11 @@
     "ICE",
     "Browning"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Objectives",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Objectives"
+   ]
   },
   {
    "name": "MASH Truck",
@@ -5083,8 +6000,11 @@
     "ICE",
     "AMS"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Objectives",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Objectives"
+   ]
   },
   {
    "name": "Devastator",
@@ -5099,8 +6019,11 @@
     "-2-EC",
     "-11"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors II Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors II Pack"
+   ]
   },
   {
    "name": "Charger",
@@ -5114,8 +6037,11 @@
     "CGR-3K",
     "-1A9"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors II Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors II Pack"
+   ]
   },
   {
    "name": "Marauder",
@@ -5135,8 +6061,11 @@
     "-7R",
     "C Red Hunter (3146)"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors II Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors II Pack"
+   ]
   },
   {
    "name": "Caesar",
@@ -5149,8 +6078,11 @@
    "models": [
     "CSR-3R Archangel"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors II Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors II Pack"
+   ]
   },
   {
    "name": "SM1 Tank Destroyer",
@@ -5164,8 +6096,11 @@
     "SM1",
     "SM1B"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors II Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors II Pack"
+   ]
   },
   {
    "name": "Marauder",
@@ -5178,8 +6113,11 @@
    "models": [
     "Bounty Hunter (3015) Bounty H t"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors III Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors III Pack"
+   ]
   },
   {
    "name": "Warhammer",
@@ -5192,8 +6130,11 @@
    "models": [
     "WHM-9K"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors III Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors III Pack"
+   ]
   },
   {
    "name": "Griffin",
@@ -5207,8 +6148,11 @@
     "GRF-2N",
     "-2N2"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors III Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors III Pack"
+   ]
   },
   {
    "name": "Timber Wolf",
@@ -5222,8 +6166,11 @@
     "Bounty Hunter",
     "S Config"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors III Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors III Pack"
+   ]
   },
   {
    "name": "Loki Mk II",
@@ -5237,8 +6184,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors III Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors III Pack"
+   ]
   },
   {
    "name": "Marauder II",
@@ -5251,8 +6201,11 @@
    "models": [
     "Bounty Hunter"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Legendary MechWarriors III Pack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Legendary MechWarriors III Pack"
+   ]
   },
   {
    "name": "Hetzer",
@@ -5269,8 +6222,11 @@
     "LB-X Fuel Cell",
     "Clan"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Rifle & Command Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Rifle & Command Lances"
+   ]
   },
   {
    "name": "Bulldog",
@@ -5285,8 +6241,11 @@
     "ERLL Plasma",
     "Chemical"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Rifle & Command Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Rifle & Command Lances"
+   ]
   },
   {
    "name": "SturmFeur",
@@ -5300,8 +6259,11 @@
     "Standard",
     "Cell"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Rifle & Command Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Rifle & Command Lances"
+   ]
   },
   {
    "name": "Von Luckner",
@@ -5315,8 +6277,11 @@
     "VNL-K65N",
     "-K90"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Rifle & Command Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Rifle & Command Lances"
+   ]
   },
   {
    "name": "Patton",
@@ -5331,8 +6296,11 @@
     "Taurian",
     "XL"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Heavy Battle & Sweep Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Heavy Battle & Sweep Lances"
+   ]
   },
   {
    "name": "Pike",
@@ -5346,8 +6314,11 @@
     "Standard",
     "LB-X"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Heavy Battle & Sweep Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Heavy Battle & Sweep Lances"
+   ]
   },
   {
    "name": "J. Edgar",
@@ -5363,8 +6334,11 @@
     "ICE Light PPC",
     "Machine Gun X-Pulse"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Heavy Battle & Sweep Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Heavy Battle & Sweep Lances"
+   ]
   },
   {
    "name": "Drillson",
@@ -5380,8 +6354,11 @@
     "C",
     "MML"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Battlefield Support: Heavy Battle & Sweep Lances",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Battlefield Support: Heavy Battle & Sweep Lances"
+   ]
   },
   {
    "name": "Axman",
@@ -5394,8 +6371,11 @@
    "models": [
     "AXM-2N"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Somerset Strikers ForcePack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Somerset Strikers ForcePack"
+   ]
   },
   {
    "name": "Mauler",
@@ -5415,8 +6395,11 @@
     "-C LMN-1PT5",
     "DCMS- MX90-D"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Somerset Strikers ForcePack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Somerset Strikers ForcePack"
+   ]
   },
   {
    "name": "Bushwacker",
@@ -5430,8 +6413,11 @@
     "BSW-X1",
     "-X4"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Somerset Strikers ForcePack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Somerset Strikers ForcePack"
+   ]
   },
   {
    "name": "Hatamoto- Chi",
@@ -5446,8 +6432,11 @@
     "-26T",
     "-30T"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Somerset Strikers ForcePack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Somerset Strikers ForcePack"
+   ]
   },
   {
    "name": "Wolfhound",
@@ -5460,8 +6449,11 @@
    "models": [
     "WLF-1B"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Somerset Strikers ForcePack",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Somerset Strikers ForcePack"
+   ]
   },
   {
    "name": "Visigoth",
@@ -5474,8 +6466,11 @@
    "models": [
     "Prime Config"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Salvage Box: Visigoth",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Salvage Box: Visigoth"
+   ]
   },
   {
    "name": "Savannah Master",
@@ -5489,8 +6484,11 @@
     "Standard",
     "Reflective"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Salvage Box: Savannah Master",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Salvage Box: Savannah Master"
+   ]
   },
   {
    "name": "Blood Asp",
@@ -5504,8 +6502,11 @@
     "Prime Config",
     "T Config"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "Salvage Box: Blood Asp (Star Adder)",
+   "section": "Mercenaries",
+   "boxSets": [
+    "Salvage Box: Blood Asp (Star Adder)"
+   ]
   },
   {
    "name": "Enforcer",
@@ -5518,8 +6519,11 @@
    "models": [
     "ENF-5R"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "BattleTech: House Davion Cavalry Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "BattleTech: House Davion Cavalry Lance"
+   ]
   },
   {
    "name": "Gunsmith",
@@ -5532,8 +6536,11 @@
    "models": [
     "CH11-NG"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "BattleTech: House Davion Cavalry Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "BattleTech: House Davion Cavalry Lance"
+   ]
   },
   {
    "name": "Hellspawn",
@@ -5547,8 +6554,11 @@
     "HSN-7D",
     "-8E"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "BattleTech: House Davion Cavalry Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "BattleTech: House Davion Cavalry Lance"
+   ]
   },
   {
    "name": "Legionnaire",
@@ -5563,8 +6573,11 @@
     "-2K",
     "-2K- RISC"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "BattleTech: House Davion Cavalry Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "BattleTech: House Davion Cavalry Lance"
+   ]
   },
   {
    "name": "Thanatos",
@@ -5579,8 +6592,11 @@
     "-7D",
     "-7D2"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "BattleTech: House Davion Heavy Battle Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "BattleTech: House Davion Heavy Battle Lance"
+   ]
   },
   {
    "name": "Falconer",
@@ -5593,8 +6609,11 @@
    "models": [
     "FLC-8R"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "BattleTech: House Davion Heavy Battle Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "BattleTech: House Davion Heavy Battle Lance"
+   ]
   },
   {
    "name": "Templar",
@@ -5608,8 +6627,11 @@
     "TLR1-O",
     "- ORISC"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "BattleTech: House Davion Heavy Battle Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "BattleTech: House Davion Heavy Battle Lance"
+   ]
   },
   {
    "name": "Thunderbolt",
@@ -5622,8 +6644,11 @@
    "models": [
     "TDR-9NAIS"
    ],
-   "boxSet": "Mercenaries",
-   "section": "Mercenaries"
+   "boxSet": "BattleTech: House Davion Heavy Battle Lance",
+   "section": "Mercenaries",
+   "boxSets": [
+    "BattleTech: House Davion Heavy Battle Lance"
+   ]
   },
   {
    "name": "Avatar",
@@ -5636,8 +6661,11 @@
    "models": [
     "AV1-O"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "BattleTech: House Kurita Ranger Lance",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "BattleTech: House Kurita Ranger Lance"
+   ]
   },
   {
    "name": "Chimera",
@@ -5650,8 +6678,11 @@
    "models": [
     "CMA-1S"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "BattleTech: House Kurita Ranger Lance",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "BattleTech: House Kurita Ranger Lance"
+   ]
   },
   {
    "name": "Panther",
@@ -5668,8 +6699,11 @@
     "-C",
     "-CA"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "BattleTech: House Kurita Ranger Lance",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "BattleTech: House Kurita Ranger Lance"
+   ]
   },
   {
    "name": "Venom",
@@ -5682,8 +6716,11 @@
    "models": [
     "SDR-9K"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "BattleTech: House Kurita Ranger Lance",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "BattleTech: House Kurita Ranger Lance"
+   ]
   },
   {
    "name": "Akuma",
@@ -5696,8 +6733,11 @@
    "models": [
     "AKU-2XC"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "BattleTech: House Kurita Command Lance",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "BattleTech: House Kurita Command Lance"
+   ]
   },
   {
    "name": "Grand Dragon",
@@ -5710,8 +6750,11 @@
    "models": [
     "DRG-10K"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "BattleTech: House Kurita Command Lance",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "BattleTech: House Kurita Command Lance"
+   ]
   },
   {
    "name": "Rokurokubi",
@@ -5724,8 +6767,11 @@
    "models": [
     "RK-4T"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "BattleTech: House Kurita Command Lance",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "BattleTech: House Kurita Command Lance"
+   ]
   },
   {
    "name": "Shiro",
@@ -5738,8 +6784,11 @@
    "models": [
     "SH-1V"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "BattleTech: House Kurita Command Lance",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "BattleTech: House Kurita Command Lance"
+   ]
   },
   {
    "name": "Black Knight",
@@ -5751,7 +6800,8 @@
     "BL-9-KNT \"Clanbuster\""
    ],
    "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "section": "Faction Force Packs",
+   "boxSets": []
   },
   {
    "name": "Stormcrow",
@@ -5763,8 +6813,11 @@
     "B Config",
     "K Config TC Config"
    ],
-   "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "boxSet": "Salvage Box: Clan Invasion",
+   "section": "Faction Force Packs",
+   "boxSets": [
+    "Salvage Box: Clan Invasion"
+   ]
   },
   {
    "name": "Wolfhound IIC",
@@ -5776,7 +6829,8 @@
     "\"Grinner\""
    ],
    "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "section": "Faction Force Packs",
+   "boxSets": []
   },
   {
    "name": "Timber Wolf",
@@ -5788,7 +6842,8 @@
     "TC Config"
    ],
    "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "section": "Faction Force Packs",
+   "boxSets": []
   },
   {
    "name": "Hammerhead",
@@ -5800,7 +6855,8 @@
     "1"
    ],
    "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "section": "Faction Force Packs",
+   "boxSets": []
   },
   {
    "name": "Eris",
@@ -5812,7 +6868,8 @@
     "ERS-2N"
    ],
    "boxSet": "Faction Force Packs",
-   "section": "Faction Force Packs"
+   "section": "Faction Force Packs",
+   "boxSets": []
   },
   {
    "name": "Phoenix Hawk",
@@ -5827,7 +6884,8 @@
     "C 2"
    ],
    "boxSet": "Premium Miniatures",
-   "section": "Premium Miniatures"
+   "section": "Premium Miniatures",
+   "boxSets": []
   },
   {
    "name": "Rifleman",
@@ -5843,7 +6901,8 @@
     "C 3"
    ],
    "boxSet": "Premium Miniatures",
-   "section": "Premium Miniatures"
+   "section": "Premium Miniatures",
+   "boxSets": []
   },
   {
    "name": "Mad Dog",
@@ -5856,7 +6915,8 @@
     "T Config"
    ],
    "boxSet": "Premium Miniatures",
-   "section": "Premium Miniatures"
+   "section": "Premium Miniatures",
+   "boxSets": []
   },
   {
    "name": "Wolverine",
@@ -5871,7 +6931,8 @@
     "-10R"
    ],
    "boxSet": "Premium Miniatures",
-   "section": "Premium Miniatures"
+   "section": "Premium Miniatures",
+   "boxSets": []
   },
   {
    "name": "BattleMaster",
@@ -5885,7 +6946,8 @@
     "C 3"
    ],
    "boxSet": "Premium Miniatures",
-   "section": "Premium Miniatures"
+   "section": "Premium Miniatures",
+   "boxSets": []
   },
   {
    "name": "Nova Cat",
@@ -5898,7 +6960,8 @@
     "T Config"
    ],
    "boxSet": "Premium Miniatures",
-   "section": "Premium Miniatures"
+   "section": "Premium Miniatures",
+   "boxSets": []
   },
   {
    "name": "Black Knight",
@@ -5910,7 +6973,8 @@
     "BL-9-KNT \"Clanbuster\""
    ],
    "boxSet": "Premium Miniatures",
-   "section": "Premium Miniatures"
+   "section": "Premium Miniatures",
+   "boxSets": []
   },
   {
    "name": "Stormcrow",
@@ -5923,7 +6987,8 @@
     "K Config TC Config"
    ],
    "boxSet": "Premium Miniatures",
-   "section": "Premium Miniatures"
+   "section": "Premium Miniatures",
+   "boxSets": []
   }
  ]
 }
