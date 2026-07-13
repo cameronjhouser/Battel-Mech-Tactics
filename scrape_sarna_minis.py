@@ -168,6 +168,8 @@ def parse_one_table(lines: list[str], start: int, section: str, entries: list[di
                 cols.setdefault("model", idx)
             elif hl == "name" or "name" in hl:
                 cols.setdefault("name", idx)
+            elif hl == "year":
+                cols.setdefault("year", idx)
             elif "box" in hl or "set" in hl or "pack" in hl:
                 cols.setdefault("boxset", idx)
         header_cells.clear()
@@ -181,7 +183,7 @@ def parse_one_table(lines: list[str], start: int, section: str, entries: list[di
             return
         get = lambda key: cells[cols[key]] if key in cols and cols[key] < len(cells) else ""
         name = get("name")
-        base, catalog, model, boxset = get("base"), get("catalog"), get("model"), get("boxset")
+        base, catalog, model, boxset, year = get("base"), get("catalog"), get("model"), get("boxset"), get("year")
         if not name or not (base or catalog):
             return
         entries.append({
@@ -191,6 +193,7 @@ def parse_one_table(lines: list[str], start: int, section: str, entries: list[di
             "models": split_multi(model),
             "boxSets": split_boxsets(boxset),
             "boxSet": boxset,  # legacy/display: original joined cell text
+            "year": year,
             "section": section,
         })
 
@@ -225,21 +228,42 @@ def parse_one_table(lines: list[str], start: int, section: str, entries: list[di
 
 # ── Output ───────────────────────────────────────────────────────────────────
 
+def derive_years(entries: list[dict]) -> tuple[dict, dict]:
+    """pack name -> release year, and catalog number -> release year (for
+    entries with no verified pack name), first-seen-wins per key. Real
+    products consistently list one year per row across all their minis."""
+    pack_years: dict[str, str] = {}
+    catalog_years: dict[str, str] = {}
+    for e in entries:
+        year = e.get("year", "")
+        if not year:
+            continue
+        for name in e.get("boxSets") or []:
+            pack_years.setdefault(name, year)
+        if not e.get("boxSets"):
+            for cat in e.get("catalogNumbers", []):
+                catalog_years.setdefault(cat, year)
+    return pack_years, catalog_years
+
+
 def write_outputs(entries: list[dict], out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
+    pack_years, catalog_years = derive_years(entries)
     doc = {
         "source": "https://www.sarna.net/wiki/Miniatures_-_Catalyst_Game_Labs",
         "attribution": "Data from Sarna BattleTechWiki (CC BY-NC-SA); miniatures by Catalyst Game Labs.",
         "fetched": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "entries": entries,
+        "packYears": pack_years,
+        "catalogYears": catalog_years,
     }
     (out_dir / "sarna-minis.json").write_text(json.dumps(doc, indent=1), encoding="utf-8")
     with (out_dir / "sarna-minis.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["Name", "Base Numbers", "Catalog Numbers", "Models", "Box Sets", "Section"])
+        w.writerow(["Name", "Base Numbers", "Catalog Numbers", "Models", "Box Sets", "Year", "Section"])
         for e in entries:
             w.writerow([e["name"], " / ".join(e["baseNumbers"]), " / ".join(e["catalogNumbers"]),
-                        " / ".join(e["models"]), " / ".join(e["boxSets"]), e["section"]])
+                        " / ".join(e["models"]), " / ".join(e["boxSets"]), e["year"], e["section"]])
     print(f"Wrote {len(entries)} entries to {out_dir}/sarna-minis.json and .csv")
 
 
@@ -307,6 +331,14 @@ def selftest() -> int:
     c = by_name.get("Commando", {})
     check(c.get("baseNumbers") == [], f"Commando base (classics, none): {c.get('baseNumbers')}")
     check(c.get("catalogNumbers") == ["35000"], f"Commando catalog: {c.get('catalogNumbers')}")
+    check(g.get("year") == "2019", f"Griffin year: {g.get('year')}")
+    check(c.get("year") == "2007", f"Commando year (no Year column match ambiguity): {c.get('year')}")
+
+    pack_years, catalog_years = derive_years(entries)
+    check(pack_years.get("Beginner Box") == "2019", f"Beginner Box pack year: {pack_years.get('Beginner Box')}")
+    check(pack_years.get("A Game of Armored Combat") == "2019",
+          f"A Game of Armored Combat pack year: {pack_years.get('A Game of Armored Combat')}")
+    check(catalog_years.get("35000") == "2007", f"Commando catalog-fallback year: {catalog_years.get('35000')}")
 
     if failures:
         print("SELFTEST FAILED:")
