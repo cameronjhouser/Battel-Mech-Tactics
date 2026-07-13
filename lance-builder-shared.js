@@ -605,7 +605,8 @@ async function sbManualSearch() {
     box.innerHTML = sbManualResults.length
       ? sbManualResults.map((u, i) =>
         `<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 10px;border-bottom:1px solid var(--border);align-items:center">
-          <span style="font-size:12px;min-width:0">${lbEsc(u.Name)}
+          ${sbImgUrl(u) ? `<img class="sb-mini-thumb" src="${lbEsc(sbImgUrl(u))}" alt="" loading="lazy">` : ''}
+          <span style="font-size:12px;min-width:0;flex:1 1 auto">${lbEsc(u.Name)}
             <span style="color:var(--text3);font-size:10px">${lbEsc(u.Type?.Name || '')} · ${u.BFPointValue || '?'} PV</span></span>
           <button class="lb-btn-sm" style="padding:1px 10px;flex-shrink:0" onclick="sbManualAdd(${i})">Add</button>
         </div>`).join('')
@@ -613,6 +614,13 @@ async function sbManualSearch() {
   } catch (_) {
     box.innerHTML = '<div style="padding:6px 10px;font-size:11px;color:var(--red)">Search failed — MUL unreachable.</div>';
   }
+}
+
+// A MUL unit's image URL, safe to embed on an https page: MUL often hands
+// back http:// URLs, which a browser on an https site silently refuses to
+// load (mixed content) — same host serves them fine over https.
+function sbImgUrl(u) {
+  return String(u?.ImageUrl || '').replace(/^http:\/\//i, 'https://');
 }
 
 function sbManualAdd(i) {
@@ -626,9 +634,9 @@ function sbManualAdd(i) {
     rec.count = (rec.count || 1) + n;
     if (!rec.name) rec.name = u.Name;
     if (!rec.type) rec.type = u.Type?.Name || '';
-    if (!rec.img) rec.img = u.ImageUrl || '';
+    if (!rec.img) rec.img = sbImgUrl(u);
   } else {
-    sbCollection[key] = { name: u.Name, type: u.Type?.Name || '', base: '', count: n, img: u.ImageUrl || '' };
+    sbCollection[key] = { name: u.Name, type: u.Type?.Name || '', base: '', count: n, img: sbImgUrl(u) };
   }
   sbTypeLookupTried.add(key); // this record's type/image is already authoritative — skip passive backfill
   const resultsEl = document.getElementById('sb-manual-results');
@@ -708,7 +716,10 @@ function sbAddPack() {
       rec.count = (rec.count || 1) + 1;
       if (!rec.base && e.baseNumbers?.length) rec.base = e.baseNumbers[0];
       if (!rec.name) rec.name = e.name;
-      if (!rec.type) { rec.type = sbGuessType(e, pack.label); toVerify.push(e); }
+      if (!rec.type) rec.type = sbGuessType(e, pack.label);
+      // Look up even when the record already has a type — it may still be
+      // missing its image, and the MUL answer carries both.
+      if (!rec.type || !rec.img) toVerify.push(e);
     } else {
       sbCollection[key] = { name: e.name, type: sbGuessType(e, pack.label), base: e.baseNumbers?.[0] || '', count: 1, img: '' };
       toVerify.push(e);
@@ -778,7 +789,7 @@ async function sbLookupUnitInfo(name, models) {
           const tail = sbNorm(u.Name).replace(en, '').trim();
           return tail && modelKeys.some(m => tail === m || tail.includes(m) || m.includes(tail));
         });
-        if (byModel) return { type: byModel.Type.Name, img: byModel.ImageUrl || '' };
+        if (byModel) return { type: byModel.Type.Name, img: sbImgUrl(byModel) };
       }
     } catch { /* try the next variant */ }
   }
@@ -786,7 +797,7 @@ async function sbLookupUnitInfo(name, models) {
   const types = [...new Set(allCands.map(c => c.u.Type.Name))];
   if (types.length !== 1) return { type: '', img: '' };
   const withImg = allCands.find(c => c.u.ImageUrl) || allCands[0];
-  return { type: types[0], img: withImg.u.ImageUrl || '' };
+  return { type: types[0], img: sbImgUrl(withImg.u) };
 }
 
 // Verify freshly pack-added records' types/images against the MUL in the
@@ -812,14 +823,16 @@ async function sbFillPackTypes(entries) {
   if (changed) { sbRenderCollection(); sbRenderBrowse(); }
 }
 
-// Passive backfill for ANY collection record missing a type — CSV uploads
-// and saved lists carry no MUL-verified type at all, so search for it in
-// the background the same way pack-add does, once per record per session
-// (sbTypeLookupTried avoids re-hitting the MUL every time the collection
-// re-renders). Called from sbCollectionChanged.
+// Passive backfill for ANY collection record missing a type OR an image —
+// CSV uploads and saved lists carry neither, and lists typed by earlier
+// versions still lack images. Searches the MUL in the background the same
+// way pack-add does, once per record per session (sbTypeLookupTried avoids
+// re-hitting the MUL every time the collection re-renders). Called from
+// sbCollectionChanged.
 let sbTypeLookupTried = new Set();
 async function sbBackfillMissingTypes() {
-  const keys = Object.keys(sbCollection).filter(k => !sbCollection[k].type && !sbTypeLookupTried.has(k));
+  const keys = Object.keys(sbCollection).filter(k =>
+    (!sbCollection[k].type || !sbCollection[k].img) && !sbTypeLookupTried.has(k));
   if (!keys.length) return;
   keys.forEach(k => sbTypeLookupTried.add(k));
   let changed = false;
