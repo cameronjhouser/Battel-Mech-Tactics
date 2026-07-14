@@ -3133,6 +3133,29 @@ const RS_WEAPON_STATS = {
   'Electronic Warfare Equipment': [2,0,'–','–','–','–','–'], 'Communications Equipment': [1,0,'–','–','–','–','–'],
   'C3 Computer (Slave)': [1,0,'–','–','–','–','–'], 'C3 Computer (Master)': [5,0,'–','–','–','–','–'],
   'Improved C3 Computer': [2,0,'–','–','–','–','–'], 'Targeting Computer': [1,0,'–','–','–','–','–'],
+  // Below sourced directly from MegaMek's own weapon classes (megamek/common/weapons/**)
+  // to match Total Warfare/Tac Ops values exactly rather than by recollection.
+  'Plasma Rifle': [2,10,10,0,5,10,15],
+  'Machine Gun Array': [1,0,2,0,1,2,3], 'Light Machine Gun Array': [1,0,1,0,2,4,6], 'Heavy Machine Gun Array': [1,0,3,0,1,2,2],
+  'Small Re-engineered Laser': [1,4,4,0,1,2,3], 'Medium Re-engineered Laser': [2,6,6,0,3,6,9], 'Large Re-engineered Laser': [5,9,9,0,5,10,15],
+  'Large X-Pulse Laser': [2,14,9,0,5,10,15],
+  'Silver Bullet Gauss Rifle': [7,1,15,2,7,15,22],
+  'Binary Laser (Blazer) Cannon': [4,16,12,0,5,10,15],
+  'Bombast Laser': [3,12,12,0,5,10,15],
+  'RISC Hyper Laser': [6,24,20,0,8,15,25],
+  'Rifle (Cannon, Light)': [1,1,3,0,4,8,12], 'Rifle (Cannon, Medium)': [2,2,6,1,5,10,15], 'Rifle (Cannon, Heavy)': [3,4,9,2,6,12,18],
+  'Improved Heavy Gauss Rifle': [11,2,22,3,6,12,19],
+  'Primitive Prototype PPC': [3,15,10,3,6,12,18],
+  'Prototype ER Large Laser': [2,12,8,0,7,14,19],
+  'Enhanced LRM-5': [2,2,'1/hit',3,7,14,21], 'Enhanced LRM-10': [4,4,'1/hit',3,7,14,21], 'Enhanced LRM-15': [6,5,'1/hit',3,7,14,21],
+  'Extended LRM-10': [4,6,'1/hit',10,12,22,38], 'Extended LRM-15': [6,8,'1/hit',10,12,22,38], 'Extended LRM-20': [8,10,'1/hit',10,12,22,38],
+  "'Mech Mortar-1": [1,1,'4/hit',6,7,14,21], "'Mech Mortar-2": [2,2,'4/hit',6,7,14,21],
+  "'Mech Mortar-4": [3,5,'4/hit',6,7,14,21], "'Mech Mortar-8": [5,10,'4/hit',6,7,14,21],
+  'HVAC/2': [2,1,2,3,10,20,35], 'HVAC/5': [4,3,5,0,8,16,28], 'HVAC/10': [6,7,10,0,6,12,20],
+  'TSEMP Cannon': [5,10,'Special',0,5,10,15], 'TSEMP One-Shot': [3,10,'Special',0,5,10,15], 'TSEMP Repeating Cannon': [7,10,'Special',0,5,10,15],
+  'Vehicular Grenade Launcher': [1,1,0,0,1,1,1],
+  'Thunderbolt-5': [1,3,5,5,6,12,18], 'Thunderbolt-10': [2,5,10,5,6,12,18],
+  'Thunderbolt-15': [3,7,15,5,6,12,18], 'Thunderbolt-20': [5,8,20,5,6,12,18],
 };
 
 // Ammo shots-per-ton (TechManual): used to render "Ammo (X) n/n" like the
@@ -3166,7 +3189,48 @@ const RS_WEAPON_STATS_CLAN = {
   'Anti-Missile System': [1,1,'–',0,1,2,3], 'Narc Missile Beacon': [1,0,'–',0,4,8,12],
   'Targeting Computer': [1,0,'–','–','–','–','–'], 'ECM Suite': [1,0,'–','–','–','–','–'],
   'Active Probe': [1,0,'–','–','–','–','–'],
+  // Sourced from MegaMek's Clan weapon classes (megamek/common/weapons/**/clan/**).
+  'Streak LRM-5': [1,2,'1/hit',0,7,14,21], 'Streak LRM-10': [2,4,'1/hit',0,7,14,21],
+  'Streak LRM-15': [3,5,'1/hit',0,7,14,21], 'Streak LRM-20': [5,6,'1/hit',0,7,14,21],
+  'ProtoMech AC/2': [2,1,2,0,7,14,20], 'ProtoMech AC/4': [3,1,4,0,5,10,15], 'ProtoMech AC/8': [4,2,8,0,3,7,10],
+  'Improved SRM-6': [2,4,'2/hit',0,4,8,12],
+  'Improved LRM-15': [2,5,'1/hit',6,7,14,21], 'Improved LRM-20': [4,6,'1/hit',6,7,14,21],
+  'Enhanced PPC': [3,15,12,0,7,14,23],
+  'Small Chemical Laser': [1,1,3,0,1,2,3], 'Medium Chemical Laser': [1,2,5,0,3,6,9], 'Large Chemical Laser': [2,6,8,0,5,10,15],
+  'Prototype ER Small Laser (CP)': [1,2,3,0,2,4,5], 'Prototype ER Medium Laser (CP)': [1,5,5,0,4,8,12],
+  "'Mech Mortar-2": [1,2,'4/hit',6,7,14,21], "'Mech Mortar-4": [2,5,'4/hit',6,7,14,21], "'Mech Mortar-8": [3,10,'4/hit',6,7,14,21],
 };
+
+// Renames/aliases for equipment names that either use an undecoded short
+// code (MGA, "Proto Mech AC 8") or whose stats are IDENTICAL to an existing
+// table entry in this simplified model (confirmed against MegaMek's weapon
+// source — e.g. "Improved Heavy Medium Laser" carries the same dmg/heat/
+// range as "Heavy Medium Laser"; only its to-hit/ammo-mode rules differ).
+const RS_WEAPON_ALIASES = {
+  'Proto Mech AC 8': 'ProtoMech AC/8', 'Proto Mech AC 2': 'ProtoMech AC/2', 'Proto Mech AC 4': 'ProtoMech AC/4',
+  'ERMedium Laser Prototype': 'ER Medium Laser',
+  'Improved ATM-3': 'ATM-3', 'Improved ATM-9': 'ATM-9', 'Improved ATM-12': 'ATM-12',
+  'Improved Gauss Rifle': 'Gauss Rifle',
+  'Improved Heavy Small Laser': 'Heavy Small Laser', 'Improved Heavy Medium Laser': 'Heavy Medium Laser', 'Improved Heavy Large Laser': 'Heavy Large Laser',
+  'MGA': 'Machine Gun Array', 'LMGA': 'Light Machine Gun Array', 'HMGA': 'Heavy Machine Gun Array',
+};
+
+// Normalizes equipment-name spelling quirks from the MTF/.blk source data
+// before a RS_WEAPON_STATS(_CLAN) lookup: hyphenates "Streak SRM 6" style
+// space-separated launcher sizes (with an optional tech-modifier prefix),
+// strips one-shot suffix tags (identical dmg/range to the base launcher),
+// and resolves the short-code/identical-stat aliases above.
+function rsNormalizeWeaponName(raw) {
+  let s = String(raw || '').trim();
+  s = s.replace(/\s*\((?:I-OS|OS)\)\s*$/i, '');
+  s = s.replace(/^((?:Streak|Enhanced|Extended|Improved|Prototype)\s+)?(LRM|SRM|MRM|MML|ATM|iATM)[ -](\d+)$/i,
+    (m, mod, fam, n) => (mod || '') + fam + '-' + n);
+  s = s.replace(/^Thunderbolt[ -](\d+)$/i, 'Thunderbolt-$1');
+  s = s.replace(/^(LRM|SRM|MRM|MML|ATM)[ -]?(\d+)\s*I?OS$/i, (m, fam, n) => fam + '-' + n);
+  s = s.replace(/^(Rocket Launcher \d+)Prototype$/i, '$1');
+  s = s.replace(/^SRT[ -]?(\d+)$/i, 'SRM-$1').replace(/^LRT[ -]?(\d+)$/i, 'LRM-$1');
+  return RS_WEAPON_ALIASES[s] || s;
+}
 
 const RS_AMMO_SHOTS = {
   'AC/2':45,'Autocannon/2':45,'Light AC/2':45,'Ultra AC/2':45,'Rotary AC/2':45,'LB 2-X AC':45,
@@ -3245,7 +3309,7 @@ function rsCleanEquipName(raw) {
     if ((m = s.match(/^@\s*/))) { s = s.slice(m[0].length); continue; }
     break;
   }
-  return { base: s.trim(), rear };
+  return { base: rsNormalizeWeaponName(s.trim()), rear };
 }
 function rsAmmoBaseName(base) {
   return base.replace(/\s*\([^)]*\)\s*$/, '').trim();
@@ -5066,13 +5130,30 @@ function vWedge(n, cx, y0, rows, sp = 28) {
   if (i < n) out += vPips(n - i, cx, y, 8, sp);
   return out;
 }
+// Ascending row-width sequence (3, 4, 5, ... maxPerRow, maxPerRow, ...) sized
+// to fully cover `n` pips at `maxPerRow` columns — unlike a fixed literal
+// row list, this never silently drops pips when armor is heavier than the
+// sequence anticipated.
+function vGrowRows(n, maxPerRow) {
+  if (n <= 0) return [];
+  const rows = [];
+  let covered = 0, w = 3;
+  while (covered < n) {
+    const row = Math.min(w, maxPerRow);
+    rows.push(row);
+    covered += row;
+    if (w < maxPerRow) w++;
+  }
+  rows[rows.length - 1] -= covered - n; // trim overshoot so rows sum to exactly n
+  return rows;
+}
 
 // Weapon range stats for the inventory table. vehicle-data.json stores names
 // only ("Autocannon/5", "SRM-4") — resolve against the shared stats tables,
 // with the Clan overrides when the unit's tech base is Clan.
 function vWeaponStats(name, techBase) {
   const clan = /clan|mixed/i.test(techBase || '');
-  let base = name.replace(/^Vehicle /, ''); // "Vehicle Flamer" -> "Flamer"
+  let base = rsNormalizeWeaponName(name.replace(/^Vehicle /, '')); // "Vehicle Flamer" -> "Flamer"
   return (clan && RS_WEAPON_STATS_CLAN[base]) || RS_WEAPON_STATS[base] || null;
 }
 
@@ -5114,13 +5195,14 @@ function vDataBox(v) {
     const ry = gY + 430 + pitch * k - (33 - pitch);
     if (k % 2 === 0) svg += `<rect x="${gX + 15}" y="${ry - fs - 2}" width="670" height="${pitch - 1}" fill="rgb(215,215,215)"/>`;
     svg += T(wc[0] + 10, ry, fs, 100, 'middle', e.qty);
+    const dispName = rsNormalizeWeaponName(e.name.replace(/^Vehicle /, ''));
     const nameW = wc[2] - wc[1] - 14;
-    const squeeze = e.name.length * fs * 0.48 > nameW ? ` textLength="${nameW}" lengthAdjust="spacingAndGlyphs"` : '';
-    svg += `<text x="${wc[1]}" y="${ry}" font-family="sans-serif" font-size="${fs}" font-weight="100" text-anchor="start"${squeeze}>${esc(e.name)}</text>`;
+    const squeeze = dispName.length * fs * 0.48 > nameW ? ` textLength="${nameW}" lengthAdjust="spacingAndGlyphs"` : '';
+    svg += `<text x="${wc[1]}" y="${ry}" font-family="sans-serif" font-size="${fs}" font-weight="100" text-anchor="start"${squeeze}>${esc(dispName)}</text>`;
     svg += T(wc[2] + 20, ry, fs, 100, 'middle', esc(e.loc));
     const st = vWeaponStats(e.name, v.techBase);
     if (st) {
-      const wm = RS_TOHIT_MODS[e.name.replace(/^Vehicle /, '')];
+      const wm = RS_TOHIT_MODS[rsNormalizeWeaponName(e.name.replace(/^Vehicle /, ''))];
       let mod = (wm && !wm[2]) ? wm[0] : 0;
       const star = wm && wm[2];
       if (hasTC && st[2] !== '—') mod -= 1; // direct-fire weapon with TC
@@ -5134,7 +5216,7 @@ function vDataBox(v) {
   });
   const condReasons = [];
   rows.forEach(e => {
-    const wm = RS_TOHIT_MODS[e.name.replace(/^Vehicle /, '')];
+    const wm = RS_TOHIT_MODS[rsNormalizeWeaponName(e.name.replace(/^Vehicle /, ''))];
     if (wm && wm[2]) {
       const line = (wm[0] > 0 ? '+' + wm[0] : wm[0]) + ' — ' + wm[1] + ' (stacks with the Mod shown)';
       if (!condReasons.includes(line)) condReasons.push(line);
@@ -5311,9 +5393,35 @@ function rsVehicleSheetSVG(v, opts) {
 
   const cx = aX + 365, top = aY + 210;
   const hover = /hover|wige/i.test(v.motion || '');
-  const hw = hover ? 205 : 175;         // half-width — hover hulls read wider
-  const hh = 730;                        // hull height
-  const ch = hover ? 90 : 60;            // corner chamfer
+  const baseHw = hover ? 205 : 175;      // half-width floor — hover hulls read wider
+  const baseCh = hover ? 90 : 60;        // corner chamfer floor
+
+  // Widen the hull for heavily-armored vehicles so front/rear wedges and the
+  // turret pip grid always have room — a fixed hull width silently dropped
+  // rear pips past ~33 armor and crushed the turret box into the label above
+  // it once armor got into the 50s/60s (superheavy-ish tonnage).
+  const TARGET_ROWS = 7; // aim for ~7 wedge rows before growing wider
+  const frontPerRow = Math.max(6, Math.ceil((a.front || 0) / TARGET_ROWS));
+  const rearPerRow = Math.max(6, Math.ceil((a.rear || 0) / TARGET_ROWS));
+  const maxPerRow = Math.min(16, Math.max(frontPerRow, rearPerRow));
+  const hw = Math.max(baseHw, Math.ceil((maxPerRow * 28) / 2) + 40);
+  const ch = Math.min(baseCh * (hw / baseHw), hw * 0.35);
+  const widened = hw - baseHw; // extra half-width to fold into skirt spacing too
+
+  // Turret pip grid also gets wider (not just taller) as armor grows, using
+  // the same extra width so a big turret value doesn't tower over the hull.
+  const turretCols = a.turret != null ? Math.min(10, Math.max(5, Math.ceil(Math.sqrt((a.turret || 1) * 1.8)))) : 5;
+  const tRows = a.turret != null ? Math.max(1, Math.ceil((a.turret || 0) / turretCols)) : 0;
+  const tBoxW = Math.max(156, turretCols * 26 + 30);
+  const tBoxH = tRows * 26 + 30;
+  const plinthTopHalf = Math.max(105, tBoxW / 2 + 25);
+  const plinthBottomHalf = Math.max(82, tBoxW / 2 + 10);
+  const plinthBottomY = top + 255 + Math.max(250, tBoxH + 80);
+
+  // Hull height grows too if the (now possibly taller) turret plinth or the
+  // rear wedge's row count needs more room than the default hull provides.
+  const rearRowCount = Math.ceil((a.rear || 0) / maxPerRow) || 1;
+  const hh = Math.max(730, (plinthBottomY - top) + rearRowCount * 28 + 160);
 
   svg += T(cx, top - 35, 27, 700, 'middle', `Front Armor ( ${a.front} )`);
 
@@ -5322,19 +5430,20 @@ function rsVehicleSheetSVG(v, opts) {
       L ${cx + hw} ${top + hh - ch} L ${cx + hw - ch} ${top + hh} L ${cx - hw + ch} ${top + hh} L ${cx - hw} ${top + hh - ch} Z"
       fill="none" stroke="#000" stroke-width="6"/>`;
   // glacis lines: hull front corners converging toward the turret plinth
-  svg += `<line x1="${cx - hw + ch}" y1="${top + 4}" x2="${cx - 95}" y2="${top + 250}" stroke="#000" stroke-width="4"/>`;
-  svg += `<line x1="${cx + hw - ch}" y1="${top + 4}" x2="${cx + 95}" y2="${top + 250}" stroke="#000" stroke-width="4"/>`;
+  svg += `<line x1="${cx - hw + ch}" y1="${top + 4}" x2="${cx - plinthTopHalf + 10}" y2="${top + 250}" stroke="#000" stroke-width="4"/>`;
+  svg += `<line x1="${cx + hw - ch}" y1="${top + 4}" x2="${cx + plinthTopHalf - 10}" y2="${top + 250}" stroke="#000" stroke-width="4"/>`;
   // rear lines converging from bottom corners up toward the hull middle
   svg += `<line x1="${cx - hw + ch}" y1="${top + hh - 4}" x2="${cx - 80}" y2="${top + hh - 210}" stroke="#000" stroke-width="4"/>`;
   svg += `<line x1="${cx + hw - ch}" y1="${top + hh - 4}" x2="${cx + 80}" y2="${top + hh - 210}" stroke="#000" stroke-width="4"/>`;
 
-  // front pips: wedge widening downward inside the glacis
-  svg += vWedge(a.front, cx, top + 45, [3, 4, 5, 6, 7, 8]);
+  // front pips: ascending wedge widening downward inside the glacis, sized
+  // to the (possibly widened) hull so it never overflows the outline
+  svg += vWedge(a.front, cx, top + 45, vGrowRows(a.front || 0, maxPerRow));
 
   // gray side skirts with 2-col pip strips
   const skirtY = top + 195, skirtH = hh - 400;
   [[-1, 'Left Side Armor', a.left], [1, 'Right Side Armor', a.right]].forEach(([s, label, val]) => {
-    const sx = cx + s * (hw - 60);
+    const sx = cx + s * (hw - 60 - widened * 0.3);
     svg += `<rect rx="10" ry="10" x="${sx - 34}" y="${skirtY}" width="68" height="${skirtH}" fill="${V_GRAY}" stroke="#000" stroke-width="3"/>`;
     const rows = Math.ceil(val / 2);
     const sp = Math.min(28, Math.floor((skirtH - 30) / Math.max(rows, 1)));
@@ -5344,25 +5453,23 @@ function rsVehicleSheetSVG(v, opts) {
         text-anchor="middle" transform="rotate(${s * 90} ${lx} ${top + hh / 2})">${label} ( ${val} )</text>`;
   });
 
-  // turret plinth (gray trapezoid) + turret with barrel + pips
+  // turret plinth (gray trapezoid) + turret with barrel + pips — sized to
+  // fully contain the pip grid regardless of how large the turret value is
   if (a.turret != null) {
-    svg += `<path d="M ${cx - 105} ${top + 255} L ${cx + 105} ${top + 255} L ${cx + 82} ${top + 505} L ${cx - 82} ${top + 505} Z"
+    svg += `<path d="M ${cx - plinthTopHalf} ${top + 255} L ${cx + plinthTopHalf} ${top + 255} L ${cx + plinthBottomHalf} ${plinthBottomY} L ${cx - plinthBottomHalf} ${plinthBottomY} Z"
         fill="${V_GRAY}" stroke="#000" stroke-width="4"/>`;
-    svg += T(cx, top + 222, 27, 700, 'middle', `Turret Armor ( ${a.turret} )`);
+    svg += T(cx, top + 210, 27, 700, 'middle', `Turret Armor ( ${a.turret} )`);
     svg += `<rect x="${cx - 8}" y="${top + 262}" width="16" height="44" fill="#fff" stroke="#000" stroke-width="4"/>`;
-    const tRows = Math.max(1, Math.ceil((a.turret || 0) / 5));
-    const tBoxH = tRows * 26 + 30;
-    svg += `<rect rx="12" ry="12" x="${cx - 78}" y="${top + 306}" width="156" height="${tBoxH}" fill="#fff" stroke="#000" stroke-width="4"/>`;
-    svg += vPips(a.turret, cx, top + 332, 5, 26);
+    svg += `<rect rx="12" ry="12" x="${cx - tBoxW / 2}" y="${top + 306}" width="${tBoxW}" height="${tBoxH}" fill="#fff" stroke="#000" stroke-width="4"/>`;
+    svg += vPips(a.turret, cx, top + 332, turretCols, 26);
   }
 
-  // rear pips: wedge narrowing toward the tail (drawn bottom-up so the
-  // narrowest row sits nearest the tail)
-  const rearRows = [8, 7, 6, 5, 4, 3];
-  let rem = a.rear, rowsUsed = [];
-  for (const r of rearRows) { if (rem <= 0) break; rowsUsed.push(Math.min(r, rem)); rem -= r; }
+  // rear pips: ascending wedge narrowing toward the tail (drawn bottom-up so
+  // the narrowest row sits nearest the tail); sized the same way as the
+  // front wedge so no armor value can silently go undrawn
+  const rowsUsed = vGrowRows(a.rear || 0, maxPerRow).reverse();
   let ry = top + hh - 60 - (rowsUsed.length - 1) * 28;
-  rowsUsed.reverse().forEach(inRow => {
+  rowsUsed.forEach(inRow => {
     for (let c = 0; c < inRow; c++) {
       const x = cx - ((inRow - 1) * 28) / 2 + c * 28;
       svg += `<circle cx="${x}" cy="${ry}" r="11" fill="#fff" stroke="#000" stroke-width="3"/>`;
