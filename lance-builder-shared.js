@@ -3211,6 +3211,11 @@ const RS_TOHIT_MODS = {
   'Small Pulse Laser': [-2, 'Pulse laser'], 'Medium Pulse Laser': [-2, 'Pulse laser'], 'Large Pulse Laser': [-2, 'Pulse laser'],
   'Small X-Pulse Laser': [-2, 'Pulse laser'], 'Medium X-Pulse Laser': [-2, 'Pulse laser'], 'Large X-Pulse Laser': [-2, 'Pulse laser'],
   'ER Small Pulse Laser': [-2, 'Pulse laser'], 'ER Medium Pulse Laser': [-2, 'Pulse laser'], 'ER Large Pulse Laser': [-2, 'Pulse laser'],
+  'Micro Pulse Laser': [-2, 'Pulse laser'],
+  'Heavy Small Laser': [1, 'Heavy laser'], 'Heavy Medium Laser': [1, 'Heavy laser'], 'Heavy Large Laser': [1, 'Heavy laser'],
+  'Small VSP Laser': [-1, 'Variable-speed pulse (−3 Sht/−2 Med/−1 Lng)', true],
+  'Medium VSP Laser': [-1, 'Variable-speed pulse (−3 Sht/−2 Med/−1 Lng)', true],
+  'Large VSP Laser': [-1, 'Variable-speed pulse (−3 Sht/−2 Med/−1 Lng)', true],
   'MRM-10': [1, 'MRM launcher'], 'MRM-20': [1, 'MRM launcher'], 'MRM-30': [1, 'MRM launcher'], 'MRM-40': [1, 'MRM launcher'],
   'Rocket Launcher 10': [1, 'Rocket launcher (one-shot)'], 'Rocket Launcher 15': [1, 'Rocket launcher (one-shot)'], 'Rocket Launcher 20': [1, 'Rocket launcher (one-shot)'],
   'LB 2-X AC': [-1, 'Firing cluster ammunition', true], 'LB 5-X AC': [-1, 'Firing cluster ammunition', true],
@@ -5020,6 +5025,483 @@ function lbDownloadCards() {
   }
 }
 
+// ═══ COMBAT VEHICLE record sheets (ground + VTOL) ═══════════════════════════
+// Self-drawn sheets for Combat Vehicles, fed by sheets/vehicle-data.json
+// (built offline by build_vehicle_sheet_data.py from the MegaMek .blk
+// database). Layout modeled on the official CGL sheets: chamfered hull with
+// gray skirts + turret plinth for ground vehicles; nose/rotor-beam/tail-boom
+// plus an Elevation Track for VTOLs. Reuses the mech sheet's primitives
+// (rsGroupBox, rsT, rsDie) and weapon stats tables on the same 2000x2600
+// canvas.
+
+const V_GRAY = '#c8c8c8';
+
+const vChk = (x, y, s = 26) =>
+  `<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="#fff" stroke="#000" stroke-width="3"/>`;
+const vPipBox = (x, y, txt) => vChk(x, y) + rsT(x + 13, y + 20, 20, 700, 'middle', txt, '#000');
+
+// Open-circle pip cluster: rows of `perRow`, centered on cx.
+function vPips(n, cx, y0, perRow, sp = 28) {
+  let out = '';
+  for (let i = 0; i < n; i++) {
+    const row = Math.floor(i / perRow), inRow = Math.min(n - row * perRow, perRow);
+    const x = cx - ((inRow - 1) * sp) / 2 + (i % perRow) * sp;
+    out += `<circle cx="${x}" cy="${y0 + row * sp}" r="11" fill="#fff" stroke="#000" stroke-width="3"/>`;
+  }
+  return out;
+}
+// Wedge cluster: row widths grow (or shrink) toward the hull's wide end.
+function vWedge(n, cx, y0, rows, sp = 28) {
+  let out = '', i = 0, y = y0;
+  for (const perRow of rows) {
+    const inRow = Math.min(perRow, n - i);
+    if (inRow <= 0) break;
+    for (let c = 0; c < inRow; c++) {
+      const x = cx - ((inRow - 1) * sp) / 2 + c * sp;
+      out += `<circle cx="${x}" cy="${y}" r="11" fill="#fff" stroke="#000" stroke-width="3"/>`;
+    }
+    i += inRow; y += sp;
+  }
+  // overflow (huge armor): plain rows below
+  if (i < n) out += vPips(n - i, cx, y, 8, sp);
+  return out;
+}
+
+// Weapon range stats for the inventory table. vehicle-data.json stores names
+// only ("Autocannon/5", "SRM-4") — resolve against the shared stats tables,
+// with the Clan overrides when the unit's tech base is Clan.
+function vWeaponStats(name, techBase) {
+  const clan = /clan|mixed/i.test(techBase || '');
+  let base = name.replace(/^Vehicle /, ''); // "Vehicle Flamer" -> "Flamer"
+  return (clan && RS_WEAPON_STATS_CLAN[base]) || RS_WEAPON_STATS[base] || null;
+}
+
+// ── Shared top-left boxes (both layouts) ────────────────────────────────────
+function vDataBox(v) {
+  const esc = lbEsc, T = rsT;
+  let svg = '';
+  const gX = 10, gY = 110, gH = 1030;
+  svg += rsGroupBox(gX, gY, 700, gH, 'Vehicle Data');
+  svg += T(gX + 10, gY + 78, 30, 700, 'start', 'Type:') + T(gX + 105, gY + 78, 30, 500, 'start', esc(v.name));
+  svg += T(gX + 15, gY + 125, 28, 700, 'start', 'Movement Points:');
+  svg += rsDie(gX + 25, gY + 145, 30, '#ffffff', '#000000', 1)
+    + T(gX + 230, gY + 170, 28, 700, 'end', 'Cruising:') + T(gX + 250, gY + 170, 28, 500, 'start', esc(v.cruise));
+  svg += rsDie(gX + 25, gY + 182, 30, '#000000', '#ffffff', 2)
+    + T(gX + 230, gY + 207, 28, 700, 'end', 'Flanking:') + T(gX + 250, gY + 207, 28, 500, 'start', esc(v.flank));
+  svg += T(gX + 15, gY + 255, 28, 700, 'start', 'Movement Type:') + T(gX + 245, gY + 255, 28, 500, 'start', esc(v.motion));
+  svg += T(gX + 15, gY + 295, 28, 700, 'start', 'Engine Type:') + T(gX + 245, gY + 295, 28, 500, 'start', esc(v.engine));
+  svg += T(gX + 355, gY + 125, 26, 700, 'start', 'Tonnage:') + T(gX + 680, gY + 125, 26, 500, 'end', esc(v.tons));
+  svg += T(gX + 355, gY + 165, 26, 700, 'start', 'Tech Base:') + T(gX + 680, gY + 165, 26, 500, 'end', esc(v.techBase));
+  svg += T(gX + 355, gY + 205, 26, 700, 'start', 'Rules Level:') + T(gX + 680, gY + 205, 26, 500, 'end', esc(v.rules || '—'));
+  svg += T(gX + 355, gY + 245, 26, 700, 'start', 'Role:') + T(gX + 680, gY + 245, 26, 500, 'end', esc(v.role || '—'));
+  if (v.jump) svg += T(gX + 355, gY + 285, 26, 700, 'start', 'Jumping MP:') + T(gX + 680, gY + 285, 26, 500, 'end', esc(v.jump));
+
+  svg += T(gX + 15, gY + 355, 30, 700, 'start', 'Weapons & Equipment Inventory');
+  svg += T(gX + 565, gY + 355, 24, 500, 'start', '(hexes)');
+  const wc = [25, 75, 330, 388, 446, 504, 556, 608, 656].map(o => gX + o);
+  ['Qty', 'Type', 'Loc', 'Mod', 'Dmg', 'Min', 'Sht', 'Med', 'Lng'].forEach((hh, k) =>
+    svg += T(wc[k], gY + 395, 24, 700, 'start', hh));
+  const rows = v.equipment || [];
+  // The Targeting Computer's -1 stacks with each weapon's own to-hit
+  // modifier (pulse laser -2 becomes -3; a Clan heavy laser's +1 becomes 0).
+  const hasTC = rows.some(e => /Targeting Computer/i.test(e.name));
+  // Rows live between gY+430 and the ammo line; compress pitch (and font)
+  // only when a heavy loadout wouldn't fit at the default 33px.
+  const availH = (gY + gH - 150) - (gY + 406);
+  const pitch = Math.min(33, Math.floor(availH / Math.max(rows.length, 1)));
+  const fs = Math.min(24, pitch - 6);
+  rows.forEach((e, k) => {
+    const ry = gY + 430 + pitch * k - (33 - pitch);
+    if (k % 2 === 0) svg += `<rect x="${gX + 15}" y="${ry - fs - 2}" width="670" height="${pitch - 1}" fill="rgb(215,215,215)"/>`;
+    svg += T(wc[0] + 10, ry, fs, 100, 'middle', e.qty);
+    const nameW = wc[2] - wc[1] - 14;
+    const squeeze = e.name.length * fs * 0.48 > nameW ? ` textLength="${nameW}" lengthAdjust="spacingAndGlyphs"` : '';
+    svg += `<text x="${wc[1]}" y="${ry}" font-family="sans-serif" font-size="${fs}" font-weight="100" text-anchor="start"${squeeze}>${esc(e.name)}</text>`;
+    svg += T(wc[2] + 20, ry, fs, 100, 'middle', esc(e.loc));
+    const st = vWeaponStats(e.name, v.techBase);
+    if (st) {
+      const wm = RS_TOHIT_MODS[e.name.replace(/^Vehicle /, '')];
+      let mod = (wm && !wm[2]) ? wm[0] : 0;
+      const star = wm && wm[2];
+      if (hasTC && st[2] !== '—') mod -= 1; // direct-fire weapon with TC
+      const modTxt = (mod > 0 ? '+' + mod : mod < 0 ? String(mod) : '—') + (star ? '*' : '');
+      svg += T(wc[3] + 20, ry, fs, mod !== 0 ? 700 : 100, 'middle', modTxt);
+      [st[2], st[3] === 0 ? '—' : st[3], st[4], st[5], st[6]].forEach((cell, j) =>
+        svg += T(wc[4 + j] + 22, ry, fs, 100, 'middle', esc(cell)));
+    } else {
+      for (let j = 0; j < 6; j++) svg += T(wc[3 + j] + 20, ry, fs, 100, 'middle', '—');
+    }
+  });
+  const condReasons = [];
+  rows.forEach(e => {
+    const wm = RS_TOHIT_MODS[e.name.replace(/^Vehicle /, '')];
+    if (wm && wm[2]) {
+      const line = (wm[0] > 0 ? '+' + wm[0] : wm[0]) + ' — ' + wm[1] + ' (stacks with the Mod shown)';
+      if (!condReasons.includes(line)) condReasons.push(line);
+    }
+  });
+  condReasons.slice(0, 2).forEach((ln, k) =>
+    svg += T(gX + 15, gY + gH - 196 + 26 * k, 19, 100, 'start', '*' + ln));
+  if (v.ammo) {
+    const parts = String(v.ammo).match(/.{1,58}(, |$)|.+/g) || [v.ammo];
+    parts.slice(0, 4).forEach((ln, k) => svg += T(gX + 15, gY + gH - 140 + 28 * k, 24, 500, 'start', esc(ln.trim())));
+  }
+  svg += T(gX + 15, gY + gH - 30, 30, 700, 'start', 'BV:') + T(gX + 80, gY + gH - 30, 30, 500, 'start', esc(v.bv || '—'));
+  return svg;
+}
+
+function vCrewBox(v, pilot) {
+  const T = rsT, esc = lbEsc;
+  const pX = 725, pY = 110;
+  const isV = v.motion === 'VTOL';
+  let svg = rsGroupBox(pX, pY, 520, 250, 'Crew Data');
+  svg += T(pX + 15, pY + 80, 28, 700, 'start', 'Crew:');
+  svg += `<line x1="${pX + 105}" y1="${pY + 84}" x2="${pX + 490}" y2="${pY + 84}" stroke="#000" stroke-width="2"/>`;
+  if (pilot && pilot.name) svg += T(pX + 110, pY + 76, 26, 500, 'start', esc(pilot.name));
+  svg += T(pX + 15, pY + 130, 28, 700, 'start', 'Gunnery Skill: ' + esc(pilot?.gunnery ?? '___'));
+  svg += T(pX + 270, pY + 130, 28, 700, 'start', 'Driving Skill: ' + esc(pilot?.driving ?? '___'));
+  svg += T(pX + 15, pY + 185, 25, 500, 'start', isV ? 'Co-Pilot Hit' : 'Commander Hit') + vPipBox(pX + 210, pY + 163, '+1');
+  svg += T(pX + 270, pY + 185, 25, 500, 'start', isV ? 'Pilot Hit' : 'Driver Hit') + vPipBox(pX + 415, pY + 163, '+2');
+  svg += T(pX + 15, pY + 220, 17, 100, 'start', 'Modifier to all Skill rolls');
+  svg += T(pX + 270, pY + 220, 17, 100, 'start', 'Modifier to Driving Skill rolls');
+  return svg;
+}
+
+// Unit image box — sits below Critical Damage, filling the column down to
+// where the rules tables begin (bottomY), showing `image` if available.
+function vImageBox(image, critBottomY, bottomY) {
+  const iX = 725, iY = critBottomY + 20;
+  const iw = 520, ih = bottomY - iY;
+  let svg = rsGroupBox(iX, iY, iw, ih, 'Unit Image');
+  if (image) {
+    const pad = 14, ax = iX + pad, ay = iY + 50, aw = iw - pad * 2, ah = ih - 50 - pad;
+    svg += `<image href="${lbEsc(image)}" x="${ax}" y="${ay}" width="${aw}" height="${ah}" preserveAspectRatio="xMidYMid meet"/>`;
+  } else {
+    svg += rsT(iX + iw / 2, iY + ih / 2, 24, 500, 'middle', 'No image available', '#888');
+  }
+  return svg;
+}
+
+function vFooter(W, H) {
+  return rsT(W / 2, H - 60, 19, 100, 'middle', '© The Topps Company, Inc. Classic BattleTech, BattleTech, ’Mech and BattleMech are trademarks of The Topps Company, Inc. All rights reserved.')
+    + rsT(W / 2, H - 34, 19, 100, 'middle', 'Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of InMediaRes Productions, LLC. Permission to photocopy for personal use.');
+}
+
+// ── Ground rules tables (hit location / motive damage / crit hits) ──────────
+function vGroundTables(v) {
+  const T = rsT;
+  let svg = '';
+  const hX = 10, hY = 1160;
+  svg += rsGroupBox(hX, hY, 985, 640, 'Ground Combat Vehicle Hit Location Table');
+  svg += T(hX + 492, hY + 78, 26, 700, 'middle', 'ATTACK DIRECTION');
+  const hitCols = [70, 330, 610, 860].map(o => hX + o);
+  ['2D6 Roll', 'FRONT', 'REAR', 'SIDE§'].forEach((hh, k) => svg += T(hitCols[k], hY + 118, 25, 700, 'middle', hh));
+  const HIT_ROWS = [
+    ['2*', 'Front (critical)', 'Rear (critical)', 'Side (critical)'],
+    ['3', 'Front†', 'Rear†', 'Side†'],
+    ['4', 'Front†', 'Rear†', 'Side†'],
+    ['5', 'Right Side†', 'Left Side†', 'Front†'],
+    ['6', 'Front', 'Rear', 'Side'],
+    ['7', 'Front', 'Rear', 'Side'],
+    ['8', 'Front', 'Rear', 'Side (critical)*'],
+    ['9', 'Left Side†', 'Right Side†', 'Rear†'],
+    ['10', 'Turret', 'Turret', 'Turret'],
+    ['11', 'Turret', 'Turret', 'Turret'],
+    ['12*', 'Turret (critical)', 'Turret (critical)', 'Turret (critical)'],
+  ];
+  HIT_ROWS.forEach((r, k) => r.forEach((cell, j) =>
+    svg += T(hitCols[j], hY + 155 + 30 * k, 23, j ? 100 : 500, 'middle', cell)));
+  [
+    '*A result of 2 or 12 (or an 8 if the attack strikes the side) may inflict a critical hit on the vehicle. Apply damage normally to',
+    'the armor in that section; the attacking player then rolls once on the Ground Combat Vehicle Critical Hits Table below.',
+    'A result of 12 with no turret indicates a chance of a critical hit on the side corresponding to the attack direction.',
+    '†The vehicle may suffer motive system damage even if its armor remains intact. Apply damage normally, then roll once',
+    'on the Motive System Damage Table at right; apply at the end of the phase in which the damage takes effect.',
+    '§Side hits strike the side indicated by the attack direction. With no turret, a turret hit strikes the side attacked.',
+  ].forEach((ln, k) => svg += T(hX + 30, hY + 500 + 24 * k, 18, 100, 'start', ln));
+
+  const mX = 1005, mY = 1160;
+  svg += rsGroupBox(mX, mY, 985, 640, 'Motive System Damage Table');
+  svg += T(mX + 80, mY + 80, 25, 700, 'middle', '2D6 Roll');
+  svg += T(mX + 190, mY + 80, 25, 700, 'start', 'EFFECT*');
+  const MOTIVE_ROWS = [
+    ['2–5', ['No effect']],
+    ['6–7', ['Minor damage; +1 modifier to all Driving Skill Rolls']],
+    ['8–9', ['Moderate damage; –1 Cruising MP, +2 modifier to all', 'Driving Skill Rolls']],
+    ['10–11', ['Heavy damage; only half Cruising MP (round fractions up),', '+3 modifier to all Driving Skill Rolls']],
+    ['12+', ['Major damage; no movement for the rest of the game.', 'Vehicle is immobile.']],
+  ];
+  let my = mY + 120;
+  MOTIVE_ROWS.forEach(([roll, lines]) => {
+    svg += T(mX + 80, my, 24, 500, 'middle', roll);
+    lines.forEach((ln, j) => svg += T(mX + 190, my + j * 27, 23, 100, 'start', ln));
+    my += 27 * lines.length + 8;
+  });
+  svg += T(mX + 30, my + 15, 24, 700, 'start', 'Attack Direction Modifier:');
+  svg += T(mX + 60, my + 48, 23, 100, 'start', 'Hit from rear') + T(mX + 400, my + 48, 23, 100, 'end', '+1');
+  svg += T(mX + 60, my + 76, 23, 100, 'start', 'Hit from the sides') + T(mX + 400, my + 76, 23, 100, 'end', '+2');
+  svg += T(mX + 520, my + 15, 24, 700, 'start', 'Vehicle Type Modifiers:');
+  [['Tracked', '+0'], ['Wheeled', '+2'], ['Hovercraft', '+3'], ['WiGE', '+4']].forEach(([t, mm], k) => {
+    const bold = t.toLowerCase().startsWith((v.motion || '').toLowerCase()) ? 700 : 100;
+    svg += T(mX + 550, my + 48 + 28 * k, 23, bold, 'start', t) + T(mX + 900, my + 48 + 28 * k, 23, bold, 'end', mm);
+  });
+  [
+    '*All movement and Driving Skill Roll penalties are cumulative, but each Driving Skill Roll modifier can only be applied',
+    'once (maximum +6 total). Motive system damage takes effect at the end of the phase in which the damage occurred.',
+    'If Cruising MP is reduced to 0, the unit cannot move but is not an immobile target. A hover vehicle rendered immobile',
+    'over a Depth 1 water hex sinks and is destroyed.',
+  ].forEach((ln, k) => svg += T(mX + 30, my + 185 + 24 * k, 18, 100, 'start', ln));
+
+  const kX = 10, kY = 1840;
+  svg += rsGroupBox(kX, kY, 1980, 600, 'Ground Combat Vehicle Critical Hits Table');
+  svg += T(kX + 990, kY + 78, 26, 700, 'middle', 'LOCATION HIT');
+  const critCols = [120, 480, 890, 1300, 1720].map(o => kX + o);
+  ['2D6 Roll', 'FRONT', 'SIDE', 'REAR', 'TURRET'].forEach((hh, k) => svg += T(critCols[k], kY + 120, 25, 700, 'middle', hh));
+  const CRIT_ROWS = [
+    ['2–5', 'No Critical Hit', 'No Critical Hit', 'No Critical Hit', 'No Critical Hit'],
+    ['6', 'Driver Hit', 'Cargo/Infantry Hit', 'Weapon Malfunction', 'Stabilizer'],
+    ['7', 'Weapon Malfunction', 'Weapon Malfunction', 'Cargo/Infantry Hit', 'Turret Jam'],
+    ['8', 'Stabilizer', 'Crew Stunned', 'Stabilizer', 'Weapon Malfunction'],
+    ['9', 'Sensors', 'Stabilizer', 'Weapon Destroyed', 'Turret Locks'],
+    ['10', 'Commander Hit', 'Weapon Destroyed', 'Engine Hit', 'Weapon Destroyed'],
+    ['11', 'Weapon Destroyed', 'Engine Hit', 'Ammunition**', 'Ammunition**'],
+    ['12', 'Crew Killed', 'Fuel Tank*', 'Fuel Tank*', 'Turret Blown Off'],
+  ];
+  CRIT_ROWS.forEach((r, k) => r.forEach((cell, j) =>
+    svg += T(critCols[j], kY + 160 + 36 * k, 24, j ? 100 : 500, 'middle', cell)));
+  svg += T(kX + 120, kY + 490, 19, 100, 'start', '*If Combat Vehicle has ICE engine only. If Combat Vehicle has a fusion engine, treat this result as Engine Hit.');
+  svg += T(kX + 120, kY + 516, 19, 100, 'start', '**If Combat Vehicle carries no ammunition, treat this result as Weapon Destroyed.');
+  return svg;
+}
+
+// ═══ GROUND VEHICLE SHEET (Tracked / Wheeled / Hover / WiGE) ════════════════
+// v = record from sheets/vehicle-data.json; opts = { pilot, image } optional.
+function rsVehicleSheetSVG(v, opts) {
+  const T = rsT;
+  const W = 2000, H = 2600;
+  let svg = '';
+  svg += T(W / 2, 60, 60, 700, 'middle', (v.motion || 'Tracked').toUpperCase() + ' VEHICLE RECORD SHEET');
+  svg += vDataBox(v) + vCrewBox(v, opts?.pilot);
+
+  // ── CRITICAL DAMAGE ──
+  const cX = 725, cY = 390;
+  svg += rsGroupBox(cX, cY, 520, 330, 'Critical Damage');
+  svg += T(cX + 15, cY + 85, 26, 500, 'start', 'Turret Locked') + vChk(cX + 190, cY + 63);
+  svg += T(cX + 270, cY + 85, 26, 500, 'start', 'Engine Hit') + vChk(cX + 415, cY + 63);
+  svg += T(cX + 15, cY + 140, 26, 500, 'start', 'Sensor Hits');
+  ['+1', '+2', '+3', 'D'].forEach((t, k) => svg += vPipBox(cX + 190 + k * 40, cY + 118, t));
+  svg += T(cX + 15, cY + 195, 26, 500, 'start', 'Motive System Hits');
+  ['+1', '+2', '+3'].forEach((t, k) => svg += vPipBox(cX + 270 + k * 40, cY + 173, t));
+  svg += T(cX + 130, cY + 250, 26, 700, 'start', 'Stabilizers');
+  svg += T(cX + 15, cY + 290, 26, 500, 'start', 'Front') + vChk(cX + 90, cY + 268);
+  svg += T(cX + 160, cY + 290, 26, 500, 'start', 'Left') + vChk(cX + 225, cY + 268);
+  svg += T(cX + 295, cY + 290, 26, 500, 'start', 'Right') + vChk(cX + 370, cY + 268);
+  svg += T(cX + 15, cY + 325, 26, 500, 'start', 'Rear') + vChk(cX + 90, cY + 303);
+  if (v.armor.turret != null) svg += T(cX + 160, cY + 325, 26, 500, 'start', 'Turret') + vChk(cX + 250, cY + 303);
+
+  svg += vImageBox(opts?.image, cY + 330, 1150);
+
+  // ── ARMOR DIAGRAM — official-style hull with gray skirts + turret plinth ──
+  const aX = 1260, aY = 110, a = v.armor;
+  const totalAF = (a.front || 0) + (a.left || 0) + (a.right || 0) + (a.rear || 0) + (a.turret || 0);
+  svg += T(aX + 365, aY + 30, 24, 500, 'middle', 'Armor Factor - ' + totalAF);
+  svg += `<rect rx="18" ry="18" x="${aX + 165}" y="${aY + 45}" width="400" height="44" fill="#000"/>`
+    + T(aX + 365, aY + 78, 30, 700, 'middle', 'ARMOR DIAGRAM', '#fff');
+  svg += T(aX + 365, aY + 122, 26, 500, 'middle', v.armorType || 'Standard');
+
+  const cx = aX + 365, top = aY + 210;
+  const hover = /hover|wige/i.test(v.motion || '');
+  const hw = hover ? 205 : 175;         // half-width — hover hulls read wider
+  const hh = 730;                        // hull height
+  const ch = hover ? 90 : 60;            // corner chamfer
+
+  svg += T(cx, top - 35, 27, 700, 'middle', `Front Armor ( ${a.front} )`);
+
+  // hull outline (chamfered)
+  svg += `<path d="M ${cx - hw} ${top + ch} L ${cx - hw + ch} ${top} L ${cx + hw - ch} ${top} L ${cx + hw} ${top + ch}
+      L ${cx + hw} ${top + hh - ch} L ${cx + hw - ch} ${top + hh} L ${cx - hw + ch} ${top + hh} L ${cx - hw} ${top + hh - ch} Z"
+      fill="none" stroke="#000" stroke-width="6"/>`;
+  // glacis lines: hull front corners converging toward the turret plinth
+  svg += `<line x1="${cx - hw + ch}" y1="${top + 4}" x2="${cx - 95}" y2="${top + 250}" stroke="#000" stroke-width="4"/>`;
+  svg += `<line x1="${cx + hw - ch}" y1="${top + 4}" x2="${cx + 95}" y2="${top + 250}" stroke="#000" stroke-width="4"/>`;
+  // rear lines converging from bottom corners up toward the hull middle
+  svg += `<line x1="${cx - hw + ch}" y1="${top + hh - 4}" x2="${cx - 80}" y2="${top + hh - 210}" stroke="#000" stroke-width="4"/>`;
+  svg += `<line x1="${cx + hw - ch}" y1="${top + hh - 4}" x2="${cx + 80}" y2="${top + hh - 210}" stroke="#000" stroke-width="4"/>`;
+
+  // front pips: wedge widening downward inside the glacis
+  svg += vWedge(a.front, cx, top + 45, [3, 4, 5, 6, 7, 8]);
+
+  // gray side skirts with 2-col pip strips
+  const skirtY = top + 195, skirtH = hh - 400;
+  [[-1, 'Left Side Armor', a.left], [1, 'Right Side Armor', a.right]].forEach(([s, label, val]) => {
+    const sx = cx + s * (hw - 60);
+    svg += `<rect rx="10" ry="10" x="${sx - 34}" y="${skirtY}" width="68" height="${skirtH}" fill="${V_GRAY}" stroke="#000" stroke-width="3"/>`;
+    const rows = Math.ceil(val / 2);
+    const sp = Math.min(28, Math.floor((skirtH - 30) / Math.max(rows, 1)));
+    svg += vPips(val, sx, skirtY + 28, 2, sp);
+    const lx = cx + s * (hw + 40);
+    svg += `<text x="${lx}" y="${top + hh / 2}" font-family="sans-serif" font-size="27" font-weight="700"
+        text-anchor="middle" transform="rotate(${s * 90} ${lx} ${top + hh / 2})">${label} ( ${val} )</text>`;
+  });
+
+  // turret plinth (gray trapezoid) + turret with barrel + pips
+  if (a.turret != null) {
+    svg += `<path d="M ${cx - 105} ${top + 255} L ${cx + 105} ${top + 255} L ${cx + 82} ${top + 505} L ${cx - 82} ${top + 505} Z"
+        fill="${V_GRAY}" stroke="#000" stroke-width="4"/>`;
+    svg += T(cx, top + 222, 27, 700, 'middle', `Turret Armor ( ${a.turret} )`);
+    svg += `<rect x="${cx - 8}" y="${top + 262}" width="16" height="44" fill="#fff" stroke="#000" stroke-width="4"/>`;
+    const tRows = Math.max(1, Math.ceil((a.turret || 0) / 5));
+    const tBoxH = tRows * 26 + 30;
+    svg += `<rect rx="12" ry="12" x="${cx - 78}" y="${top + 306}" width="156" height="${tBoxH}" fill="#fff" stroke="#000" stroke-width="4"/>`;
+    svg += vPips(a.turret, cx, top + 332, 5, 26);
+  }
+
+  // rear pips: wedge narrowing toward the tail (drawn bottom-up so the
+  // narrowest row sits nearest the tail)
+  const rearRows = [8, 7, 6, 5, 4, 3];
+  let rem = a.rear, rowsUsed = [];
+  for (const r of rearRows) { if (rem <= 0) break; rowsUsed.push(Math.min(r, rem)); rem -= r; }
+  let ry = top + hh - 60 - (rowsUsed.length - 1) * 28;
+  rowsUsed.reverse().forEach(inRow => {
+    for (let c = 0; c < inRow; c++) {
+      const x = cx - ((inRow - 1) * 28) / 2 + c * 28;
+      svg += `<circle cx="${x}" cy="${ry}" r="11" fill="#fff" stroke="#000" stroke-width="3"/>`;
+    }
+    ry += 28;
+  });
+  svg += T(cx, top + hh + 45, 27, 700, 'middle', `Rear Armor ( ${a.rear} )`);
+
+  svg += vGroundTables(v);
+  svg += vFooter(W, H);
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#fff">${svg}</svg>`;
+}
+
+// ═══ VTOL SHEET ═════════════════════════════════════════════════════════════
+function rsVTOLSheetSVG(v, opts) {
+  const T = rsT;
+  const W = 2000, H = 2600;
+  let svg = '';
+  svg += T(W / 2, 60, 60, 700, 'middle', 'VTOL VEHICLE RECORD SHEET');
+  svg += vDataBox(v) + vCrewBox(v, opts?.pilot);
+
+  // ── CRITICAL DAMAGE (VTOL variant) ──
+  const cX = 725, cY = 390;
+  svg += rsGroupBox(cX, cY, 520, 290, 'Critical Damage');
+  svg += T(cX + 15, cY + 85, 26, 500, 'start', 'Flight Stabilizer*') + vPipBox(cX + 225, cY + 63, '+3');
+  svg += T(cX + 290, cY + 85, 26, 500, 'start', 'Engine Hit') + vChk(cX + 430, cY + 63);
+  svg += T(cX + 15, cY + 140, 26, 500, 'start', 'Sensor Hits');
+  ['+1', '+2', '+3', 'D'].forEach((t, k) => svg += vPipBox(cX + 225 + k * 40, cY + 118, t));
+  svg += T(cX + 15, cY + 195, 26, 700, 'start', 'Stabilizers');
+  svg += T(cX + 15, cY + 235, 26, 500, 'start', 'Front') + vChk(cX + 90, cY + 213);
+  svg += T(cX + 150, cY + 235, 26, 500, 'start', 'Left') + vChk(cX + 210, cY + 213);
+  svg += T(cX + 270, cY + 235, 26, 500, 'start', 'Right') + vChk(cX + 345, cY + 213);
+  svg += T(cX + 400, cY + 235, 26, 500, 'start', 'Rear') + vChk(cX + 465, cY + 213);
+  svg += T(cX + 15, cY + 272, 19, 100, 'start', '*Move at Cruising speed only');
+
+  svg += vImageBox(opts?.image, cY + 290, 1150);
+
+  // ── ARMOR DIAGRAM — helicopter top-down ──
+  const aX = 1260, aY = 110, a = v.armor;
+  const totalAF = (a.front || 0) + (a.left || 0) + (a.right || 0) + (a.rear || 0) + (a.rotor || 0);
+  svg += T(aX + 365, aY + 30, 24, 500, 'middle', 'Armor Factor - ' + totalAF);
+  svg += `<rect rx="18" ry="18" x="${aX + 165}" y="${aY + 45}" width="400" height="44" fill="#000"/>`
+    + T(aX + 365, aY + 78, 30, 700, 'middle', 'ARMOR DIAGRAM', '#fff');
+  svg += T(aX + 365, aY + 122, 26, 500, 'middle', v.armorType || 'Standard');
+
+  const cx = aX + 365, top = aY + 205;
+  svg += T(cx, top - 30, 27, 700, 'middle', `Front Armor ( ${a.front} )`);
+  // nose bubble
+  svg += `<ellipse cx="${cx}" cy="${top + 90}" rx="105" ry="100" fill="none" stroke="#000" stroke-width="6"/>`;
+  svg += vWedge(a.front, cx, top + 40, [3, 4, 5, 4, 3], 27);
+  // fuselage (gray strip) below nose
+  svg += `<rect x="${cx - 34}" y="${top + 185}" width="68" height="240" fill="${V_GRAY}" stroke="#000" stroke-width="4"/>`;
+  // rotor beam across, with hub
+  const beamY = top + 235;
+  svg += `<rect x="${cx - 300}" y="${beamY - 15}" width="600" height="30" fill="#fff" stroke="#000" stroke-width="5"/>`;
+  svg += `<rect x="${cx - 20}" y="${beamY - 22}" width="40" height="44" fill="${V_GRAY}" stroke="#000" stroke-width="4"/>`;
+  // rotor pips alternating outward along the beam
+  const rp = a.rotor || 0;
+  for (let i = 0; i < rp; i++) {
+    const side = i % 2 === 0 ? -1 : 1;
+    const x = cx + side * (60 + Math.floor(i / 2) * 70);
+    svg += `<circle cx="${x}" cy="${beamY}" r="11" fill="#fff" stroke="#000" stroke-width="3"/>`;
+  }
+  svg += T(cx, beamY + 38, 22, 700, 'middle', `Rotor Armor ( ${a.rotor} )`);
+  // side pips flanking the fuselage
+  [[-1, 'Left Side Armor', a.left], [1, 'Right Side Armor', a.right]].forEach(([s, label, val]) => {
+    svg += vPips(val, cx + s * 80, top + 285, 2, 28);
+    const lx = cx + s * 210;
+    svg += `<text x="${lx}" y="${top + 420}" font-family="sans-serif" font-size="27" font-weight="700"
+        text-anchor="middle" transform="rotate(${s * 90} ${lx} ${top + 420})">${label} ( ${val} )</text>`;
+  });
+  // tail boom + rear pips (single column)
+  const boomH = Math.max(180, a.rear * 30 + 40);
+  svg += `<rect x="${cx - 17}" y="${top + 425}" width="34" height="${boomH}" fill="${V_GRAY}" stroke="#000" stroke-width="4"/>`;
+  svg += vPips(a.rear, cx, top + 455, 1, 30);
+  svg += T(cx, top + 425 + boomH + 45, 27, 700, 'middle', `Rear Armor ( ${a.rear} )`);
+
+  // ── ELEVATION TRACK ──
+  const eX = 10, eY = 1160;
+  svg += rsGroupBox(eX, eY, 1980, 150, 'Elevation Track');
+  for (let i = 0; i < 30; i++) {
+    const bx = eX + 40 + i * 64;
+    svg += `<rect x="${bx}" y="${eY + 60}" width="50" height="50" fill="#fff" stroke="#000" stroke-width="3"/>`;
+    svg += T(bx + 25, eY + 50, 18, 500, 'middle', 'Turn ' + (i + 1));
+  }
+
+  // ── VTOL HIT LOCATION TABLE ──
+  const hX = 10, hY = 1340;
+  svg += rsGroupBox(hX, hY, 985, 620, 'VTOL Combat Hit Location Table');
+  svg += T(hX + 492, hY + 78, 26, 700, 'middle', 'ATTACK DIRECTION');
+  const hitCols = [70, 330, 610, 860].map(o => hX + o);
+  ['2D6 Roll', 'FRONT', 'REAR', 'SIDE'].forEach((hh, k) => svg += T(hitCols[k], hY + 118, 25, 700, 'middle', hh));
+  const HIT_ROWS = [
+    ['2*', 'Front (critical)', 'Rear (critical)', 'Side (critical)'],
+    ['3', 'Rotors†', 'Rotors†', 'Rotors†'],
+    ['4', 'Rotors†', 'Rotors†', 'Rotors†'],
+    ['5', 'Right Side', 'Left Side', 'Front'],
+    ['6', 'Front', 'Rear', 'Side'],
+    ['7', 'Front', 'Rear', 'Side'],
+    ['8', 'Front', 'Rear', 'Side (critical)*'],
+    ['9', 'Left Side', 'Right Side', 'Rear'],
+    ['10', 'Rotors†', 'Rotors†', 'Rotors†'],
+    ['11', 'Rotors†', 'Rotors†', 'Rotors†'],
+    ['12*', 'Rotors (critical)', 'Rotors (critical)', 'Rotors (critical)'],
+  ];
+  HIT_ROWS.forEach((r, k) => r.forEach((cell, j) =>
+    svg += T(hitCols[j], hY + 155 + 30 * k, 23, j ? 100 : 500, 'middle', cell)));
+  [
+    '*A result of 2 or 12 (or an 8 if the attack strikes the side) may inflict a critical hit. Apply damage normally to the armor',
+    'in that section; the attacking player then rolls once on the VTOL Critical Hits Table below.',
+    '†Each rotor hit reduces the VTOL’s Cruising MP by 1 (recalculate Flanking MP); rotor armor takes 1 point of damage',
+    'per hit regardless of the attack’s Damage Value, with any critical rotor result applied on the Critical Hits Table.',
+  ].forEach((ln, k) => svg += T(hX + 30, hY + 500 + 24 * k, 18, 100, 'start', ln));
+
+  // ── VTOL CRITICAL HITS TABLE ──
+  const kX = 1005, kY = 1340;
+  svg += rsGroupBox(kX, kY, 985, 620, 'VTOL Critical Hits Table');
+  svg += T(kX + 492, kY + 78, 26, 700, 'middle', 'LOCATION HIT');
+  const critCols = [70, 265, 470, 675, 880].map(o => kX + o);
+  ['2D6 Roll', 'FRONT', 'SIDE', 'REAR', 'ROTORS'].forEach((hh, k) => svg += T(critCols[k], kY + 118, 22, 700, 'middle', hh));
+  const CRIT_ROWS = [
+    ['2–5', 'No Critical Hit', 'No Critical Hit', 'No Critical Hit', 'No Critical Hit'],
+    ['6', 'Co-Pilot Hit', 'Weapon Malfunction', 'Cargo/Infantry Hit', 'Rotor Damage'],
+    ['7', 'Weapon Malfunction', 'Cargo/Infantry Hit', 'Weapon Malfunction', 'Rotor Damage'],
+    ['8', 'Sensors', 'Stabilizer', 'Stabilizer', 'Rotor Damage'],
+    ['9', 'Pilot Hit', 'Weapon Destroyed', 'Weapon Destroyed', 'Flight Stabilizer Hit'],
+    ['10', 'Weapon Destroyed', 'Engine Hit', 'Sensors', 'Flight Stabilizer Hit'],
+    ['11', 'Crew Killed', 'Ammunition**', 'Engine Hit', 'Rotors Destroyed'],
+    ['12', 'Fuel Tank*', 'Fuel Tank*', 'Fuel Tank*', 'Rotors Destroyed'],
+  ];
+  CRIT_ROWS.forEach((r, k) => r.forEach((cell, j) =>
+    svg += `<text x="${critCols[j]}" y="${kY + 160 + 36 * k}" font-family="sans-serif" font-size="20" font-weight="${j ? 100 : 500}" text-anchor="middle">${cell}</text>`));
+  svg += T(kX + 40, kY + 480, 19, 100, 'start', '*If VTOL has ICE engine only; with a fusion engine, treat as Engine Hit.');
+  svg += T(kX + 40, kY + 506, 19, 100, 'start', '**If VTOL carries no ammunition, treat this result as Weapon Destroyed.');
+
+  svg += vFooter(W, H);
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#fff">${svg}</svg>`;
+}
+
 // ── Shared sheets-popup builder ─────────────────────────────────────────────
 // config: { lances, lanceTypes, cmdState, unitBonuses, fDef, totalPV,
 //           isClan, getLancePV(li), getSkillText(li) }
@@ -5051,6 +5533,19 @@ async function lbOpenSheetsCore(cfg) {
       mechData = j.mechs || {};
       mechAliases = j.aliases || {};
       mechByMul = j.byMul || {};
+    }
+  } catch (_) {}
+
+  // Combat Vehicle counterpart (build_vehicle_sheet_data.py, MegaMek .blk
+  // data). Same deal — optional, PDF/mordel fallback if unavailable.
+  let vehData = {}, vehByMul = {}, vehByName = {};
+  try {
+    const res = await fetch(sheetsBase + 'vehicle-data.json');
+    if (res.ok) {
+      const j = await res.json();
+      vehData = j.vehicles || {};
+      vehByMul = j.byMul || {};
+      vehByName = j.byName || {};
     }
   } catch (_) {}
 
@@ -5087,6 +5582,15 @@ async function lbOpenSheetsCore(cfg) {
     return /biped/i.test(rec.motive || 'Biped') ? rec : null;
   }
 
+  // Same idea for Combat Vehicles: exact MUL id first (distinguishes
+  // variants like "(Ultra)" whose parenthetical sbNorm strips), then the
+  // normalized-name fallback (resolves to the base variant).
+  function sheetVehicleData(u) {
+    if ((u.Type?.Name || '') !== 'Combat Vehicle') return null;
+    let key = vehByMul[String(u.Id || '')] || vehByName[sbNorm(u.Name)];
+    return key ? vehData[key] || null : null;
+  }
+
   let lanceSections = '';
   let embeddedCount = 0;
   const pdfUrls   = [];
@@ -5120,13 +5624,20 @@ async function lbOpenSheetsCore(cfg) {
       </div>`;
 
       const mechRec = sheetMechData(u);
-      if (mechRec) {
+      const vehRec = mechRec ? null : sheetVehicleData(u);
+      if (mechRec || vehRec) {
         // Self-drawn SVG record sheet (no PDF dependency, no calibration hack).
         embeddedCount++;
+        const drawn = (() => {
+          const g = getUnitSkill(li, si);
+          if (mechRec) return rsSheetSVG(mechRec, { gunnery: g, piloting: g + 1 });
+          const opts = { pilot: { gunnery: g, driving: g + 1 }, image: sbImgUrl(u) };
+          return vehRec.motion === 'VTOL' ? rsVTOLSheetSVG(vehRec, opts) : rsVehicleSheetSVG(vehRec, opts);
+        })();
         lanceSections += `<div class="sheet-block sheet-drawn">
           ${metaBar}
           <div class="drawn-note">✍️ Self-drawn record sheet (from MegaMek data)${file ? ' · scanned PDF also available below' : ''}</div>
-          <div class="drawn-sheet">${(() => { const g = getUnitSkill(li, si); return rsSheetSVG(mechRec, { gunnery: g, piloting: g + 1 }); })()}</div>
+          <div class="drawn-sheet">${drawn}</div>
           <div class="sheet-actions">
             <button class="btn-print-one" onclick="printDrawnSheet(this)">🖨 Print / Save PDF (this sheet)</button>
             ${file ? `
