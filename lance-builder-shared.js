@@ -5396,32 +5396,49 @@ function rsVehicleSheetSVG(v, opts) {
   const baseHw = hover ? 205 : 175;      // half-width floor — hover hulls read wider
   const baseCh = hover ? 90 : 60;        // corner chamfer floor
 
-  // Widen the hull for heavily-armored vehicles so front/rear wedges and the
-  // turret pip grid always have room — a fixed hull width silently dropped
-  // rear pips past ~33 armor and crushed the turret box into the label above
-  // it once armor got into the 50s/60s (superheavy-ish tonnage).
-  const TARGET_ROWS = 7; // aim for ~7 wedge rows before growing wider
-  const frontPerRow = Math.max(6, Math.ceil((a.front || 0) / TARGET_ROWS));
-  const rearPerRow = Math.max(6, Math.ceil((a.rear || 0) / TARGET_ROWS));
-  const maxPerRow = Math.min(16, Math.max(frontPerRow, rearPerRow));
-  const hw = Math.max(baseHw, Math.ceil((maxPerRow * 28) / 2) + 40);
-  const ch = Math.min(baseCh * (hw / baseHw), hw * 0.35);
-  const widened = hw - baseHw; // extra half-width to fold into skirt spacing too
-
-  // Turret pip grid also gets wider (not just taller) as armor grows, using
-  // the same extra width so a big turret value doesn't tower over the hull.
+  // Turret pip grid width is needed before the hull half-width can be picked
+  // (see hw below — the side skirts must clear the plinth horizontally).
   const turretCols = a.turret != null ? Math.min(10, Math.max(5, Math.ceil(Math.sqrt((a.turret || 1) * 1.8)))) : 5;
   const tRows = a.turret != null ? Math.max(1, Math.ceil((a.turret || 0) / turretCols)) : 0;
   const tBoxW = Math.max(156, turretCols * 26 + 30);
   const tBoxH = tRows * 26 + 30;
   const plinthTopHalf = Math.max(105, tBoxW / 2 + 25);
   const plinthBottomHalf = Math.max(82, tBoxW / 2 + 10);
-  const plinthBottomY = top + 255 + Math.max(250, tBoxH + 80);
+
+  // Widen the hull for heavily-armored vehicles so front/rear wedges and the
+  // turret pip grid always have room — a fixed hull width silently dropped
+  // rear pips past ~33 armor, crushed the turret box into the label above
+  // it once armor got into the 50s/60s, and (independently) let the side
+  // skirts run horizontally into a wide turret plinth once its pip grid
+  // needed more than ~5 columns.
+  const TARGET_ROWS = 7; // aim for ~7 wedge rows before growing wider
+  const frontPerRow = Math.max(6, Math.ceil((a.front || 0) / TARGET_ROWS));
+  const rearPerRow = Math.max(6, Math.ceil((a.rear || 0) / TARGET_ROWS));
+  const maxPerRow = Math.min(16, Math.max(frontPerRow, rearPerRow));
+  const wedgeHw = Math.ceil((maxPerRow * 28) / 2) + 40;
+  const turretHw = plinthTopHalf + 114; // keep the 68-wide skirts clear of the plinth
+  const hw = Math.max(baseHw, wedgeHw, turretHw);
+  const ch = Math.min(baseCh * (hw / baseHw), hw * 0.35);
+  const widened = hw - baseHw; // extra half-width to fold into skirt spacing too
+
+  // Front wedge row count is needed before the turret plinth can be placed
+  // (a tall wedge must push the plinth down, or the label between them has
+  // nowhere to go — see turretTop below).
+  const frontRows = vGrowRows(a.front || 0, maxPerRow);
+  const frontBottomOffset = 45 + (frontRows.length - 1) * 28;
+  // The plinth's top (offset from `top`) floats down below the front wedge's
+  // actual bottom row so the "Turret Armor (N)" label always has a clearly
+  // visible (not just non-zero) gap on both sides, however tall the wedge
+  // grows — a 45-unit gap technically doesn't overlap but reads as touching
+  // at this canvas's render scale, hence the larger margins here.
+  const turretTop = Math.max(290, frontBottomOffset + 115);
+  const turretLabelOffset = turretTop - 60;
+  const plinthBottomOffset = turretTop + Math.max(250, tBoxH + 80);
 
   // Hull height grows too if the (now possibly taller) turret plinth or the
   // rear wedge's row count needs more room than the default hull provides.
   const rearRowCount = Math.ceil((a.rear || 0) / maxPerRow) || 1;
-  const hh = Math.max(730, (plinthBottomY - top) + rearRowCount * 28 + 160);
+  const hh = Math.max(730, plinthBottomOffset + rearRowCount * 28 + 160);
 
   svg += T(cx, top - 35, 27, 700, 'middle', `Front Armor ( ${a.front} )`);
 
@@ -5430,15 +5447,15 @@ function rsVehicleSheetSVG(v, opts) {
       L ${cx + hw} ${top + hh - ch} L ${cx + hw - ch} ${top + hh} L ${cx - hw + ch} ${top + hh} L ${cx - hw} ${top + hh - ch} Z"
       fill="none" stroke="#000" stroke-width="6"/>`;
   // glacis lines: hull front corners converging toward the turret plinth
-  svg += `<line x1="${cx - hw + ch}" y1="${top + 4}" x2="${cx - plinthTopHalf + 10}" y2="${top + 250}" stroke="#000" stroke-width="4"/>`;
-  svg += `<line x1="${cx + hw - ch}" y1="${top + 4}" x2="${cx + plinthTopHalf - 10}" y2="${top + 250}" stroke="#000" stroke-width="4"/>`;
+  svg += `<line x1="${cx - hw + ch}" y1="${top + 4}" x2="${cx - plinthTopHalf + 10}" y2="${top + turretTop - 5}" stroke="#000" stroke-width="4"/>`;
+  svg += `<line x1="${cx + hw - ch}" y1="${top + 4}" x2="${cx + plinthTopHalf - 10}" y2="${top + turretTop - 5}" stroke="#000" stroke-width="4"/>`;
   // rear lines converging from bottom corners up toward the hull middle
   svg += `<line x1="${cx - hw + ch}" y1="${top + hh - 4}" x2="${cx - 80}" y2="${top + hh - 210}" stroke="#000" stroke-width="4"/>`;
   svg += `<line x1="${cx + hw - ch}" y1="${top + hh - 4}" x2="${cx + 80}" y2="${top + hh - 210}" stroke="#000" stroke-width="4"/>`;
 
   // front pips: ascending wedge widening downward inside the glacis, sized
   // to the (possibly widened) hull so it never overflows the outline
-  svg += vWedge(a.front, cx, top + 45, vGrowRows(a.front || 0, maxPerRow));
+  svg += vWedge(a.front, cx, top + 45, frontRows);
 
   // gray side skirts with 2-col pip strips
   const skirtY = top + 195, skirtH = hh - 400;
@@ -5456,12 +5473,13 @@ function rsVehicleSheetSVG(v, opts) {
   // turret plinth (gray trapezoid) + turret with barrel + pips — sized to
   // fully contain the pip grid regardless of how large the turret value is
   if (a.turret != null) {
-    svg += `<path d="M ${cx - plinthTopHalf} ${top + 255} L ${cx + plinthTopHalf} ${top + 255} L ${cx + plinthBottomHalf} ${plinthBottomY} L ${cx - plinthBottomHalf} ${plinthBottomY} Z"
+    const plinthBottomY = top + plinthBottomOffset;
+    svg += `<path d="M ${cx - plinthTopHalf} ${top + turretTop} L ${cx + plinthTopHalf} ${top + turretTop} L ${cx + plinthBottomHalf} ${plinthBottomY} L ${cx - plinthBottomHalf} ${plinthBottomY} Z"
         fill="${V_GRAY}" stroke="#000" stroke-width="4"/>`;
-    svg += T(cx, top + 210, 27, 700, 'middle', `Turret Armor ( ${a.turret} )`);
-    svg += `<rect x="${cx - 8}" y="${top + 262}" width="16" height="44" fill="#fff" stroke="#000" stroke-width="4"/>`;
-    svg += `<rect rx="12" ry="12" x="${cx - tBoxW / 2}" y="${top + 306}" width="${tBoxW}" height="${tBoxH}" fill="#fff" stroke="#000" stroke-width="4"/>`;
-    svg += vPips(a.turret, cx, top + 332, turretCols, 26);
+    svg += T(cx, top + turretLabelOffset, 27, 700, 'middle', `Turret Armor ( ${a.turret} )`);
+    svg += `<rect x="${cx - 8}" y="${top + turretTop + 7}" width="16" height="44" fill="#fff" stroke="#000" stroke-width="4"/>`;
+    svg += `<rect rx="12" ry="12" x="${cx - tBoxW / 2}" y="${top + turretTop + 51}" width="${tBoxW}" height="${tBoxH}" fill="#fff" stroke="#000" stroke-width="4"/>`;
+    svg += vPips(a.turret, cx, top + turretTop + 77, turretCols, 26);
   }
 
   // rear pips: ascending wedge narrowing toward the tail (drawn bottom-up so
