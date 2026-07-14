@@ -8,3 +8,4 @@ sheets/pdfs/
 sheets/_failed.txt
 _screens/
 _inline-check.js
+__pycache__/
