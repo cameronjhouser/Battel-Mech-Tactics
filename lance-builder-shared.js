@@ -5270,10 +5270,10 @@ function vFooter(W, H) {
 }
 
 // ── Ground rules tables (hit location / motive damage / crit hits) ──────────
-function vGroundTables(v) {
+function vGroundTables(v, tablesY) {
   const T = rsT;
   let svg = '';
-  const hX = 10, hY = 1160;
+  const hX = 10, hY = tablesY;
   svg += rsGroupBox(hX, hY, 985, 640, 'Ground Combat Vehicle Hit Location Table');
   svg += T(hX + 492, hY + 78, 26, 700, 'middle', 'ATTACK DIRECTION');
   const hitCols = [70, 330, 610, 860].map(o => hX + o);
@@ -5302,7 +5302,7 @@ function vGroundTables(v) {
     '§Side hits strike the side indicated by the attack direction. With no turret, a turret hit strikes the side attacked.',
   ].forEach((ln, k) => svg += T(hX + 30, hY + 500 + 24 * k, 18, 100, 'start', ln));
 
-  const mX = 1005, mY = 1160;
+  const mX = 1005, mY = tablesY;
   svg += rsGroupBox(mX, mY, 985, 640, 'Motive System Damage Table');
   svg += T(mX + 80, mY + 80, 25, 700, 'middle', '2D6 Roll');
   svg += T(mX + 190, mY + 80, 25, 700, 'start', 'EFFECT*');
@@ -5334,7 +5334,7 @@ function vGroundTables(v) {
     'over a Depth 1 water hex sinks and is destroyed.',
   ].forEach((ln, k) => svg += T(mX + 30, my + 185 + 24 * k, 18, 100, 'start', ln));
 
-  const kX = 10, kY = 1840;
+  const kX = 10, kY = tablesY + 680;
   svg += rsGroupBox(kX, kY, 1980, 600, 'Ground Combat Vehicle Critical Hits Table');
   svg += T(kX + 990, kY + 78, 26, 700, 'middle', 'LOCATION HIT');
   const critCols = [120, 480, 890, 1300, 1720].map(o => kX + o);
@@ -5360,7 +5360,7 @@ function vGroundTables(v) {
 // v = record from sheets/vehicle-data.json; opts = { pilot, image } optional.
 function rsVehicleSheetSVG(v, opts) {
   const T = rsT;
-  const W = 2000, H = 2600;
+  const W = 2000;
   let svg = '';
   svg += T(W / 2, 60, 60, 700, 'middle', (v.motion || 'Tracked').toUpperCase() + ' VEHICLE RECORD SHEET');
   svg += vDataBox(v) + vCrewBox(v, opts?.pilot);
@@ -5418,14 +5418,22 @@ function rsVehicleSheetSVG(v, opts) {
   const wedgeHw = Math.ceil((maxPerRow * 28) / 2) + 40;
   const turretHw = plinthTopHalf + 114; // keep the 68-wide skirts clear of the plinth
   const hw = Math.max(baseHw, wedgeHw, turretHw);
-  const ch = Math.min(baseCh * (hw / baseHw), hw * 0.35);
+  // The chamfer is cosmetic (a corner cut), not something that needs to grow
+  // proportionally with hw — scaling it linearly let it grow tall enough on
+  // very wide hulls that the front wedge's fixed start position landed
+  // inside the taper, poking pips out past the angled corner. Grown only
+  // mildly, and capped, so the taper zone stays predictably shallow.
+  const ch = Math.min(baseCh + (hw - baseHw) * 0.25, 110);
   const widened = hw - baseHw; // extra half-width to fold into skirt spacing too
 
   // Front wedge row count is needed before the turret plinth can be placed
   // (a tall wedge must push the plinth down, or the label between them has
-  // nowhere to go — see turretTop below).
+  // nowhere to go — see turretTop below). It starts just outside the
+  // chamfer's taper zone so its top rows can never poke past the hull's
+  // angled corners, however tall ch grows.
   const frontRows = vGrowRows(a.front || 0, maxPerRow);
-  const frontBottomOffset = 45 + (frontRows.length - 1) * 28;
+  const frontStartOffset = ch + 30;
+  const frontBottomOffset = frontStartOffset + (frontRows.length - 1) * 28;
   // The plinth's top (offset from `top`) floats down below the front wedge's
   // actual bottom row so the "Turret Armor (N)" label always has a clearly
   // visible (not just non-zero) gap on both sides, however tall the wedge
@@ -5436,9 +5444,9 @@ function rsVehicleSheetSVG(v, opts) {
   const plinthBottomOffset = turretTop + Math.max(250, tBoxH + 80);
 
   // Hull height grows too if the (now possibly taller) turret plinth or the
-  // rear wedge's row count needs more room than the default hull provides.
-  const rearRowCount = Math.ceil((a.rear || 0) / maxPerRow) || 1;
-  const hh = Math.max(730, plinthBottomOffset + rearRowCount * 28 + 160);
+  // rear wedge's actual row count needs more room than the default provides.
+  const rearRows = vGrowRows(a.rear || 0, maxPerRow);
+  const hh = Math.max(730, plinthBottomOffset + rearRows.length * 28 + 160);
 
   svg += T(cx, top - 35, 27, 700, 'middle', `Front Armor ( ${a.front} )`);
 
@@ -5455,7 +5463,7 @@ function rsVehicleSheetSVG(v, opts) {
 
   // front pips: ascending wedge widening downward inside the glacis, sized
   // to the (possibly widened) hull so it never overflows the outline
-  svg += vWedge(a.front, cx, top + 45, frontRows);
+  svg += vWedge(a.front, cx, top + frontStartOffset, frontRows);
 
   // gray side skirts with 2-col pip strips
   const skirtY = top + 195, skirtH = hh - 400;
@@ -5482,21 +5490,27 @@ function rsVehicleSheetSVG(v, opts) {
     svg += vPips(a.turret, cx, top + turretTop + 77, turretCols, 26);
   }
 
-  // rear pips: ascending wedge narrowing toward the tail (drawn bottom-up so
-  // the narrowest row sits nearest the tail); sized the same way as the
-  // front wedge so no armor value can silently go undrawn
-  const rowsUsed = vGrowRows(a.rear || 0, maxPerRow).reverse();
-  let ry = top + hh - 60 - (rowsUsed.length - 1) * 28;
-  rowsUsed.forEach(inRow => {
+  // rear pips: ascending wedge narrowing toward the tail — the narrowest row
+  // sits just outside the rear chamfer's taper zone (mirroring the front
+  // wedge's clearance) and widening rows grow away from it, toward the
+  // hull's middle, so nothing can poke past the angled rear corners either
+  let ry = top + hh - ch - 30;
+  rearRows.forEach(inRow => {
     for (let c = 0; c < inRow; c++) {
       const x = cx - ((inRow - 1) * 28) / 2 + c * 28;
       svg += `<circle cx="${x}" cy="${ry}" r="11" fill="#fff" stroke="#000" stroke-width="3"/>`;
     }
-    ry += 28;
+    ry -= 28;
   });
   svg += T(cx, top + hh + 45, 27, 700, 'middle', `Rear Armor ( ${a.rear} )`);
 
-  svg += vGroundTables(v);
+  // The rules tables (and overall canvas) normally sit at their default
+  // fixed position, but a heavily-armored vehicle's hull can grow tall
+  // enough to run into them — push both down by however much the diagram
+  // actually needed instead of letting the tables clip its bottom edge.
+  const tablesY = Math.max(1160, top + hh + 100);
+  const H = tablesY + 1440;
+  svg += vGroundTables(v, tablesY);
   svg += vFooter(W, H);
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#fff">${svg}</svg>`;
 }
