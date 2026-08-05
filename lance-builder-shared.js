@@ -1932,6 +1932,7 @@ function sbRefreshCollectionSelect(selectName) {
   if (selectName !== undefined) sbActiveCollectionName = selectName;
   const el = document.getElementById('sb-collection-select');
   const filterEl = document.getElementById('sb-filter-collection');
+  const quickEl = document.getElementById('sb-quickload-collection');
   const collections = sbStoredCollections();
   const names = Object.keys(collections).sort((a, b) => a.localeCompare(b));
   const want = names.includes(sbActiveCollectionName) ? sbActiveCollectionName : '';
@@ -1941,11 +1942,15 @@ function sbRefreshCollectionSelect(selectName) {
       : '<option value="">No saved lists</option>';
     if (names.length) el.value = want;
   }
-  if (filterEl) {
-    filterEl.innerHTML = '<option value="">None</option>'
+  // filterEl and quickEl are two pickers for the same "None" + real-lists
+  // shape — always carry "None" since, unlike the My Collection picker
+  // above, resting on no active list is a deliberate, valid choice here.
+  [filterEl, quickEl].forEach(sel => {
+    if (!sel) return;
+    sel.innerHTML = '<option value="">None</option>'
       + names.map(n => `<option value="${lbEsc(n)}">${lbEsc(n)} (${collections[n].unitCount || 0})</option>`).join('');
-    filterEl.value = want;
-  }
+    sel.value = want;
+  });
 }
 
 // Loads a saved list by name into sbCollection and marks it as the active
@@ -1974,17 +1979,28 @@ function sbLoadCollectionSelected() {
 // loads nor clears anything, so an in-progress unsaved collection (a
 // fresh CSV upload, manual adds, pack adds) is never destroyed just
 // because this picker happens to show its neutral resting state.
-function sbFilterCollectionChanged() {
-  const sel = document.getElementById('sb-filter-collection');
-  const name = sel?.value || '';
-  if (!name) return;
-  if (!sbLoadCollectionByName(name)) { sel.value = ''; return; }
+// Shared by every "load a saved collection list" picker on the Force
+// Builder tab (the prominent one above the Catalog, and the "Collection
+// list" filter tucked into the Filters row) — whichever one the user
+// changes drives the others via sbRefreshCollectionSelect.
+function sbCollectionListChanged(name) {
+  if (!name) return true;
+  if (!sbLoadCollectionByName(name)) return false;
   const status = document.getElementById('sb-status');
   if (status) status.textContent = `Owned units now marked from saved list "${name}" (${Object.keys(sbCollection).length} entries).`;
   sbRenderBrowse();
   sbRenderCollection();
   sbRenderPackPreview();
   sbRenderCys();
+  return true;
+}
+function sbFilterCollectionChanged() {
+  const sel = document.getElementById('sb-filter-collection');
+  if (!sbCollectionListChanged(sel?.value || '')) sel.value = '';
+}
+function sbQuickLoadCollection() {
+  const sel = document.getElementById('sb-quickload-collection');
+  if (!sbCollectionListChanged(sel?.value || '')) sel.value = '';
 }
 
 function sbDeleteCollectionSelected() {

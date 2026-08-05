@@ -190,6 +190,11 @@
 
     <!-- ── FORCE BUILDER VIEW ──────────────────────────── -->
     <div id="sb-view-force">
+    <div class="card" style="padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:2px solid #d4a800">
+      <div style="font-weight:700;font-size:12px;color:#d4a800;white-space:nowrap">📂 LOAD COLLECTION</div>
+      <select id="sb-quickload-collection" onchange="sbQuickLoadCollection()" style="flex:1 1 240px;min-width:180px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12px;padding:5px 8px"><option value="">None</option></select>
+      <span style="font-size:11px;color:var(--text2)">Marks which units you own, powering the "Owned only" filter and owned markers below.</span>
+    </div>
     <details class="sfb-collapse" open>
     <summary>Catalog</summary>
       <div class="card" style="padding:12px 14px;margin-bottom:0">
@@ -301,8 +306,8 @@
           <input type="number" id="sb-filter-intro-max" placeholder="max" min="1" max="9999" oninput="sbRenderBrowse()" style="width:56px">
         </div>
       </div>
-      <div class="sb-fgroup">
-        <label class="sb-fg-label">Collection list</label>
+      <div class="sb-fgroup" style="background:rgba(212,168,0,.12);border:1px solid #d4a800;border-radius:4px;padding:4px 8px">
+        <label class="sb-fg-label" style="color:#d4a800">📂 Collection list</label>
         <select id="sb-filter-collection" onchange="sbFilterCollectionChanged()" title="Load a saved list to mark owned units, without switching to My Collection"><option value="">None</option></select>
       </div>
       <div class="sb-fgroup">
