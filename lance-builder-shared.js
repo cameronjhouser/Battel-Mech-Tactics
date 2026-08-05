@@ -457,7 +457,7 @@ function lbSwitchMode(mode) {
   document.getElementById('lb-mode-skirmish').style.display = mode === 'skirmish' ? '' : 'none';
   document.getElementById('lb-tab-owned').classList.toggle('on', mode === 'owned');
   document.getElementById('lb-tab-skirmish').classList.toggle('on', mode === 'skirmish');
-  if (mode === 'skirmish') { sbInit(); sbRefreshSavedSelect(); sbRefreshCollectionSelect(); }
+  if (mode === 'skirmish') { sbInit(); sbRefreshSavedSelect(); sbRefreshCollectionSelect(); sbMaybeShowFirstTimeHint(); }
 }
 
 /* ── SKIRMISH FORCE BUILDER ─────────────────────────── */
@@ -602,6 +602,7 @@ function sbCollectionChanged(msg, keepActiveName) {
   sbRenderPackPreview();
   sbRenderCys();
   sbBackfillMissingTypes(); // async — passively fills in type/image for CSV/saved-list records
+  sbMaybeShowFirstTimeHint();
 }
 
 async function sbManualSearch() {
@@ -1916,6 +1917,7 @@ function sbSaveCollectionPrompt() {
   sbSetStoredCollections(collections);
   localStorage.setItem('bmtSavedCollections.lastName', key);
   sbRefreshCollectionSelect(key);
+  sbMaybeShowFirstTimeHint();
   alert(`Saved "${key}" with ${n} unit names.`);
 }
 
@@ -2508,6 +2510,7 @@ function sbSaveForcePrompt() {
   sbSetStoredLances(lances);
   localStorage.setItem('bmtSavedLances.lastName', key);
   sbRefreshSavedSelect(key);
+  sbMaybeShowFirstTimeHint();
   alert(`Saved "${key}" with ${sbForce.length} units.`);
 }
 
@@ -2551,6 +2554,91 @@ function sbDeleteSelected() {
   delete lances[name];
   sbSetStoredLances(lances);
   sbRefreshSavedSelect();
+}
+
+// Saved Lances live only in this browser's localStorage — nothing about
+// them ever leaves the machine on its own. Export/Import move them through
+// an actual file, which is the only way to carry a lance to a new computer,
+// a different browser, or just keep a backup.
+function sbExportLances() {
+  const lances = sbStoredLances();
+  const names = Object.keys(lances);
+  if (!names.length) { alert('No saved lances to export.'); return; }
+  const blob = new Blob([JSON.stringify({ bmtSavedLances: lances }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `battlemech-saved-lances-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// Imports lances from a file produced by sbExportLances(), merging into
+// whatever's already saved here. Collisions are confirmed once (not per
+// lance) rather than nagging for every name that already exists.
+function sbImportLancesFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    let data;
+    try {
+      data = JSON.parse(e.target.result);
+    } catch (_) {
+      alert("That file isn't valid JSON.");
+      input.value = '';
+      return;
+    }
+    const incoming = (data && typeof data === 'object' && data.bmtSavedLances && typeof data.bmtSavedLances === 'object')
+      ? data.bmtSavedLances
+      : (data && typeof data === 'object' ? data : null); // tolerate a bare export too
+    const incomingNames = incoming ? Object.keys(incoming).filter(n => incoming[n]?.force) : [];
+    if (!incomingNames.length) {
+      alert('No saved lances found in that file.');
+      input.value = '';
+      return;
+    }
+    const lances = sbStoredLances();
+    const collisions = incomingNames.filter(n => lances[n]);
+    let overwrite = true;
+    if (collisions.length) {
+      overwrite = confirm(`${collisions.length} of ${incomingNames.length} lance(s) already exist here (e.g. "${collisions[0]}").\n\n`
+        + 'OK to overwrite them with the imported versions, Cancel to keep your existing ones and skip those.');
+    }
+    let imported = 0;
+    incomingNames.forEach(n => {
+      if (lances[n] && !overwrite) return;
+      lances[n] = incoming[n];
+      imported++;
+    });
+    sbSetStoredLances(lances);
+    sbRefreshSavedSelect();
+    sbMaybeShowFirstTimeHint();
+    alert(`Imported ${imported} of ${incomingNames.length} saved lance(s).`);
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// Shown once on a browser/profile with no saved lances AND no saved
+// collections — this data never leaves the browser it was created in, so a
+// new machine (or a wiped profile) always starts looking empty even for a
+// returning user. Points at the two things that need redoing.
+function sbMaybeShowFirstTimeHint() {
+  const el = document.getElementById('sb-firsttime-hint');
+  if (!el) return;
+  if (localStorage.getItem('bmtFirstTimeHint.dismissed')) { el.style.display = 'none'; return; }
+  const hasLances = Object.keys(sbStoredLances()).length > 0;
+  const hasCollections = Object.keys(sbStoredCollections()).length > 0;
+  const hasActiveCollection = Object.keys(sbCollection || {}).length > 0;
+  el.style.display = (hasLances || hasCollections || hasActiveCollection) ? 'none' : 'flex';
+}
+function sbDismissFirstTimeHint() {
+  localStorage.setItem('bmtFirstTimeHint.dismissed', '1');
+  const el = document.getElementById('sb-firsttime-hint');
+  if (el) el.style.display = 'none';
 }
 
 // Chunk sbForce into lance (4) / star (5) groups, same rule sbRenderForce

@@ -2404,6 +2404,16 @@
       <button class="lb-mode-btn" id="sb-subtab-collection" onclick="sbShowView('collection')">My Collection</button>
     </div>
 
+    <div id="sb-firsttime-hint" style="display:none;background:var(--bg3);border:1px solid #d4a800;border-radius:6px;padding:10px 14px;margin:10px 0 14px;font-size:12px;line-height:1.5;justify-content:space-between;align-items:center;gap:14px">
+      <div>
+        <strong>First time on this browser?</strong>
+        This page's data lives only in your browser, not your account — a new machine or browser starts empty.
+        📂 Load your owned units in the <a href="#" onclick="sbShowView('collection');return false" style="color:inherit;text-decoration:underline">My Collection</a> tab to enable the "Owned only" filter.
+        💾 <strong>Saved Lances</strong> can be moved between machines with the Export/Import buttons below the Saved Lances list.
+      </div>
+      <button class="lb-btn-sm" onclick="sbDismissFirstTimeHint()" style="flex-shrink:0">Got it</button>
+    </div>
+
     <!-- ── MY COLLECTION VIEW ──────────────────────────── -->
     <div id="sb-view-collection" style="display:none">
       <div class="grid-2">
@@ -2703,6 +2713,11 @@
             <select id="sb-saved-select" style="flex:1 1 auto;min-width:0;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:11px;padding:3px 4px"><option value="">No saved forces</option></select>
             <button class="lb-btn-sm" onclick="sbLoadSelected()" style="padding:2px 7px;flex-shrink:0" title="Load selected force">📂</button>
             <button class="lb-btn-sm" onclick="sbDeleteSelected()" style="padding:2px 7px;flex-shrink:0" title="Delete selected force">🗑️</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:5px">
+            <button class="lb-btn-sm" onclick="sbExportLances()" style="padding:2px 7px;flex:1 1 auto;font-size:10px" title="Download all saved lances as a file — the only way to back them up or move them to another machine/browser">⬇ Export All</button>
+            <button class="lb-btn-sm" onclick="document.getElementById('sb-import-lances-input').click()" style="padding:2px 7px;flex:1 1 auto;font-size:10px" title="Load saved lances from a file exported here previously">⬆ Import</button>
+            <input type="file" id="sb-import-lances-input" accept=".json,application/json" style="display:none" onchange="sbImportLancesFile(this)">
           </div>
         </div>
         <div class="sb-pv-meter">
